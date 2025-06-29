@@ -1,0 +1,6 @@
+---
+description: If you need to consult drizzle docs always consult this documentation from drizzle made for llm
+globs: 
+alwaysApply: false
+---
+If you need to consult drizzle docs always consult this documentation: https://orm.drizzle.team/llms.txt

@@ -9,13 +9,11 @@ import {
 	Settings,
 	Shield,
 	Upload,
-	User,
 	Users,
-	Zap,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
+import { useCallback, useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -31,23 +29,77 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import {
+	changeUserPassword,
+	getUserProfile,
+	updateUserEmail,
+	updateUserProfile,
+} from "@/lib/actions/user";
 import { signOut, useSession } from "@/lib/auth-client";
+
+interface UserProfile {
+	id: string;
+	email: string;
+	firstName?: string | null;
+	lastName?: string | null;
+	image?: string | null;
+	emailVerified: boolean;
+	createdAt: Date;
+	updatedAt: Date;
+}
 
 export default function Dashboard() {
 	const { data: session, isPending } = useSession();
 	const router = useRouter();
-	const [activeSection, setActiveSection] = useState("profile");
-	const [displayName, setDisplayName] = useState("Shadon Design");
-	const [username, setUsername] = useState("nicol43");
-	const [firstName, setFirstName] = useState("Stephanie");
-	const [lastName, setLastName] = useState("Nicol");
-	const [email, setEmail] = useState("stephanie_nicol@mail.com");
+	const [isPendingTransition, startTransition] = useTransition();
+	const [activeSection, setActiveSection] = useState("account");
+
+	// User profile state
+	const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+	const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+
+	// Form states
+	const [firstName, setFirstName] = useState("");
+	const [lastName, setLastName] = useState("");
+	const [email, setEmail] = useState("");
 	const [currentPassword, setCurrentPassword] = useState("");
 	const [newPassword, setNewPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [dataExportAccess, setDataExportAccess] = useState(false);
 	const [allowAdminAddMembers, setAllowAdminAddMembers] = useState(false);
 	const [enableTwoFactor, setEnableTwoFactor] = useState(false);
+
+	// Load user profile data
+	const loadUserProfile = useCallback(async () => {
+		try {
+			setIsLoadingProfile(true);
+			const result = await getUserProfile();
+
+			if (result.error) {
+				toast.error(result.error);
+				return;
+			}
+
+			if (result.data) {
+				setUserProfile(result.data);
+				// Update form states with real data
+				setFirstName(result.data.firstName || "");
+				setLastName(result.data.lastName || "");
+				setEmail(result.data.email);
+			}
+		} catch (error) {
+			console.error("Erro ao carregar perfil:", error);
+			toast.error("Erro ao carregar dados do perfil");
+		} finally {
+			setIsLoadingProfile(false);
+		}
+	}, []);
+
+	useEffect(() => {
+		if (session?.user) {
+			loadUserProfile();
+		}
+	}, [session, loadUserProfile]);
 
 	useEffect(() => {
 		if (!isPending && !session) {
@@ -69,7 +121,71 @@ export default function Dashboard() {
 		}
 	};
 
-	if (isPending) {
+	const handleUpdateProfile = async () => {
+		startTransition(async () => {
+			try {
+				const result = await updateUserProfile({
+					firstName: firstName || undefined,
+					lastName: lastName || undefined,
+				});
+
+				if (result.error) {
+					toast.error(result.error);
+				} else if (result.success) {
+					toast.success(result.success);
+					loadUserProfile(); // Reload profile data
+				}
+			} catch (error) {
+				toast.error("Erro ao atualizar perfil");
+				console.error("Erro ao atualizar perfil:", error);
+			}
+		});
+	};
+
+	const handleUpdateEmail = async () => {
+		startTransition(async () => {
+			try {
+				const result = await updateUserEmail({ email });
+
+				if (result.error) {
+					toast.error(result.error);
+				} else if (result.success) {
+					toast.success(result.success);
+					loadUserProfile(); // Reload profile data
+				}
+			} catch (error) {
+				toast.error("Erro ao atualizar email");
+				console.error("Erro ao atualizar email:", error);
+			}
+		});
+	};
+
+	const handleChangePassword = async () => {
+		startTransition(async () => {
+			try {
+				const result = await changeUserPassword({
+					currentPassword,
+					newPassword,
+					confirmPassword,
+				});
+
+				if (result.error) {
+					toast.error(result.error);
+				} else if (result.success) {
+					toast.success(result.success);
+					// Clear password fields on success
+					setCurrentPassword("");
+					setNewPassword("");
+					setConfirmPassword("");
+				}
+			} catch (error) {
+				toast.error("Erro ao alterar senha");
+				console.error("Erro ao alterar senha:", error);
+			}
+		});
+	};
+
+	if (isPending || isLoadingProfile) {
 		return (
 			<div className="min-h-screen flex items-center justify-center">
 				<div className="flex flex-col items-center space-y-4">
@@ -84,35 +200,21 @@ export default function Dashboard() {
 		return null;
 	}
 
-	const teams = [
-		{
-			id: "shadon",
-			name: "Shadon Design Team",
-			joined: "5 September 2024",
-			permissions: "Admin",
-		},
-		{
-			id: "vercel",
-			name: "Vercel Team",
-			joined: "2 August 2024",
-			permissions: "Admin",
-		},
-		{
-			id: "figma",
-			name: "Figma Team",
-			joined: "14 January 2023",
-			permissions: "Designer",
-		},
-		{
-			id: "nextjs",
-			name: "Next JS Team",
-			joined: "11 May 2023",
-			permissions: "Developer",
-		},
-	];
+	const getInitials = (name: string) => {
+		return name
+			.split(" ")
+			.map((n) => n[0])
+			.join("")
+			.toUpperCase()
+			.slice(0, 2);
+	};
+
+	const userInitials = getInitials(
+		`${userProfile?.firstName || ""} ${userProfile?.lastName || ""}`.trim() ||
+			"User",
+	);
 
 	const sidebarItems = [
-		{ id: "profile", label: "Perfil", icon: User },
 		{ id: "account", label: "Conta", icon: Settings },
 		{ id: "members", label: "Membros", icon: Users },
 		{ id: "billing", label: "Cobrança", icon: CreditCard },
@@ -152,10 +254,6 @@ export default function Dashboard() {
 							</nav>
 						</div>
 						<div className="flex items-center space-x-4">
-							<Button className="bg-black text-white hover:bg-gray-800">
-								<Zap className="w-4 h-4 mr-2" />
-								Upgrade
-							</Button>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
 									<Button
@@ -164,7 +262,7 @@ export default function Dashboard() {
 									>
 										<div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-blue-400 flex items-center justify-center">
 											<span className="text-white text-sm font-semibold">
-												SN
+												{userInitials}
 											</span>
 										</div>
 									</Button>
@@ -173,18 +271,15 @@ export default function Dashboard() {
 									<DropdownMenuLabel>
 										<div className="flex flex-col space-y-1">
 											<p className="text-sm font-medium">
-												{session?.user?.name || "Stephanie Nicol"}
+												{`${userProfile?.firstName || ""} ${userProfile?.lastName || ""}`.trim() ||
+													"Usuário"}
 											</p>
 											<p className="text-xs text-muted-foreground">
-												{session?.user?.email || "stephanie_nicol@mail.com"}
+												{userProfile?.email}
 											</p>
 										</div>
 									</DropdownMenuLabel>
 									<DropdownMenuSeparator />
-									<DropdownMenuItem onClick={() => setActiveSection("profile")}>
-										<User className="mr-2 h-4 w-4" />
-										Perfil
-									</DropdownMenuItem>
 									<DropdownMenuItem onClick={() => setActiveSection("account")}>
 										<Settings className="mr-2 h-4 w-4" />
 										Configurações
@@ -234,7 +329,7 @@ export default function Dashboard() {
 
 					{/* Main Content */}
 					<div className="flex-1 space-y-6">
-						{activeSection === "profile" && (
+						{activeSection === "account" && (
 							<>
 								{/* Avatar Section */}
 								<Card>
@@ -249,7 +344,7 @@ export default function Dashboard() {
 												<div className="flex items-center space-x-4">
 													<div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-400 to-blue-400 flex items-center justify-center">
 														<span className="text-white text-lg font-semibold">
-															SN
+															{userInitials}
 														</span>
 													</div>
 													<Button variant="outline" size="sm">
@@ -263,126 +358,61 @@ export default function Dashboard() {
 									</CardContent>
 								</Card>
 
-								{/* Display Name */}
+								{/* Profile Information */}
 								<Card>
 									<CardContent className="pt-6">
 										<div className="flex justify-between items-start">
 											<div className="flex-1 max-w-md">
 												<h3 className="text-lg font-semibold mb-2">
-													Nome de exibição
+													Informações do Perfil
 												</h3>
 												<p className="text-muted-foreground mb-4">
-													Digite seu nome completo ou um nome de exibição que
-													gostaria de usar.
+													Visualize suas informações básicas de perfil.
 												</p>
-												<Input
-													value={displayName}
-													onChange={(e) => setDisplayName(e.target.value)}
-													className="mb-2"
-												/>
-												<p className="text-sm text-muted-foreground">
-													Comprimento máximo permitido é de 32 caracteres.
-												</p>
-											</div>
-											<Button>Salvar</Button>
-										</div>
-									</CardContent>
-								</Card>
-
-								{/* Teams */}
-								<Card>
-									<CardContent className="pt-6">
-										<div className="flex justify-between items-start mb-6">
-											<div>
-												<h3 className="text-lg font-semibold mb-2">Times</h3>
-												<p className="text-muted-foreground">
-													Aqui está seu namespace de URL para uso em nosso
-													aplicativo.
-												</p>
-											</div>
-											<div className="flex gap-2">
-												<Button variant="outline">Editar</Button>
-												<Button>Salvar</Button>
-											</div>
-										</div>
-
-										<div className="space-y-4">
-											<div className="grid grid-cols-3 gap-4 text-sm font-medium text-muted-foreground border-b pb-2">
-												<div>Nome do time</div>
-												<div>Ingressou</div>
-												<div>Permissões</div>
-											</div>
-											{teams.map((team) => (
-												<div
-													key={team.id}
-													className="grid grid-cols-3 gap-4 text-sm py-2"
-												>
-													<div className="font-medium">{team.name}</div>
-													<div className="text-muted-foreground">
-														{team.joined}
+												<div className="space-y-2">
+													<div>
+														<Label className="text-sm font-medium">
+															Nome Completo
+														</Label>
+														<p className="text-sm text-muted-foreground">
+															{`${userProfile?.firstName || ""} ${userProfile?.lastName || ""}`.trim() ||
+																"Não informado"}
+														</p>
 													</div>
 													<div>
-														<Badge variant="outline">{team.permissions}</Badge>
+														<Label className="text-sm font-medium">Email</Label>
+														<p className="text-sm text-muted-foreground">
+															{userProfile?.email}
+														</p>
 													</div>
 												</div>
-											))}
+											</div>
 										</div>
 									</CardContent>
 								</Card>
 
-								{/* Delete Account */}
-								<Card className="border-red-200 dark:border-red-800">
-									<CardContent className="pt-6">
-										<h3 className="text-lg font-semibold mb-2 text-red-600">
-											Excluir conta
-										</h3>
-										<p className="text-muted-foreground mb-4">
-											Isso excluirá permanentemente sua Conta Pessoal. Por
-											favor, note que esta ação é irreversível, então proceda
-											com cautela.
-										</p>
-										<p className="text-red-600 text-sm mb-4 font-medium">
-											Esta ação não pode ser desfeita!
-										</p>
-										<Button variant="destructive">Excluir conta</Button>
-									</CardContent>
-								</Card>
-							</>
-						)}
-
-						{activeSection === "account" && (
-							<>
 								{/* Basic Information */}
 								<Card>
 									<CardContent className="pt-6">
 										<div className="flex justify-between items-start mb-6">
 											<div>
 												<h3 className="text-lg font-semibold mb-2">
-													Informações básicas
+													Editar Informações
 												</h3>
 												<p className="text-muted-foreground">
-													Visualize e atualize seus dados pessoais e informações
-													da conta.
+													Atualize seus dados pessoais e informações da conta.
 												</p>
 											</div>
 										</div>
 
 										<div className="grid grid-cols-2 gap-4 max-w-2xl">
 											<div>
-												<Label htmlFor="username">Nome de usuário</Label>
-												<Input
-													id="username"
-													value={username}
-													onChange={(e) => setUsername(e.target.value)}
-												/>
-											</div>
-											<div></div>
-											<div>
 												<Label htmlFor="firstName">Nome</Label>
 												<Input
 													id="firstName"
 													value={firstName}
 													onChange={(e) => setFirstName(e.target.value)}
+													placeholder="Digite seu primeiro nome"
 												/>
 											</div>
 											<div>
@@ -391,6 +421,7 @@ export default function Dashboard() {
 													id="lastName"
 													value={lastName}
 													onChange={(e) => setLastName(e.target.value)}
+													placeholder="Digite seu sobrenome"
 												/>
 											</div>
 											<div className="col-span-2">
@@ -400,12 +431,29 @@ export default function Dashboard() {
 													type="email"
 													value={email}
 													onChange={(e) => setEmail(e.target.value)}
+													placeholder="Digite seu email"
 												/>
 											</div>
 										</div>
 
-										<div className="flex justify-end mt-6">
-											<Button>Salvar</Button>
+										<div className="flex justify-end mt-6 space-x-2">
+											<Button
+												variant="outline"
+												onClick={handleUpdateEmail}
+												disabled={isPendingTransition}
+											>
+												{isPendingTransition
+													? "Atualizando..."
+													: "Atualizar Email"}
+											</Button>
+											<Button
+												onClick={handleUpdateProfile}
+												disabled={isPendingTransition}
+											>
+												{isPendingTransition
+													? "Salvando..."
+													: "Salvar Informações"}
+											</Button>
 										</div>
 									</CardContent>
 								</Card>
@@ -461,7 +509,12 @@ export default function Dashboard() {
 										</div>
 
 										<div className="flex justify-end mt-6">
-											<Button>Salvar</Button>
+											<Button
+												onClick={handleChangePassword}
+												disabled={isPendingTransition}
+											>
+												{isPendingTransition ? "Alterando..." : "Salvar"}
+											</Button>
 										</div>
 									</CardContent>
 								</Card>
@@ -544,6 +597,24 @@ export default function Dashboard() {
 										<div className="flex justify-end mt-6">
 											<Button>Salvar</Button>
 										</div>
+									</CardContent>
+								</Card>
+
+								{/* Delete Account */}
+								<Card className="border-red-200 dark:border-red-800">
+									<CardContent className="pt-6">
+										<h3 className="text-lg font-semibold mb-2 text-red-600">
+											Excluir conta
+										</h3>
+										<p className="text-muted-foreground mb-4">
+											Isso excluirá permanentemente sua Conta Pessoal. Por
+											favor, note que esta ação é irreversível, então proceda
+											com cautela.
+										</p>
+										<p className="text-red-600 text-sm mb-4 font-medium">
+											Esta ação não pode ser desfeita!
+										</p>
+										<Button variant="destructive">Excluir conta</Button>
 									</CardContent>
 								</Card>
 							</>

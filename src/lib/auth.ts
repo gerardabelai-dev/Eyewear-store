@@ -25,4 +25,16 @@ export const auth = betterAuth({
 	},
 	baseURL: serverEnv.NEXT_PUBLIC_APP_URL,
 	trustedOrigins: [serverEnv.NEXT_PUBLIC_APP_URL],
+	user: {
+		additionalFields: {
+			firstName: {
+				type: "string",
+				required: false,
+			},
+			lastName: {
+				type: "string",
+				required: false,
+			},
+		},
+	},
 });

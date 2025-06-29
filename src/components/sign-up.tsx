@@ -19,6 +19,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { updateUserProfile } from "@/lib/actions/user";
 import { signIn, signUp } from "@/lib/auth-client";
 
 const signUpSchema = z
@@ -88,7 +89,24 @@ export default function SignUp() {
 				image: image ? await convertImageToBase64(image) : "",
 				callbackURL: "/dashboard",
 				fetchOptions: {
-					onSuccess: () => {
+					onSuccess: async () => {
+						// Update user profile with firstName and lastName after signup
+						try {
+							const result = await updateUserProfile({
+								firstName: values.firstName,
+								lastName: values.lastName,
+							});
+
+							if (result.error) {
+								console.error(
+									"Failed to update profile with firstName/lastName:",
+									result.error,
+								);
+							}
+						} catch (updateError) {
+							console.error("Error updating profile:", updateError);
+						}
+
 						toast.success("Conta criada com sucesso!");
 						router.push("/dashboard");
 					},
