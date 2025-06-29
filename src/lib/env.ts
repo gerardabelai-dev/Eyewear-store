@@ -99,7 +99,11 @@ export const serverEnv =
 export const clientEnv = validateClientEnv();
 
 // For backward compatibility, expose the appropriate env based on context
-export const env = typeof window === "undefined" ? serverEnv : clientEnv;
+// Note: Use serverEnv directly in server-only files (like drizzle.config.ts)
+export const env =
+	typeof window === "undefined"
+		? (serverEnv as unknown as typeof clientEnv)
+		: (clientEnv as unknown as typeof serverEnv);
 
 // Type exports for TypeScript support
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
