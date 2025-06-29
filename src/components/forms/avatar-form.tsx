@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Upload, X } from "lucide-react";
-import Image from "next/image";
 import { useRef, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -16,6 +15,7 @@ import {
 	FormItem,
 	FormMessage,
 } from "@/components/ui/form";
+import { UserAvatar } from "@/components/ui/user-avatar";
 import { updateUserAvatar } from "@/lib/actions/user";
 
 // Since file uploads are handled differently, we'll use a simpler schema
@@ -120,32 +120,15 @@ export function AvatarForm({ userImage, userInitials }: AvatarFormProps) {
 					</div>
 				</div>
 
-				<div className="flex items-center gap-6">
+				<div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
 					{/* Avatar Preview */}
-					<div className="relative">
-						<div className="w-20 h-20 rounded-full overflow-hidden bg-muted flex items-center justify-center">
-							{imagePreview ? (
-								<Image
-									src={imagePreview}
-									alt="Preview"
-									width={80}
-									height={80}
-									className="w-full h-full object-cover"
-								/>
-							) : userImage ? (
-								<Image
-									src={userImage}
-									alt="Avatar"
-									width={80}
-									height={80}
-									className="w-full h-full object-cover"
-								/>
-							) : (
-								<span className="text-lg font-medium text-muted-foreground">
-									{userInitials}
-								</span>
-							)}
-						</div>
+					<div className="relative shrink-0">
+						<UserAvatar
+							userImage={imagePreview || userImage}
+							userInitials={userInitials}
+							size="xl"
+							className="bg-muted"
+						/>
 						{imagePreview && (
 							<button
 								type="button"
@@ -158,7 +141,7 @@ export function AvatarForm({ userImage, userInitials }: AvatarFormProps) {
 					</div>
 
 					{/* Upload Controls */}
-					<div className="flex-1">
+					<div className="flex-1 w-full sm:w-auto text-center sm:text-left">
 						<input
 							ref={fileInputRef}
 							type="file"
@@ -167,7 +150,7 @@ export function AvatarForm({ userImage, userInitials }: AvatarFormProps) {
 							className="hidden"
 						/>
 
-						<div className="flex items-center gap-3">
+						<div className="flex flex-col sm:flex-row items-center gap-3">
 							<Button
 								type="button"
 								variant="outline"

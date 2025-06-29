@@ -48,27 +48,32 @@ export default async function Dashboard() {
 	return (
 		<div className="min-h-screen bg-background">
 			<DashboardHeader
+				userImage={userProfile.image}
 				userInitials={userInitials}
 				userName={userName}
 				userEmail={userProfile.email}
 			/>
 
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-				<div className="flex justify-between items-center mb-8">
-					<h1 className="text-3xl font-bold">Configurações da Conta</h1>
+			<div className="mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 max-w-7xl">
+				<div className="mb-6 sm:mb-8">
+					<h1 className="text-2xl sm:text-3xl font-bold">
+						Configurações da Conta
+					</h1>
 				</div>
 
-				<div className="flex gap-8">
-					{/* Sidebar */}
-					<div className="w-64 space-y-2">
-						<Button variant="outline" className="w-full justify-start">
-							<Settings className="w-4 h-4 mr-3" />
-							Conta
-						</Button>
+				<div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+					{/* Sidebar - Hidden on mobile, sticky on desktop */}
+					<div className="hidden lg:block lg:w-64 lg:shrink-0">
+						<div className="sticky top-24 space-y-2">
+							<Button variant="outline" className="w-full justify-start">
+								<Settings className="w-4 h-4 mr-3" />
+								Conta
+							</Button>
+						</div>
 					</div>
 
 					{/* Main Content */}
-					<div className="flex-1 space-y-6">
+					<div className="flex-1 space-y-4 sm:space-y-6 min-w-0">
 						{/* Avatar Section */}
 						<AvatarForm
 							userImage={userProfile.image}
