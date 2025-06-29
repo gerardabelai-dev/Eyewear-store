@@ -158,8 +158,8 @@ export default function Home() {
 						plataforma de autenticação.
 					</p>
 					<Link href="/auth">
-						<Button size="lg" className="flex items-center space-x-2">
-							<span>Criar Sua Conta</span>
+						<Button size="lg" className="flex items-center space-x-2 mx-auto">
+							<span>Criar minha conta</span>
 							<ArrowRight className="w-4 h-4" />
 						</Button>
 					</Link>
