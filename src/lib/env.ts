@@ -12,7 +12,7 @@ const serverEnvSchema = z.object({
 	NODE_ENV: z
 		.enum(["development", "production", "test"])
 		.default("development"),
-	NEXT_PUBLIC_APP_URL: z.string().url("Invalid NEXT_PUBLIC_APP_URL"),
+	NEXT_PUBLIC_APP_URL: z.url("Invalid NEXT_PUBLIC_APP_URL"),
 
 	// Neon Database Configuration (server-only)
 	DATABASE_URL: z
@@ -25,7 +25,7 @@ const serverEnvSchema = z.object({
 
 	// Better Auth Configuration (server-only)
 	BETTER_AUTH_SECRET: z.string().min(1, "BETTER_AUTH_SECRET is required"),
-	BETTER_AUTH_URL: z.string().url("Invalid BETTER_AUTH_URL"),
+	BETTER_AUTH_URL: z.url("Invalid BETTER_AUTH_URL"),
 
 	// Google OAuth Configuration (server-only)
 	GOOGLE_CLIENT_ID: z.string().min(1, "GOOGLE_CLIENT_ID is required"),
@@ -50,7 +50,7 @@ const serverEnvSchema = z.object({
 
 // Client-side environment validation (only public variables)
 const clientEnvSchema = z.object({
-	NEXT_PUBLIC_APP_URL: z.string().url("Invalid NEXT_PUBLIC_APP_URL"),
+	NEXT_PUBLIC_APP_URL: z.url("Invalid NEXT_PUBLIC_APP_URL"),
 });
 
 // Server-side environment validation
