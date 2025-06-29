@@ -58,7 +58,7 @@ export default function Dashboard() {
 			<div className="min-h-screen flex items-center justify-center">
 				<div className="flex flex-col items-center space-y-4">
 					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-					<p className="text-muted-foreground">Loading your dashboard...</p>
+					<p className="text-muted-foreground">Carregando seu dashboard...</p>
 				</div>
 			</div>
 		);
@@ -75,11 +75,11 @@ export default function Dashboard() {
 					<div className="flex justify-between items-center h-16">
 						<div className="flex items-center space-x-4">
 							<Settings className="w-6 h-6" />
-							<h1 className="text-xl font-semibold">Settings</h1>
+							<h1 className="text-xl font-semibold">Configurações</h1>
 						</div>
 						<Button variant="outline" onClick={handleSignOut} size="sm">
 							<LogOut className="w-4 h-4 mr-2" />
-							Sign Out
+							Sair
 						</Button>
 					</div>
 				</div>
@@ -89,10 +89,10 @@ export default function Dashboard() {
 				<div className="space-y-6">
 					<div>
 						<h2 className="text-2xl font-bold tracking-tight">
-							Account Settings
+							Configurações da Conta
 						</h2>
 						<p className="text-muted-foreground">
-							Manage your account settings and preferences.
+							Gerencie as configurações e preferências da sua conta.
 						</p>
 					</div>
 
@@ -100,9 +100,9 @@ export default function Dashboard() {
 					<Alert>
 						<CheckCircle className="h-4 w-4" />
 						<AlertDescription>
-							Your account is verified and secure.{" "}
+							Sua conta está verificada e segura.{" "}
 							<Badge variant="secondary" className="ml-2">
-								Active
+								Ativo
 							</Badge>
 						</AlertDescription>
 					</Alert>
@@ -112,10 +112,10 @@ export default function Dashboard() {
 						<CardHeader>
 							<CardTitle className="flex items-center space-x-2">
 								<User className="w-5 h-5" />
-								<span>Profile</span>
+								<span>Perfil</span>
 							</CardTitle>
 							<CardDescription>
-								This is how others will see you on the site.
+								É assim que outros vão te ver no site.
 							</CardDescription>
 						</CardHeader>
 						<CardContent className="space-y-6">
@@ -123,7 +123,7 @@ export default function Dashboard() {
 								{session.user.image ? (
 									<Image
 										src={session.user.image}
-										alt="Profile"
+										alt="Perfil"
 										width={80}
 										height={80}
 										className="w-20 h-20 rounded-full border"
@@ -136,11 +136,11 @@ export default function Dashboard() {
 								<div className="space-y-2">
 									<div className="flex items-center space-x-2">
 										<p className="text-sm font-medium leading-none">
-											{session.user.name || "No name set"}
+											{session.user.name || "Nome não definido"}
 										</p>
 										{session.user.emailVerified && (
 											<Badge variant="outline" className="text-green-600">
-												Verified
+												Verificado
 											</Badge>
 										)}
 									</div>
@@ -148,7 +148,7 @@ export default function Dashboard() {
 										{session.user.email}
 									</p>
 									<Button variant="outline" size="sm" className="mt-2">
-										Change photo
+										Alterar foto
 									</Button>
 								</div>
 							</div>
@@ -157,10 +157,10 @@ export default function Dashboard() {
 
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 								<div className="space-y-2">
-									<Label htmlFor="fullName">Full Name</Label>
+									<Label htmlFor="fullName">Nome Completo</Label>
 									<Input
 										id="fullName"
-										value={session.user.name || "Not set"}
+										value={session.user.name || "Não definido"}
 										disabled
 									/>
 								</div>
@@ -169,7 +169,7 @@ export default function Dashboard() {
 									<Input id="email" value={session.user.email} disabled />
 								</div>
 								<div className="space-y-2">
-									<Label htmlFor="userId">User ID</Label>
+									<Label htmlFor="userId">ID do Usuário</Label>
 									<Input
 										id="userId"
 										value={session.user.id}
@@ -178,11 +178,11 @@ export default function Dashboard() {
 									/>
 								</div>
 								<div className="space-y-2">
-									<Label htmlFor="memberSince">Member Since</Label>
+									<Label htmlFor="memberSince">Membro desde</Label>
 									<Input
 										id="memberSince"
 										value={new Date(session.user.createdAt).toLocaleDateString(
-											"en-US",
+											"pt-BR",
 											{
 												year: "numeric",
 												month: "long",
@@ -201,22 +201,22 @@ export default function Dashboard() {
 						<CardHeader>
 							<CardTitle className="flex items-center space-x-2">
 								<Shield className="w-5 h-5" />
-								<span>Security</span>
+								<span>Segurança</span>
 							</CardTitle>
 							<CardDescription>
-								Manage your security settings and preferences.
+								Gerencie suas configurações e preferências de segurança.
 							</CardDescription>
 						</CardHeader>
 						<CardContent className="space-y-4">
 							<div className="flex items-center justify-between p-4 border rounded-lg">
 								<div className="space-y-1">
-									<p className="text-sm font-medium">Password</p>
+									<p className="text-sm font-medium">Senha</p>
 									<p className="text-sm text-muted-foreground">
-										Last updated on account creation
+										Última atualização na criação da conta
 									</p>
 								</div>
 								<Button variant="outline" size="sm">
-									Change password
+									Alterar senha
 								</Button>
 							</div>
 
@@ -224,18 +224,18 @@ export default function Dashboard() {
 								<div className="space-y-1">
 									<div className="flex items-center space-x-2">
 										<p className="text-sm font-medium">
-											Two-factor authentication
+											Autenticação de dois fatores
 										</p>
 										<Badge variant="outline" className="text-orange-600">
-											Recommended
+											Recomendado
 										</Badge>
 									</div>
 									<p className="text-sm text-muted-foreground">
-										Add an extra layer of security to your account
+										Adicione uma camada extra de segurança à sua conta
 									</p>
 								</div>
 								<Button variant="outline" size="sm">
-									Enable 2FA
+									Ativar 2FA
 								</Button>
 							</div>
 
@@ -243,8 +243,8 @@ export default function Dashboard() {
 								<div className="flex items-center space-x-2 text-green-600 dark:text-green-400 p-4 bg-green-50 dark:bg-green-950/50 rounded-lg">
 									<Shield className="w-4 h-4" />
 									<span className="text-sm font-medium">
-										Account created on{" "}
-										{session.user.createdAt.toLocaleDateString("en-US", {
+										Conta criada em{" "}
+										{session.user.createdAt.toLocaleDateString("pt-BR", {
 											year: "numeric",
 											month: "long",
 											day: "numeric",
@@ -260,10 +260,10 @@ export default function Dashboard() {
 						<CardHeader>
 							<CardTitle className="flex items-center space-x-2">
 								<Bell className="w-5 h-5" />
-								<span>Preferences</span>
+								<span>Preferências</span>
 							</CardTitle>
 							<CardDescription>
-								Configure how you receive notifications and updates.
+								Configure como você recebe notificações e atualizações.
 							</CardDescription>
 						</CardHeader>
 						<CardContent className="space-y-6">
@@ -273,10 +273,10 @@ export default function Dashboard() {
 										htmlFor="email-notifications"
 										className="text-sm font-medium"
 									>
-										Email notifications
+										Notificações por email
 									</Label>
 									<p className="text-sm text-muted-foreground">
-										Receive emails about your account activity
+										Receba emails sobre a atividade da sua conta
 									</p>
 								</div>
 								<Switch
@@ -294,10 +294,10 @@ export default function Dashboard() {
 										htmlFor="marketing-emails"
 										className="text-sm font-medium"
 									>
-										Marketing emails
+										Emails de marketing
 									</Label>
 									<p className="text-sm text-muted-foreground">
-										Receive emails about new features and updates
+										Receba emails sobre novos recursos e atualizações
 									</p>
 								</div>
 								<Switch
@@ -312,13 +312,13 @@ export default function Dashboard() {
 							<div className="flex items-center justify-between">
 								<div className="space-y-1">
 									<Label className="text-sm font-medium">
-										Push notifications
+										Notificações push
 									</Label>
 									<p className="text-sm text-muted-foreground">
-										Receive push notifications on your devices
+										Receba notificações push nos seus dispositivos
 									</p>
 								</div>
-								<Badge variant="secondary">Coming soon</Badge>
+								<Badge variant="secondary">Em breve</Badge>
 							</div>
 						</CardContent>
 					</Card>
@@ -327,18 +327,18 @@ export default function Dashboard() {
 					<Card className="border-red-200 dark:border-red-800">
 						<CardHeader>
 							<CardTitle className="text-red-600 dark:text-red-400">
-								Danger Zone
+								Zona de Perigo
 							</CardTitle>
 							<CardDescription>
-								Irreversible and destructive actions
+								Ações irreversíveis e destrutivas
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
 							<div className="flex items-center justify-between p-4 border border-red-200 dark:border-red-800 rounded-lg">
 								<div className="space-y-1">
-									<p className="text-sm font-medium">Delete account</p>
+									<p className="text-sm font-medium">Excluir conta</p>
 									<p className="text-sm text-muted-foreground">
-										Permanently delete your account and all associated data
+										Exclua permanentemente sua conta e todos os dados associados
 									</p>
 								</div>
 								<Button
@@ -346,7 +346,7 @@ export default function Dashboard() {
 									size="sm"
 									className="text-red-600 border-red-200 hover:bg-red-50"
 								>
-									Delete account
+									Excluir conta
 								</Button>
 							</div>
 						</CardContent>

@@ -23,20 +23,20 @@ import { signIn, signUp } from "@/lib/auth-client";
 
 const signUpSchema = z
 	.object({
-		firstName: z.string().min(1, "First name is required"),
-		lastName: z.string().min(1, "Last name is required"),
+		firstName: z.string().min(1, "Nome é obrigatório"),
+		lastName: z.string().min(1, "Sobrenome é obrigatório"),
 		email: z
 			.string()
-			.min(1, "Email is required")
-			.email("Please enter a valid email address"),
+			.min(1, "Email é obrigatório")
+			.email("Por favor, insira um endereço de email válido"),
 		password: z
 			.string()
-			.min(1, "Password is required")
-			.min(8, "Password must be at least 8 characters"),
-		confirmPassword: z.string().min(1, "Please confirm your password"),
+			.min(1, "Senha é obrigatória")
+			.min(8, "A senha deve ter pelo menos 8 caracteres"),
+		confirmPassword: z.string().min(1, "Por favor, confirme sua senha"),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
-		message: "Passwords don't match",
+		message: "As senhas não coincidem",
 		path: ["confirmPassword"],
 	});
 
@@ -89,16 +89,16 @@ export default function SignUp() {
 				callbackURL: "/dashboard",
 				fetchOptions: {
 					onSuccess: () => {
-						toast.success("Account created successfully!");
+						toast.success("Conta criada com sucesso!");
 						router.push("/dashboard");
 					},
 					onError: (ctx) => {
-						toast.error(ctx.error.message || "Failed to create account");
+						toast.error(ctx.error.message || "Falha ao criar conta");
 					},
 				},
 			});
 		} catch (_errorrr) {
-			toast.error("An unexpected error occurred");
+			toast.error("Ocorreu um erro inesperado");
 		}
 	};
 
@@ -111,15 +111,15 @@ export default function SignUp() {
 				},
 				{
 					onSuccess: () => {
-						toast.success("Account created successfully!");
+						toast.success("Conta criada com sucesso!");
 					},
 					onError: (ctx) => {
-						toast.error(ctx.error.message || "Failed to sign up with Google");
+						toast.error(ctx.error.message || "Falha ao criar conta com Google");
 					},
 				},
 			);
 		} catch (_errorrr) {
-			toast.error("An unexpected error occurred");
+			toast.error("Ocorreu um erro inesperado");
 		}
 	};
 
@@ -127,10 +127,10 @@ export default function SignUp() {
 		<div className="w-full max-w-md mx-auto space-y-6">
 			<div className="space-y-2 text-center">
 				<h1 className="text-2xl font-semibold tracking-tight">
-					Create an account
+					Criar uma conta
 				</h1>
 				<p className="text-sm text-muted-foreground">
-					Enter your information to get started
+					Digite suas informações para começar
 				</p>
 			</div>
 
@@ -145,7 +145,7 @@ export default function SignUp() {
 										<div className="relative w-20 h-20 rounded-full overflow-hidden">
 											<Image
 												src={imagePreview}
-												alt="Profile preview"
+												alt="Prévia do perfil"
 												width={80}
 												height={80}
 												className="object-cover w-full h-full"
@@ -173,9 +173,9 @@ export default function SignUp() {
 										size="sm"
 										onClick={() => fileInputRef.current?.click()}
 									>
-										Upload Photo
+										Enviar Foto
 									</Button>
-									<p className="text-xs text-muted-foreground mt-1">Optional</p>
+									<p className="text-xs text-muted-foreground mt-1">Opcional</p>
 								</div>
 								<input
 									ref={fileInputRef}
@@ -192,9 +192,9 @@ export default function SignUp() {
 									name="firstName"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>First name</FormLabel>
+											<FormLabel>Nome</FormLabel>
 											<FormControl>
-												<Input placeholder="John" {...field} />
+												<Input placeholder="João" {...field} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
@@ -205,9 +205,9 @@ export default function SignUp() {
 									name="lastName"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Last name</FormLabel>
+											<FormLabel>Sobrenome</FormLabel>
 											<FormControl>
-												<Input placeholder="Doe" {...field} />
+												<Input placeholder="Silva" {...field} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
@@ -223,7 +223,7 @@ export default function SignUp() {
 										<FormLabel>Email</FormLabel>
 										<FormControl>
 											<Input
-												placeholder="name@example.com"
+												placeholder="seu@email.com"
 												type="email"
 												autoComplete="email"
 												{...field}
@@ -239,10 +239,10 @@ export default function SignUp() {
 								name="password"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Password</FormLabel>
+										<FormLabel>Senha</FormLabel>
 										<FormControl>
 											<Input
-												placeholder="Create a password"
+												placeholder="Crie uma senha"
 												type="password"
 												autoComplete="new-password"
 												{...field}
@@ -258,10 +258,10 @@ export default function SignUp() {
 								name="confirmPassword"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Confirm password</FormLabel>
+										<FormLabel>Confirmar senha</FormLabel>
 										<FormControl>
 											<Input
-												placeholder="Confirm your password"
+												placeholder="Confirme sua senha"
 												type="password"
 												autoComplete="new-password"
 												{...field}
@@ -280,10 +280,10 @@ export default function SignUp() {
 								{form.formState.isSubmitting ? (
 									<>
 										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-										Creating account...
+										Criando conta...
 									</>
 								) : (
-									"Create account"
+									"Criar conta"
 								)}
 							</Button>
 						</form>
@@ -295,7 +295,7 @@ export default function SignUp() {
 						</div>
 						<div className="relative flex justify-center text-xs uppercase">
 							<span className="bg-background px-2 text-muted-foreground">
-								Or continue with
+								Ou continue com
 							</span>
 						</div>
 					</div>
@@ -329,7 +329,7 @@ export default function SignUp() {
 								d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
 							/>
 						</svg>
-						Continue with Google
+						Continuar com Google
 					</Button>
 				</CardContent>
 			</Card>

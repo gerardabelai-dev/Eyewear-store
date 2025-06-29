@@ -24,12 +24,12 @@ import { signIn } from "@/lib/auth-client";
 const signInSchema = z.object({
 	email: z
 		.string()
-		.min(1, "Email is required")
-		.email("Please enter a valid email address"),
+		.min(1, "Email é obrigatório")
+		.email("Por favor, insira um endereço de email válido"),
 	password: z
 		.string()
-		.min(1, "Password is required")
-		.min(8, "Password must be at least 8 characters"),
+		.min(1, "Senha é obrigatória")
+		.min(8, "A senha deve ter pelo menos 8 caracteres"),
 	rememberMe: z.boolean(),
 });
 
@@ -55,16 +55,16 @@ export default function SignIn() {
 				},
 				{
 					onSuccess: () => {
-						toast.success("Welcome back!");
+						toast.success("Bem-vindo de volta!");
 						router.push("/dashboard");
 					},
 					onError: (ctx) => {
-						toast.error(ctx.error.message || "Failed to sign in");
+						toast.error(ctx.error.message || "Falha ao fazer login");
 					},
 				},
 			);
 		} catch (_errorrr) {
-			toast.error("An unexpected error occurred");
+			toast.error("Ocorreu um erro inesperado");
 		}
 	};
 
@@ -77,24 +77,26 @@ export default function SignIn() {
 				},
 				{
 					onSuccess: () => {
-						toast.success("Welcome back!");
+						toast.success("Bem-vindo de volta!");
 					},
 					onError: (ctx) => {
-						toast.error(ctx.error.message || "Failed to sign in with Google");
+						toast.error(ctx.error.message || "Falha ao fazer login com Google");
 					},
 				},
 			);
 		} catch (_errorrr) {
-			toast.error("An unexpected error occurred");
+			toast.error("Ocorreu um erro inesperado");
 		}
 	};
 
 	return (
 		<div className="w-full max-w-md mx-auto space-y-6">
 			<div className="space-y-2 text-center">
-				<h1 className="text-2xl font-semibold tracking-tight">Welcome back</h1>
+				<h1 className="text-2xl font-semibold tracking-tight">
+					Bem-vindo de volta
+				</h1>
 				<p className="text-sm text-muted-foreground">
-					Enter your email to sign in to your account
+					Digite seu email para acessar sua conta
 				</p>
 			</div>
 
@@ -110,7 +112,7 @@ export default function SignIn() {
 										<FormLabel>Email</FormLabel>
 										<FormControl>
 											<Input
-												placeholder="name@example.com"
+												placeholder="seu@email.com"
 												type="email"
 												autoComplete="email"
 												{...field}
@@ -127,17 +129,17 @@ export default function SignIn() {
 								render={({ field }) => (
 									<FormItem>
 										<div className="flex items-center justify-between">
-											<FormLabel>Password</FormLabel>
+											<FormLabel>Senha</FormLabel>
 											<Link
 												href="#"
 												className="text-sm text-muted-foreground hover:text-primary"
 											>
-												Forgot password?
+												Esqueceu a senha?
 											</Link>
 										</div>
 										<FormControl>
 											<Input
-												placeholder="Enter your password"
+												placeholder="Digite sua senha"
 												type="password"
 												autoComplete="current-password"
 												{...field}
@@ -161,7 +163,7 @@ export default function SignIn() {
 										</FormControl>
 										<div className="space-y-1 leading-none">
 											<FormLabel className="text-sm font-normal">
-												Remember me
+												Lembrar de mim
 											</FormLabel>
 										</div>
 									</FormItem>
@@ -176,10 +178,10 @@ export default function SignIn() {
 								{form.formState.isSubmitting ? (
 									<>
 										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-										Signing in...
+										Entrando...
 									</>
 								) : (
-									"Sign in"
+									"Entrar"
 								)}
 							</Button>
 						</form>
@@ -191,7 +193,7 @@ export default function SignIn() {
 						</div>
 						<div className="relative flex justify-center text-xs uppercase">
 							<span className="bg-background px-2 text-muted-foreground">
-								Or continue with
+								Ou continue com
 							</span>
 						</div>
 					</div>
@@ -225,7 +227,7 @@ export default function SignIn() {
 								d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
 							/>
 						</svg>
-						Continue with Google
+						Continuar com Google
 					</Button>
 				</CardContent>
 			</Card>

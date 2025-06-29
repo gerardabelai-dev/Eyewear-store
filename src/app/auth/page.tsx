@@ -19,14 +19,14 @@ export default function AuthPage() {
 						className="flex-1 text-sm"
 						onClick={() => setShowSignUp(false)}
 					>
-						Sign In
+						Entrar
 					</Button>
 					<Button
 						variant={showSignUp ? "default" : "ghost"}
 						className="flex-1 text-sm"
 						onClick={() => setShowSignUp(true)}
 					>
-						Sign Up
+						Cadastrar
 					</Button>
 				</div>
 
