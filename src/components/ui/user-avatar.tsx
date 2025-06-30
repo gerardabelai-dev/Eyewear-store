@@ -28,9 +28,7 @@ export function UserAvatar({
 			className={cn(
 				"rounded-full overflow-hidden flex items-center justify-center",
 				sizeClass,
-				userImage
-					? "bg-background"
-					: "bg-gradient-to-r from-purple-400 to-blue-400",
+				"bg-gradient-to-r from-blue-600 to-purple-600",
 				className,
 			)}
 		>
@@ -49,8 +47,8 @@ export function UserAvatar({
 			) : (
 				<span
 					className={cn(
-						"font-semibold text-white",
-						size === "sm" ? "text-sm" : "text-sm",
+						"font-semibold text-white drop-shadow-sm",
+						size === "sm" ? "text-xs" : size === "md" ? "text-sm" : "text-lg",
 					)}
 				>
 					{userInitials}

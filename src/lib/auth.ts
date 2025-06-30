@@ -37,4 +37,38 @@ export const auth = betterAuth({
 			},
 		},
 	},
+	databaseHooks: {
+		user: {
+			create: {
+				before: async (user) => {
+					// Automatically generate name from firstName and lastName
+					const userData = user as any;
+					if (userData.firstName && userData.lastName) {
+						return {
+							data: {
+								...user,
+								name: `${userData.firstName} ${userData.lastName}`,
+							},
+						};
+					}
+					return { data: user };
+				},
+			},
+			update: {
+				before: async (user) => {
+					// Automatically update name when firstName or lastName changes
+					const userData = user as any;
+					if (userData.firstName && userData.lastName) {
+						return {
+							data: {
+								...user,
+								name: `${userData.firstName} ${userData.lastName}`,
+							},
+						};
+					}
+					return { data: user };
+				},
+			},
+		},
+	},
 });

@@ -22,6 +22,13 @@
       "when": 1751233342084,
       "tag": "0002_tearful_forge",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1751245245555,
+      "tag": "0003_funny_bill_hollister",
+      "breakpoints": true
     }
   ]
 }

@@ -127,7 +127,6 @@ export function AvatarForm({ userImage, userInitials }: AvatarFormProps) {
 							userImage={imagePreview || userImage}
 							userInitials={userInitials}
 							size="xl"
-							className="bg-muted"
 						/>
 						{imagePreview && (
 							<button

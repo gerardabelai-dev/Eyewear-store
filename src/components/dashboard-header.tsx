@@ -50,8 +50,10 @@ export function DashboardHeader({
 				<div className="flex justify-between items-center h-14 sm:h-16">
 					<div className="flex items-center space-x-4 sm:space-x-8 min-w-0">
 						<div className="flex items-center space-x-2 shrink-0">
-							<div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-								<Shield className="w-3 h-3 sm:w-5 sm:h-5 text-white" />
+							<div
+								className={`w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-sm`}
+							>
+								<Shield className="w-3 h-3 sm:w-5 sm:h-5 text-white drop-shadow-sm" />
 							</div>
 							<span className="text-lg sm:text-xl font-bold truncate">
 								DrVista Admin

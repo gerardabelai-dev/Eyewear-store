@@ -122,9 +122,9 @@ export function PasswordForm({ hasPassword }: PasswordFormProps) {
 					<Form {...changePasswordForm}>
 						<form
 							onSubmit={changePasswordForm.handleSubmit(onChangePasswordSubmit)}
-							className="space-y-6"
+							className="space-y-6 "
 						>
-							<div className="max-w-md space-y-6">
+							<div className="max-w-md">
 								<FormField
 									control={changePasswordForm.control}
 									name="currentPassword"
@@ -140,7 +140,9 @@ export function PasswordForm({ hasPassword }: PasswordFormProps) {
 										</FormItem>
 									)}
 								/>
+							</div>
 
+							<div className="max-w-md grid sm:grid-cols-2 gap-4">
 								<FormField
 									control={changePasswordForm.control}
 									name="newPassword"

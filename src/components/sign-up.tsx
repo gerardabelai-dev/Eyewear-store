@@ -19,7 +19,6 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { updateUserProfile } from "@/lib/actions/user";
 import { signIn, signUp } from "@/lib/auth-client";
 
 const signUpSchema = z
@@ -82,31 +81,18 @@ export default function SignUp() {
 
 	const onSubmit = async (values: SignUpValues) => {
 		try {
-			await signUp.email({
-				email: values.email,
-				password: values.password,
-				name: `${values.firstName} ${values.lastName}`,
-				image: image ? await convertImageToBase64(image) : "",
-				callbackURL: "/dashboard",
-				fetchOptions: {
-					onSuccess: async () => {
-						// Update user profile with firstName and lastName after signup
-						try {
-							const result = await updateUserProfile({
-								firstName: values.firstName,
-								lastName: values.lastName,
-							});
-
-							if (result.error) {
-								console.error(
-									"Failed to update profile with firstName/lastName:",
-									result.error,
-								);
-							}
-						} catch (updateError) {
-							console.error("Error updating profile:", updateError);
-						}
-
+			await signUp.email(
+				{
+					email: values.email,
+					password: values.password,
+					name: `${values.firstName} ${values.lastName}`,
+					firstName: values.firstName,
+					lastName: values.lastName,
+					image: image ? await convertImageToBase64(image) : "",
+					callbackURL: "/dashboard",
+				} as any,
+				{
+					onSuccess: () => {
 						toast.success("Conta criada com sucesso!");
 						router.push("/dashboard");
 					},
@@ -114,7 +100,7 @@ export default function SignUp() {
 						toast.error(ctx.error.message || "Falha ao criar conta");
 					},
 				},
-			});
+			);
 		} catch (_errorrr) {
 			toast.error("Ocorreu um erro inesperado");
 		}
