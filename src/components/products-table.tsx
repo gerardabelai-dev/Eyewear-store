@@ -1,0 +1,242 @@
+"use client";
+
+import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
+import { ProductForm } from "@/components/forms/product-form";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+	Sheet,
+	SheetContent,
+	SheetDescription,
+	SheetHeader,
+	SheetTitle,
+} from "@/components/ui/sheet";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
+import type { Product } from "@/lib/db/schema";
+
+interface ProductsTableProps {
+	products: Product[];
+}
+
+function getStockStatus(stock: number) {
+	if (stock === 0) {
+		return { label: "Sem estoque", variant: "destructive" as const };
+	}
+	if (stock <= 10) {
+		return { label: "Estoque baixo", variant: "secondary" as const };
+	}
+	return { label: "Em estoque", variant: "default" as const };
+}
+
+function formatPrice(price: string) {
+	return new Intl.NumberFormat("pt-BR", {
+		style: "currency",
+		currency: "BRL",
+	}).format(parseFloat(price));
+}
+
+function formatCategory(category: string) {
+	const categoryMap: Record<string, string> = {
+		eletronicos: "Eletrônicos",
+		roupas: "Roupas",
+		"casa-jardim": "Casa e Jardim",
+		esportes: "Esportes",
+		livros: "Livros",
+		beleza: "Beleza",
+		automoveis: "Automóveis",
+		outros: "Outros",
+	};
+	return categoryMap[category] || category;
+}
+
+// Product Images Component
+function ProductImages({ images }: { images: string[] }) {
+	if (!images || images.length === 0) {
+		return (
+			<div className="flex h-12 w-12 items-center justify-center rounded-md bg-muted">
+				<span className="text-xs text-muted-foreground">Sem imagem</span>
+			</div>
+		);
+	}
+
+	if (images.length === 1) {
+		return (
+			<div className="relative h-12 w-12 overflow-hidden rounded-md">
+				<img
+					src={images[0]}
+					alt="Produto"
+					className="h-full w-full object-cover"
+				/>
+			</div>
+		);
+	}
+
+	return (
+		<div className="flex -space-x-2">
+			{images.slice(0, 3).map((image, index) => (
+				<div
+					key={image}
+					className="relative h-10 w-10 overflow-hidden rounded-md border-2 border-background"
+				>
+					<Image
+						src={image}
+						alt={`Produto ${index + 1}`}
+						className="h-full w-full object-cover"
+						width={40}
+						height={40}
+					/>
+				</div>
+			))}
+			{images.length > 3 && (
+				<div className="flex h-10 w-10 items-center justify-center rounded-md border-2 border-background bg-muted text-xs font-medium">
+					+{images.length - 3}
+				</div>
+			)}
+		</div>
+	);
+}
+
+export function ProductsTable({ products }: ProductsTableProps) {
+	const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+	if (products.length === 0) {
+		return (
+			<div className="flex h-32 items-center justify-center rounded-lg border border-dashed">
+				<p className="text-muted-foreground">Nenhum produto encontrado</p>
+			</div>
+		);
+	}
+
+	return (
+		<>
+			<div className="rounded-md border">
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead>Imagem</TableHead>
+							<TableHead>Produto</TableHead>
+							<TableHead>Categoria</TableHead>
+							<TableHead>Preço</TableHead>
+							<TableHead>Estoque</TableHead>
+							<TableHead>Status</TableHead>
+							<TableHead className="w-[70px]">Ações</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{products.map((product) => {
+							const stockStatus = getStockStatus(product.stock);
+							return (
+								<TableRow key={product.id}>
+									<TableCell>
+										<ProductImages images={product.images || []} />
+									</TableCell>
+									<TableCell>
+										<div className="space-y-1">
+											<div className="font-medium">{product.name}</div>
+											{product.description && (
+												<div className="text-sm text-muted-foreground line-clamp-2">
+													{product.description}
+												</div>
+											)}
+										</div>
+									</TableCell>
+									<TableCell>{formatCategory(product.category)}</TableCell>
+									<TableCell className="font-medium">
+										{formatPrice(product.price)}
+									</TableCell>
+									<TableCell>{product.stock}</TableCell>
+									<TableCell>
+										<Badge variant={stockStatus.variant}>
+											{stockStatus.label}
+										</Badge>
+									</TableCell>
+									<TableCell>
+										<DropdownMenu>
+											<DropdownMenuTrigger asChild>
+												<Button variant="ghost" className="h-8 w-8 p-0">
+													<span className="sr-only">Abrir menu</span>
+													<MoreHorizontal className="h-4 w-4" />
+												</Button>
+											</DropdownMenuTrigger>
+											<DropdownMenuContent align="end">
+												<DropdownMenuLabel>Ações</DropdownMenuLabel>
+												<DropdownMenuItem
+													onClick={() =>
+														navigator.clipboard.writeText(product.id)
+													}
+												>
+													Copiar ID do produto
+												</DropdownMenuItem>
+												<DropdownMenuSeparator />
+												<DropdownMenuItem
+													onClick={() => setEditingProduct(product)}
+												>
+													<Edit className="mr-2 h-4 w-4" />
+													Editar
+												</DropdownMenuItem>
+												<DropdownMenuItem className="text-destructive">
+													<Trash2 className="mr-2 h-4 w-4" />
+													Deletar
+												</DropdownMenuItem>
+											</DropdownMenuContent>
+										</DropdownMenu>
+									</TableCell>
+								</TableRow>
+							);
+						})}
+					</TableBody>
+				</Table>
+			</div>
+
+			{/* Edit Product Sheet */}
+			<Sheet
+				open={!!editingProduct}
+				onOpenChange={() => setEditingProduct(null)}
+			>
+				<SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
+					<div className="p-6">
+						<SheetHeader>
+							<SheetTitle className="flex items-center gap-2">
+								<Edit className="h-5 w-5" />
+								Editar Produto
+							</SheetTitle>
+							<SheetDescription>
+								Atualize as informações do produto. Modifique as imagens para
+								manter seu produto atrativo.
+							</SheetDescription>
+						</SheetHeader>
+
+						{editingProduct && (
+							<div className="mt-6">
+								<ProductForm
+									product={editingProduct}
+									onSuccess={() => {
+										setEditingProduct(null);
+										// The page will be revalidated automatically due to revalidatePath in the action
+									}}
+								/>
+							</div>
+						)}
+					</div>
+				</SheetContent>
+			</Sheet>
+		</>
+	);
+}

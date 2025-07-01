@@ -1,7 +1,8 @@
 "use client";
 
 import { LogOut, Search, Settings, Shield } from "lucide-react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -22,6 +23,12 @@ interface DashboardHeaderProps {
 	userEmail: string;
 }
 
+const navigationItems = [
+	{ name: "Produtos", href: "/produtos" },
+	{ name: "Pedidos", href: "#" },
+	{ name: "Clientes", href: "#" },
+];
+
 export function DashboardHeader({
 	userImage,
 	userInitials,
@@ -29,6 +36,7 @@ export function DashboardHeader({
 	userEmail,
 }: DashboardHeaderProps) {
 	const router = useRouter();
+	const pathname = usePathname();
 
 	const handleSignOut = async () => {
 		try {
@@ -44,12 +52,22 @@ export function DashboardHeader({
 		}
 	};
 
+	const isActivePath = (href: string) => {
+		if (href === "/dashboard") {
+			return pathname === "/dashboard";
+		}
+		return pathname.startsWith(href) && href !== "#";
+	};
+
 	return (
 		<header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between items-center h-14 sm:h-16">
 					<div className="flex items-center space-x-4 sm:space-x-8 min-w-0">
-						<div className="flex items-center space-x-2 shrink-0">
+						<Link
+							href="/dashboard"
+							className="flex items-center space-x-2 shrink-0"
+						>
 							<div
 								className={`w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-sm`}
 							>
@@ -58,23 +76,42 @@ export function DashboardHeader({
 							<span className="text-lg sm:text-xl font-bold truncate">
 								DrVista Admin
 							</span>
-						</div>
+						</Link>
 						<nav className="hidden lg:flex items-center space-x-6">
-							<Button variant="ghost" className="text-muted-foreground">
-								Dashboard
-							</Button>
-							<Button variant="ghost" className="text-muted-foreground">
-								Pedidos
-							</Button>
-							<Button variant="ghost" className="text-muted-foreground">
-								Produtos
-							</Button>
-							<Button variant="ghost" className="text-muted-foreground">
-								Clientes
-							</Button>
-							<Button variant="outline" className="bg-muted text-foreground">
-								Configurações
-							</Button>
+							{navigationItems.map((item) => {
+								const isActive = isActivePath(item.href);
+								const isDisabled = item.href === "#";
+
+								if (isDisabled) {
+									return (
+										<span
+											key={item.name}
+											className="px-3 py-2 text-sm font-medium text-muted-foreground cursor-not-allowed opacity-50"
+										>
+											{item.name}
+										</span>
+									);
+								}
+
+								return (
+									<Link
+										key={item.name}
+										href={item.href}
+										className={`px-3 py-2 text-sm font-medium rounded-md transition-colors hover:bg-accent hover:text-accent-foreground ${
+											isActive
+												? "bg-primary text-primary-foreground"
+												: "text-muted-foreground"
+										}`}
+									>
+										{item.name}
+									</Link>
+								);
+							})}
+							<Link href="/dashboard">
+								<Button variant="outline" className="bg-muted text-foreground">
+									Configurações
+								</Button>
+							</Link>
 						</nav>
 					</div>
 					<div className="flex items-center space-x-2 sm:space-x-4">
@@ -119,17 +156,29 @@ export function DashboardHeader({
 
 								{/* Mobile navigation items */}
 								<div className="lg:hidden">
-									<DropdownMenuItem>Dashboard</DropdownMenuItem>
-									<DropdownMenuItem>Pedidos</DropdownMenuItem>
-									<DropdownMenuItem>Produtos</DropdownMenuItem>
-									<DropdownMenuItem>Clientes</DropdownMenuItem>
+									{navigationItems.map((item) => {
+										if (item.href === "#") {
+											return (
+												<DropdownMenuItem key={item.name} disabled>
+													{item.name}
+												</DropdownMenuItem>
+											);
+										}
+										return (
+											<Link key={item.name} href={item.href}>
+												<DropdownMenuItem>{item.name}</DropdownMenuItem>
+											</Link>
+										);
+									})}
 									<DropdownMenuSeparator />
 								</div>
 
-								<DropdownMenuItem>
-									<Settings className="mr-2 h-4 w-4" />
-									Configurações
-								</DropdownMenuItem>
+								<Link href="/dashboard">
+									<DropdownMenuItem>
+										<Settings className="mr-2 h-4 w-4" />
+										Configurações
+									</DropdownMenuItem>
+								</Link>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem onClick={handleSignOut}>
 									<LogOut className="mr-2 h-4 w-4" />

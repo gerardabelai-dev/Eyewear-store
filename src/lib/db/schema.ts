@@ -1,4 +1,12 @@
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+	boolean,
+	decimal,
+	integer,
+	json,
+	pgTable,
+	text,
+	timestamp,
+} from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
 	id: text("id").primaryKey(),
@@ -52,6 +60,21 @@ export const verification = pgTable("verification", {
 	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
 
+export const product = pgTable("product", {
+	id: text("id").primaryKey(),
+	name: text("name").notNull(),
+	description: text("description"),
+	price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+	stock: integer("stock").notNull().default(0),
+	category: text("category").notNull(),
+	images: json("images").$type<string[]>().default([]),
+	userId: text("userId")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
+
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
 export type Session = typeof session.$inferSelect;
@@ -60,3 +83,5 @@ export type Account = typeof account.$inferSelect;
 export type NewAccount = typeof account.$inferInsert;
 export type Verification = typeof verification.$inferSelect;
 export type NewVerification = typeof verification.$inferInsert;
+export type Product = typeof product.$inferSelect;
+export type NewProduct = typeof product.$inferInsert;
