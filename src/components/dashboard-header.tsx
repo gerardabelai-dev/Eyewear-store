@@ -109,7 +109,16 @@ export function DashboardHeader({
 								);
 							})}
 							<Link href="/dashboard">
-								<Button variant="ghost">Configurações</Button>
+								<Button
+									variant="ghost"
+									className={
+										isActivePath("/dashboard")
+											? "text-foreground"
+											: "text-muted-foreground"
+									}
+								>
+									Configurações
+								</Button>
 							</Link>
 						</nav>
 					</div>
