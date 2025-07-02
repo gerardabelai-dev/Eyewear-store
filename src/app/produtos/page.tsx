@@ -2,16 +2,14 @@ import {
 	AlertTriangle,
 	Package,
 	Package2,
-	Plus,
 	Search,
 	TrendingUp,
 } from "lucide-react";
 import { redirect } from "next/navigation";
 import { DashboardHeader } from "@/components/dashboard-header";
-import { ProductForm } from "@/components/forms/product-form";
+import { ProductCreationSheet } from "@/components/product-creation-sheet";
 import { ProductsTable } from "@/components/products-table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -20,52 +18,9 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-	Sheet,
-	SheetContent,
-	SheetDescription,
-	SheetHeader,
-	SheetTitle,
-	SheetTrigger,
-} from "@/components/ui/sheet";
 import { getProducts } from "@/lib/actions/product";
 import { getUserProfile } from "@/lib/actions/user";
 import { getCurrentUser } from "@/lib/auth-server";
-
-// Product Creation Sheet Wrapper
-function ProductCreationSheet() {
-	return (
-		<Sheet>
-			<SheetTrigger asChild>
-				<Button className="gap-2">
-					<Plus className="h-4 w-4" />
-					Novo Produto
-				</Button>
-			</SheetTrigger>
-			<SheetContent className="w-full sm:max-w-2xl">
-				<SheetHeader>
-					<SheetTitle className="flex items-center gap-2">
-						<Package className="h-5 w-5" />
-						Novo Produto
-					</SheetTitle>
-					<SheetDescription>
-						Preencha as informações para criar um novo produto. Adicione imagens
-						para tornar seu produto mais atrativo.
-					</SheetDescription>
-				</SheetHeader>
-
-				<div className="mt-6">
-					<ProductForm
-						onSuccess={() => {
-							// Close the sheet after successful creation
-							// This will be handled by the sheet automatically when the form resets
-						}}
-					/>
-				</div>
-			</SheetContent>
-		</Sheet>
-	);
-}
 
 export default async function ProdutosPage() {
 	const user = await getCurrentUser();

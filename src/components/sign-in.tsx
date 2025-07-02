@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -130,12 +129,16 @@ export default function SignIn() {
 									<FormItem>
 										<div className="flex items-center justify-between">
 											<FormLabel>Senha</FormLabel>
-											<Link
-												href="#"
-												className="text-sm text-muted-foreground hover:text-primary"
+											<button
+												type="button"
+												className="text-sm text-muted-foreground hover:text-primary cursor-pointer underline bg-transparent border-none p-0"
+												onClick={() => {
+													// TODO: Implement forgot password functionality
+													console.log("Forgot password clicked");
+												}}
 											>
 												Esqueceu a senha?
-											</Link>
+											</button>
 										</div>
 										<FormControl>
 											<Input

@@ -60,17 +60,40 @@ export const verification = pgTable("verification", {
 	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
 
+export const category = pgTable("category", {
+	id: text("id").primaryKey(),
+	name: text("name").notNull().unique(),
+	slug: text("slug").notNull().unique(),
+	description: text("description"),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
+
+export const subcategory = pgTable("subcategory", {
+	id: text("id").primaryKey(),
+	name: text("name").notNull(),
+	slug: text("slug").notNull(),
+	description: text("description"),
+	categoryId: text("categoryId")
+		.notNull()
+		.references(() => category.id, { onDelete: "cascade" }),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
+
 export const product = pgTable("product", {
 	id: text("id").primaryKey(),
 	name: text("name").notNull(),
 	description: text("description"),
 	price: decimal("price", { precision: 10, scale: 2 }).notNull(),
 	stock: integer("stock").notNull().default(0),
-	category: text("category").notNull(),
-	images: json("images").$type<string[]>().default([]),
-	userId: text("userId")
+	categoryId: text("categoryId")
 		.notNull()
-		.references(() => user.id, { onDelete: "cascade" }),
+		.references(() => category.id, { onDelete: "restrict" }),
+	subcategoryId: text("subcategoryId").references(() => subcategory.id, {
+		onDelete: "restrict",
+	}),
+	images: json("images").$type<string[]>().default([]),
 	createdAt: timestamp("createdAt").notNull().defaultNow(),
 	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
@@ -83,5 +106,9 @@ export type Account = typeof account.$inferSelect;
 export type NewAccount = typeof account.$inferInsert;
 export type Verification = typeof verification.$inferSelect;
 export type NewVerification = typeof verification.$inferInsert;
+export type Category = typeof category.$inferSelect;
+export type NewCategory = typeof category.$inferInsert;
+export type Subcategory = typeof subcategory.$inferSelect;
+export type NewSubcategory = typeof subcategory.$inferInsert;
 export type Product = typeof product.$inferSelect;
 export type NewProduct = typeof product.$inferInsert;

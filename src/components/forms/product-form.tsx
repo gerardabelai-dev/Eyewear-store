@@ -2,7 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircleIcon, ImageIcon, UploadIcon, XIcon } from "lucide-react";
-import { useState } from "react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -24,8 +25,12 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useFileUpload } from "@/hooks/use-file-upload";
+import {
+	getCategories,
+	getSubcategoriesByCategory,
+} from "@/lib/actions/category";
 import { createProduct, updateProduct } from "@/lib/actions/product";
-import type { Product } from "@/lib/db/schema";
+import type { Category, Product, Subcategory } from "@/lib/db/schema";
 
 const productFormSchema = z.object({
 	name: z
@@ -44,7 +49,8 @@ const productFormSchema = z.object({
 		const num = parseInt(val);
 		return !Number.isNaN(num) && num >= 0;
 	}, "Estoque deve ser um número válido maior ou igual a 0"),
-	category: z.string().min(1, "Categoria é obrigatória"),
+	categoryId: z.string().min(1, "Categoria é obrigatória"),
+	subcategoryId: z.string().optional(),
 	images: z
 		.array(z.string().url("URL da imagem inválida"))
 		.max(6, "Máximo de 6 imagens permitidas")
@@ -53,20 +59,11 @@ const productFormSchema = z.object({
 
 type ProductFormData = z.infer<typeof productFormSchema>;
 
-const categories = [
-	{ label: "Eletrônicos", value: "eletronicos" },
-	{ label: "Roupas", value: "roupas" },
-	{ label: "Casa e Jardim", value: "casa-jardim" },
-	{ label: "Esportes", value: "esportes" },
-	{ label: "Livros", value: "livros" },
-	{ label: "Beleza", value: "beleza" },
-	{ label: "Automóveis", value: "automoveis" },
-	{ label: "Outros", value: "outros" },
-];
-
 interface ProductFormProps {
 	onSuccess?: () => void;
-	product?: Product; // For edit mode
+	product?:
+		| Product
+		| (Product & { categoryName?: string; subcategoryName?: string }); // For edit mode
 }
 
 // Product Image Upload Component
@@ -107,44 +104,48 @@ function ProductImageUpload({
 		multiple: true,
 		maxFiles,
 		initialFiles,
-		onFilesChange: (updatedFiles) => {
-			// Convert files to URLs for form submission
-			// In a real app, you'd upload these to a storage service and get URLs
-			const imageUrls = updatedFiles
-				.map((file) => {
-					if (file.preview) {
-						return file.preview;
-					}
-					// For existing files that are already URLs
-					if (typeof file.file === "object" && "url" in file.file) {
-						return (file.file as any).url;
-					}
-					return "";
-				})
-				.filter(Boolean);
-
-			onImagesChange(imageUrls);
-		},
 	});
+
+	// Update images when files change - use useEffect to avoid setState during render
+	useEffect(() => {
+		// Convert files to URLs for form submission
+		// In a real app, you'd upload these to a storage service and get URLs
+		const imageUrls = files
+			.map((file) => {
+				if (file.preview) {
+					return file.preview;
+				}
+				// For existing files that are already URLs
+				if (typeof file.file === "object" && "url" in file.file) {
+					return (file.file as any).url;
+				}
+				return "";
+			})
+			.filter(Boolean);
+
+		onImagesChange(imageUrls);
+	}, [files, onImagesChange]);
 
 	return (
 		<div className="space-y-2">
-			{/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
 			<div
 				onDragEnter={handleDragEnter}
 				onDragLeave={handleDragLeave}
 				onDragOver={handleDragOver}
 				onDrop={handleDrop}
 				onClick={openFileDialog}
+				data-dragging={isDragging || undefined}
+				data-files={files.length > 0 || undefined}
+				className="border-input data-[dragging=true]:bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 relative flex min-h-52 flex-col items-center overflow-hidden rounded-xl border border-dashed p-4 transition-colors not-data-[files]:justify-center has-[input:focus]:ring-[3px] cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 w-full"
+				role="button"
+				tabIndex={0}
+				aria-label="Upload de imagens do produto"
 				onKeyDown={(e) => {
 					if (e.key === "Enter" || e.key === " ") {
 						e.preventDefault();
 						openFileDialog();
 					}
 				}}
-				data-dragging={isDragging || undefined}
-				data-files={files.length > 0 || undefined}
-				className="border-input data-[dragging=true]:bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 relative flex min-h-52 flex-col items-center overflow-hidden rounded-xl border border-dashed p-4 transition-colors not-data-[files]:justify-center has-[input:focus]:ring-[3px] cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
 			>
 				<input
 					{...getInputProps()}
@@ -183,14 +184,16 @@ function ProductImageUpload({
 									key={file.id}
 									className="bg-accent relative aspect-square rounded-md"
 								>
-									<img
-										src={file.preview}
+									<Image
+										src={file.preview || "/placeholder.svg"}
 										alt={
 											file.file instanceof File
 												? file.file.name
 												: "Imagem do produto"
 										}
 										className="size-full rounded-[inherit] object-cover"
+										width={200}
+										height={200}
 									/>
 									<Button
 										type="button"
@@ -209,17 +212,18 @@ function ProductImageUpload({
 						</div>
 					</div>
 				) : (
-					<div className="text-center">
-						<div
-							className="bg-background mb-2 flex size-11 shrink-0 items-center justify-center rounded-full border"
-							aria-hidden="true"
-						>
-							<ImageIcon className="size-5 opacity-60" />
+					<div className="flex flex-col items-center justify-center gap-3 text-center">
+						<div className="bg-muted/50 rounded-full p-4">
+							<ImageIcon className="text-muted-foreground size-8" />
 						</div>
-						<p className="text-sm font-medium">Arraste suas imagens aqui</p>
-						<p className="text-muted-foreground text-xs">
-							SVG, PNG, JPG, GIF ou WebP (máx. {maxSizeMB}MB)
-						</p>
+						<div>
+							<p className="text-foreground text-sm">
+								Arraste e solte imagens ou clique para selecionar
+							</p>
+							<p className="text-muted-foreground text-xs mt-1">
+								PNG, JPG ou WEBP até {maxSizeMB}MB
+							</p>
+						</div>
 						<Button
 							type="button"
 							variant="outline"
@@ -254,6 +258,9 @@ function ProductImageUpload({
 
 export function ProductForm({ onSuccess, product }: ProductFormProps) {
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [categories, setCategories] = useState<Category[]>([]);
+	const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
+	const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
 	const isEditing = !!product;
 
 	const form = useForm<ProductFormData>({
@@ -263,10 +270,44 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 			description: product?.description || "",
 			price: product?.price || "",
 			stock: product?.stock?.toString() || "",
-			category: product?.category || "",
+			categoryId: product?.categoryId || "",
+			subcategoryId: product?.subcategoryId || "",
 			images: product?.images || [],
 		},
 	});
+
+	// Load categories on component mount
+	useEffect(() => {
+		async function loadCategories() {
+			const result = await getCategories();
+			if (result.data) {
+				setCategories(result.data);
+			}
+		}
+		loadCategories();
+	}, []);
+
+	// Load subcategories when category changes
+	useEffect(() => {
+		async function loadSubcategories() {
+			if (selectedCategoryId) {
+				const result = await getSubcategoriesByCategory(selectedCategoryId);
+				if (result.data) {
+					setSubcategories(result.data);
+				}
+			} else {
+				setSubcategories([]);
+			}
+		}
+		loadSubcategories();
+	}, [selectedCategoryId]);
+
+	// Set initial category if editing
+	useEffect(() => {
+		if (product?.categoryId) {
+			setSelectedCategoryId(product.categoryId);
+		}
+	}, [product?.categoryId]);
 
 	async function onSubmit(data: ProductFormData) {
 		setIsSubmitting(true);
@@ -363,12 +404,17 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 
 					<FormField
 						control={form.control}
-						name="category"
+						name="categoryId"
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Categoria</FormLabel>
 								<Select
-									onValueChange={field.onChange}
+									onValueChange={(value) => {
+										field.onChange(value);
+										setSelectedCategoryId(value);
+										// Reset subcategory when category changes
+										form.setValue("subcategoryId", "");
+									}}
 									defaultValue={field.value}
 								>
 									<FormControl>
@@ -378,8 +424,8 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 									</FormControl>
 									<SelectContent>
 										{categories.map((category) => (
-											<SelectItem key={category.value} value={category.value}>
-												{category.label}
+											<SelectItem key={category.id} value={category.id}>
+												{category.name}
 											</SelectItem>
 										))}
 									</SelectContent>
@@ -388,6 +434,40 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 							</FormItem>
 						)}
 					/>
+
+					{selectedCategoryId && subcategories.length > 0 && (
+						<FormField
+							control={form.control}
+							name="subcategoryId"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Subcategoria (Opcional)</FormLabel>
+									<Select
+										onValueChange={(value) => {
+											// Convert "none" back to empty string for the form
+											field.onChange(value === "none" ? "" : value);
+										}}
+										defaultValue={field.value || "none"}
+									>
+										<FormControl>
+											<SelectTrigger>
+												<SelectValue placeholder="Selecione uma subcategoria" />
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent>
+											<SelectItem value="none">Nenhuma subcategoria</SelectItem>
+											{subcategories.map((subcategory) => (
+												<SelectItem key={subcategory.id} value={subcategory.id}>
+													{subcategory.name}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					)}
 
 					<Separator />
 

@@ -4,7 +4,14 @@ export default function Component() {
 	return (
 		<div className="dark bg-muted text-foreground px-4 py-3">
 			<p className="flex justify-center text-sm">
-				<a href="#" className="group">
+				<button
+					type="button"
+					className="group bg-transparent border-none p-0 text-inherit underline cursor-pointer"
+					onClick={() => {
+						// TODO: Implement action for this announcement
+						console.log("Announcement clicked");
+					}}
+				>
 					<span className="me-1 text-base leading-none">✨</span>
 					Introducing transactional and marketing emails
 					<ArrowRightIcon
@@ -12,7 +19,7 @@ export default function Component() {
 						size={16}
 						aria-hidden="true"
 					/>
-				</a>
+				</button>
 			</p>
 		</div>
 	);

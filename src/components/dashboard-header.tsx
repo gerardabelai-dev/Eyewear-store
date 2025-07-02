@@ -84,33 +84,32 @@ export function DashboardHeader({
 
 								if (isDisabled) {
 									return (
-										<span
+										<Button
 											key={item.name}
-											className="px-3 py-2 text-sm font-medium text-muted-foreground cursor-not-allowed opacity-50"
+											variant="ghost"
+											className="text-muted-foreground cursor-not-allowed opacity-50"
+											disabled
 										>
 											{item.name}
-										</span>
+										</Button>
 									);
 								}
 
 								return (
-									<Link
-										key={item.name}
-										href={item.href}
-										className={`px-3 py-2 text-sm font-medium rounded-md transition-colors hover:bg-accent hover:text-accent-foreground ${
-											isActive
-												? "bg-primary text-primary-foreground"
-												: "text-muted-foreground"
-										}`}
-									>
-										{item.name}
+									<Link key={item.name} href={item.href}>
+										<Button
+											variant="ghost"
+											className={
+												isActive ? "text-foreground" : "text-muted-foreground"
+											}
+										>
+											{item.name}
+										</Button>
 									</Link>
 								);
 							})}
 							<Link href="/dashboard">
-								<Button variant="outline" className="bg-muted text-foreground">
-									Configurações
-								</Button>
+								<Button variant="ghost">Configurações</Button>
 							</Link>
 						</nav>
 					</div>

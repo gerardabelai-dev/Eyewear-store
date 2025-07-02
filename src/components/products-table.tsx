@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
+import { Edit, ImageOff, MoreHorizontal, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { ProductForm } from "@/components/forms/product-form";
@@ -31,8 +31,16 @@ import {
 } from "@/components/ui/table";
 import type { Product } from "@/lib/db/schema";
 
+// Extended Product type with category information
+type ProductWithCategory = Product & {
+	categoryName: string | null;
+	categorySlug: string | null;
+	subcategoryName: string | null;
+	subcategorySlug: string | null;
+};
+
 interface ProductsTableProps {
-	products: Product[];
+	products: ProductWithCategory[];
 }
 
 function getStockStatus(stock: number) {
@@ -52,18 +60,14 @@ function formatPrice(price: string) {
 	}).format(parseFloat(price));
 }
 
-function formatCategory(category: string) {
-	const categoryMap: Record<string, string> = {
-		eletronicos: "Eletrônicos",
-		roupas: "Roupas",
-		"casa-jardim": "Casa e Jardim",
-		esportes: "Esportes",
-		livros: "Livros",
-		beleza: "Beleza",
-		automoveis: "Automóveis",
-		outros: "Outros",
-	};
-	return categoryMap[category] || category;
+function formatCategory(product: ProductWithCategory) {
+	let categoryText = product.categoryName || "Sem categoria";
+
+	if (product.subcategoryName) {
+		categoryText += ` > ${product.subcategoryName}`;
+	}
+
+	return categoryText;
 }
 
 // Product Images Component
@@ -71,7 +75,7 @@ function ProductImages({ images }: { images: string[] }) {
 	if (!images || images.length === 0) {
 		return (
 			<div className="flex h-12 w-12 items-center justify-center rounded-md bg-muted">
-				<span className="text-xs text-muted-foreground">Sem imagem</span>
+				<ImageOff className="h-6 w-6 text-muted-foreground" />
 			</div>
 		);
 	}
@@ -79,10 +83,12 @@ function ProductImages({ images }: { images: string[] }) {
 	if (images.length === 1) {
 		return (
 			<div className="relative h-12 w-12 overflow-hidden rounded-md">
-				<img
+				<Image
 					src={images[0]}
 					alt="Produto"
 					className="h-full w-full object-cover"
+					width={48}
+					height={48}
 				/>
 			</div>
 		);
@@ -114,7 +120,8 @@ function ProductImages({ images }: { images: string[] }) {
 }
 
 export function ProductsTable({ products }: ProductsTableProps) {
-	const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+	const [editingProduct, setEditingProduct] =
+		useState<ProductWithCategory | null>(null);
 
 	if (products.length === 0) {
 		return (
@@ -149,15 +156,17 @@ export function ProductsTable({ products }: ProductsTableProps) {
 									</TableCell>
 									<TableCell>
 										<div className="space-y-1">
-											<div className="font-medium">{product.name}</div>
+											<div className="font-medium max-w-32 whitespace-nowrap overflow-hidden text-ellipsis">
+												{product.name}
+											</div>
 											{product.description && (
-												<div className="text-sm text-muted-foreground line-clamp-2">
+												<div className="text-sm text-muted-foreground max-w-32 whitespace-nowrap overflow-hidden text-ellipsis">
 													{product.description}
 												</div>
 											)}
 										</div>
 									</TableCell>
-									<TableCell>{formatCategory(product.category)}</TableCell>
+									<TableCell>{formatCategory(product)}</TableCell>
 									<TableCell className="font-medium">
 										{formatPrice(product.price)}
 									</TableCell>
