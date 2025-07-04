@@ -1,111 +1,200 @@
-# Fullstack Admin Dashboard
+# DrVista Admin - Sistema de Gestão com Pedidos
 
-A modern admin dashboard built with Next.js 15, Better Auth, Drizzle ORM, and Neon PostgreSQL.
+Sistema administrativo moderno com autenticação segura, gestão de produtos e **sistema completo de pedidos** usando Next.js, TypeScript, Drizzle ORM e Better Auth.
 
-## Features
+## ✨ Funcionalidades
 
-- 🔐 **Authentication**: Better Auth with email/password + Google OAuth
-- 🗃️ **Database**: Neon PostgreSQL with Drizzle ORM
-- ✅ **Validation**: Zod v4 with environment variable validation
-- 🎨 **UI**: Tailwind CSS + Shadcn UI components
-- ⚡ **Performance**: Next.js 15 with Turbopack
-- 🔧 **Code Quality**: Biome for linting and formatting
-- 📱 **Responsive**: Mobile-first design
+### 🔐 Autenticação
+- Autenticação segura com Better Auth
+- Login com Google OAuth
+- Gerenciamento de sessões
+- Proteção de rotas
 
-## Tech Stack
+### 📦 Gestão de Produtos
+- Catálogo completo de produtos
+- Categorias e subcategorias
+- Controle de estoque
+- Upload de imagens
+- Filtros e busca
 
-- **Framework**: Next.js 15
-- **Authentication**: Better Auth 1.2.12
-- **Database**: Neon PostgreSQL
-- **ORM**: Drizzle ORM
-- **Validation**: Zod v4
-- **Styling**: Tailwind CSS
-- **UI Components**: Shadcn UI
-- **Code Quality**: Biome
+### 🛒 **Sistema de Pedidos (NOVO)**
+- **Criação de pedidos** com múltiplos produtos
+- **Gestão de clientes** com informações completas
+- **Controle de status** (Pendente, Processamento, Concluído, Cancelado)
+- **Atualização automática de estoque** ao criar/cancelar pedidos
+- **Dashboard com estatísticas** de vendas e faturamento
+- **Visualização detalhada** de pedidos
+- **Geração automática** de números de pedido
 
-## Quick Start
+### 📊 Dashboard e Relatórios
+- Estatísticas de produtos e estoque
+- **Estatísticas de pedidos e faturamento**
+- **Controle de receita** por pedidos concluídos
+- Cards informativos com métricas importantes
 
-### Prerequisites
+## 🚀 Tecnologias
 
-- Node.js 18+ 
-- A Neon database (create one at [neon.tech](https://neon.tech))
-- Google OAuth credentials (optional, for social login)
+- **Next.js 14** - Framework React com App Router
+- **TypeScript** - Tipagem estática
+- **Drizzle ORM** - ORM moderno para TypeScript
+- **Better Auth** - Autenticação segura
+- **Neon Database** - PostgreSQL serverless
+- **Tailwind CSS** - Estilização
+- **Shadcn/ui** - Componentes UI
+- **Zod** - Validação de schemas
 
-### Setup
+## 🗃️ Estrutura do Banco de Dados
 
-1. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+### Tabelas Principais
+- `user` - Usuários do sistema
+- `category` / `subcategory` - Categorização de produtos
+- `product` - Produtos com preços e estoque
+- **`order`** - Pedidos com informações do cliente
+- **`orderItem`** - Itens dos pedidos (produtos + quantidades)
 
-2. **Configure environment variables**:
-   ```bash
-   cp .env.example .env.local
-   # Edit .env.local with your actual values
-   ```
+### Relacionamentos
+- Usuário pode ter múltiplos pedidos
+- Pedido pode ter múltiplos itens
+- Cada item está relacionado a um produto
+- Controle de integridade referencial
 
-3. **Push database schema**:
-   ```bash
-   npm run db:push
-   ```
+## 📋 Funcionalidades do Sistema de Pedidos
 
-4. **Start development server**:
-   ```bash
-   npm run dev
-   ```
+### 1. Criação de Pedidos
+- Interface intuitiva para seleção de produtos
+- Validação de estoque em tempo real
+- Cálculo automático de totais
+- Campos para informações do cliente
+- Observações opcionais
 
-> **Note**: Environment variables are automatically validated on startup using Zod v4 schema validation. If any required variables are missing or invalid, the application will fail to start with helpful error messages.
+### 2. Gestão de Status
+- **Pendente** - Pedido criado, aguardando processamento
+- **Em Processamento** - Pedido sendo preparado
+- **Concluído** - Pedido finalizado e entregue
+- **Cancelado** - Pedido cancelado (estoque restaurado)
 
+### 3. Controle de Estoque
+- Redução automática do estoque ao criar pedido
+- Restauração do estoque ao cancelar pedido
+- Validação de disponibilidade antes da criação
+- Alertas de estoque baixo
 
+### 4. Dashboard de Vendas
+- Total de pedidos registrados
+- Quantidade por status
+- Faturamento total (pedidos concluídos)
+- Visualização em tempo real
 
+## 🛠️ Instalação e Configuração
 
+### Pré-requisitos
+- Node.js 18+
+- Conta no Neon Database
+- Conta no Google Cloud (para OAuth)
 
-## Project Structure
-
+### 1. Clone o repositório
+```bash
+git clone <repository-url>
+cd drvista-admin
 ```
-src/
-├── app/
-│   ├── api/auth/[...all]/     # Better Auth API routes
-│   ├── layout.tsx             # Root layout
-│   └── page.tsx               # Home page
-├── components/
-│   ├── ui/                    # Shadcn UI components
-│   ├── sign-in.tsx           # Sign in component
-│   └── sign-up.tsx           # Sign up component
-└── lib/
-    ├── auth.ts               # Better Auth server config
-    ├── auth-client.ts        # Better Auth client config
-    ├── db.ts                 # Database connection
-    ├── db/schema.ts          # Database schema
-    ├── env.ts                # Environment validation with Zod v4
-    └── utils.ts              # Utility functions
+
+### 2. Instale as dependências
+```bash
+npm install
 ```
 
-## Better Auth + Drizzle + Neon Setup
+### 3. Configure as variáveis de ambiente
+Crie um arquivo `.env.local` com:
 
-This project uses Better Auth with the Drizzle PostgreSQL adapter for Neon database:
+```env
+# Next.js Configuration
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-**Database Schema**: All required tables (user, session, account, verification) are defined in `src/lib/db/schema.ts`
+# Neon Database Configuration
+DATABASE_URL=postgres://[user]:[password]@[host]/[database]
 
-**Authentication Configuration**: 
-- Email/password authentication enabled
-- Google OAuth support (optional)
-- Session management with Neon PostgreSQL
-- TypeScript-safe with Drizzle ORM
+# Better Auth Configuration
+BETTER_AUTH_SECRET=your-secret-key-here
+BETTER_AUTH_URL=http://localhost:3000
 
-**Key Features**:
-- ✅ Serverless-ready with Neon
-- ✅ Type-safe database operations
-- ✅ Automatic schema migrations
-- ✅ Production-ready authentication
+# Google OAuth Configuration
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+```
 
-## Learn More
+### 4. Execute as migrações do banco
+```bash
+npx drizzle-kit push
+```
 
-- [Better Auth Documentation](https://www.better-auth.com/docs)
-- [Drizzle ORM Documentation](https://orm.drizzle.team/)
-- [Neon Documentation](https://neon.tech/docs)
-- [Next.js Documentation](https://nextjs.org/docs)
+### 5. Inicie o servidor de desenvolvimento
+```bash
+npm run dev
+```
 
-## License
+## 🔄 Migrações do Banco de Dados
 
-MIT License
+O sistema inclui migrações para:
+- Estrutura inicial de usuários e autenticação
+- Tabelas de produtos e categorias
+- **Tabelas de pedidos e itens** (migração 0007)
+
+Para gerar novas migrações:
+```bash
+npx drizzle-kit generate
+```
+
+Para aplicar migrações:
+```bash
+npx drizzle-kit push
+```
+
+## 📖 Como Usar o Sistema de Pedidos
+
+### 1. Acesse a página de Pedidos
+- Navegue até `/pedidos` no menu principal
+- Visualize o dashboard com estatísticas
+
+### 2. Criar um novo pedido
+- Clique em "Novo Pedido"
+- Preencha as informações do cliente
+- Adicione produtos ao pedido
+- Confirme a criação
+
+### 3. Gerenciar pedidos existentes
+- Visualize todos os pedidos na tabela
+- Altere o status conforme necessário
+- Veja detalhes completos de cada pedido
+
+### 4. Acompanhar métricas
+- Monitore faturamento total
+- Controle pedidos por status
+- Analise tendências de vendas
+
+## 🔐 Segurança
+
+- Validação de dados com Zod
+- Autenticação obrigatória para todas as operações
+- Controle de acesso por usuário
+- Sanitização de entradas
+- Proteção contra SQL injection com Drizzle ORM
+
+## 🤝 Contribuindo
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova funcionalidade'`)
+4. Push para a branch (`git push origin feature/nova-funcionalidade`)
+5. Abra um Pull Request
+
+## 📝 Licença
+
+Este projeto está licenciado under the MIT License - veja o arquivo [LICENSE](LICENSE) para detalhes.
+
+## 🆘 Suporte
+
+Para suporte, entre em contato através do email ou abra uma issue no GitHub.
+
+---
+
+**Sistema de Pedidos** desenvolvido com ❤️ usando tecnologias modernas para uma experiência completa de gestão empresarial.

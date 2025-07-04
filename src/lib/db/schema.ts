@@ -98,6 +98,37 @@ export const product = pgTable("product", {
 	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
 
+export const order = pgTable("order", {
+	id: text("id").primaryKey(),
+	orderNumber: text("orderNumber").notNull().unique(),
+	userId: text("userId")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	customerName: text("customerName").notNull(),
+	customerEmail: text("customerEmail").notNull(),
+	customerPhone: text("customerPhone"),
+	status: text("status").notNull().default("pending"), // pending, processing, completed, cancelled
+	totalAmount: decimal("totalAmount", { precision: 10, scale: 2 }).notNull(),
+	notes: text("notes"),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
+
+export const orderItem = pgTable("orderItem", {
+	id: text("id").primaryKey(),
+	orderId: text("orderId")
+		.notNull()
+		.references(() => order.id, { onDelete: "cascade" }),
+	productId: text("productId")
+		.notNull()
+		.references(() => product.id, { onDelete: "restrict" }),
+	quantity: integer("quantity").notNull(),
+	unitPrice: decimal("unitPrice", { precision: 10, scale: 2 }).notNull(),
+	totalPrice: decimal("totalPrice", { precision: 10, scale: 2 }).notNull(),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
+
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
 export type Session = typeof session.$inferSelect;
@@ -112,3 +143,7 @@ export type Subcategory = typeof subcategory.$inferSelect;
 export type NewSubcategory = typeof subcategory.$inferInsert;
 export type Product = typeof product.$inferSelect;
 export type NewProduct = typeof product.$inferInsert;
+export type Order = typeof order.$inferSelect;
+export type NewOrder = typeof order.$inferInsert;
+export type OrderItem = typeof orderItem.$inferSelect;
+export type NewOrderItem = typeof orderItem.$inferInsert;

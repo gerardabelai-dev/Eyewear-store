@@ -1,8 +1,5 @@
 "use client";
 
-import { LogOut, Search, Settings, Shield } from "lucide-react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -15,6 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { signOut } from "@/lib/auth-client";
+import { LogOut, Search, Settings, Shield } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 interface DashboardHeaderProps {
 	userImage?: string | null;
@@ -25,7 +25,7 @@ interface DashboardHeaderProps {
 
 const navigationItems = [
 	{ name: "Produtos", href: "/produtos" },
-	{ name: "Pedidos", href: "#" },
+	{ name: "Pedidos", href: "/pedidos" },
 	{ name: "Clientes", href: "#" },
 ];
 
