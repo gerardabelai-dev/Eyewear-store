@@ -129,42 +129,6 @@ export default async function PedidosPage() {
 				</Card>
 			</div>
 
-			{/* Status Overview */}
-			<Card>
-				<CardHeader>
-					<CardTitle>Status dos Pedidos</CardTitle>
-					<CardDescription>
-						Visão geral do status atual dos pedidos
-					</CardDescription>
-				</CardHeader>
-				<CardContent className="flex flex-wrap gap-2">
-					<Badge variant="secondary" className="whitespace-nowrap">
-						{stats.pendingOrders} Pendentes
-					</Badge>
-					<Badge
-						variant="outline"
-						className="whitespace-nowrap border-blue-200 text-blue-700"
-					>
-						{stats.processingOrders} Em Processamento
-					</Badge>
-					<Badge
-						variant="outline"
-						className="whitespace-nowrap border-green-200 text-green-700"
-					>
-						{stats.completedOrders} Concluídos
-					</Badge>
-					{stats.cancelledOrders > 0 && (
-						<Badge
-							variant="outline"
-							className="whitespace-nowrap border-red-200 text-red-700"
-						>
-							{stats.cancelledOrders} Cancelados
-						</Badge>
-					)}
-				</CardContent>
-			</Card>
-
-			{/* Orders Table */}
 			<Card>
 				<CardHeader>
 					<CardTitle>Pedidos Registrados</CardTitle>

@@ -39,6 +39,15 @@ const updateOrderStatusSchema = z.object({
 	}),
 });
 
+const updateOrderSchema = z.object({
+	id: z.string().min(1, "ID do pedido é obrigatório"),
+	customerName: z.string().min(1, "Nome do cliente é obrigatório"),
+	customerEmail: z.string().email("E-mail inválido"),
+	customerPhone: z.string().optional(),
+	notes: z.string().optional(),
+	items: z.array(orderItemSchema).min(1, "Pelo menos um item é obrigatório"),
+});
+
 // Generate order number
 function generateOrderNumber(): string {
 	const timestamp = Date.now().toString();
@@ -231,6 +240,144 @@ export async function createOrder(data: z.infer<typeof createOrderSchema>) {
 		return { data: newOrder[0], success: "Pedido criado com sucesso" };
 	} catch (error) {
 		console.error("Erro ao criar pedido:", error);
+		if (error instanceof z.ZodError) {
+			return {
+				error: error.errors[0]?.message || "Dados inválidos fornecidos",
+			};
+		}
+		return { error: "Erro interno do servidor" };
+	}
+}
+
+// Update an existing order
+export async function updateOrder(data: z.infer<typeof updateOrderSchema>) {
+	try {
+		const currentUser = await getCurrentUser();
+		if (!currentUser) {
+			return { error: "Usuário não autenticado" };
+		}
+
+		const validatedData = updateOrderSchema.parse(data);
+
+		// Check if order exists and belongs to current user
+		const existingOrder = await db
+			.select()
+			.from(order)
+			.where(
+				and(eq(order.id, validatedData.id), eq(order.userId, currentUser.id)),
+			)
+			.limit(1);
+
+		if (!existingOrder.length) {
+			return { error: "Pedido não encontrado" };
+		}
+
+		// Don't allow updating completed or cancelled orders
+		if (
+			existingOrder[0].status === "completed" ||
+			existingOrder[0].status === "cancelled"
+		) {
+			return {
+				error: "Não é possível editar pedidos concluídos ou cancelados",
+			};
+		}
+
+		// Get existing order items to restore stock
+		const existingItems = await db
+			.select()
+			.from(orderItem)
+			.where(eq(orderItem.orderId, validatedData.id));
+
+		// Restore stock for existing items
+		for (const item of existingItems) {
+			const productData = await db
+				.select()
+				.from(product)
+				.where(eq(product.id, item.productId))
+				.limit(1);
+
+			if (productData.length > 0) {
+				await db
+					.update(product)
+					.set({
+						stock: productData[0].stock + item.quantity,
+						updatedAt: new Date(),
+					})
+					.where(eq(product.id, item.productId));
+			}
+		}
+
+		// Validate new products and stock
+		const allProducts = await db.select().from(product);
+		const productsMap = new Map(allProducts.map((p) => [p.id, p]));
+
+		for (const item of validatedData.items) {
+			const productData = productsMap.get(item.productId);
+			if (!productData) {
+				return { error: `Produto ${item.productId} não encontrado` };
+			}
+			if (productData.stock < item.quantity) {
+				return {
+					error: `Estoque insuficiente para o produto ${productData.name}`,
+				};
+			}
+		}
+
+		// Calculate new total amount
+		const totalAmount = validatedData.items.reduce((sum, item) => {
+			return sum + parseFloat(item.unitPrice) * item.quantity;
+		}, 0);
+
+		// Delete existing order items
+		await db.delete(orderItem).where(eq(orderItem.orderId, validatedData.id));
+
+		// Update order
+		const updatedOrder = await db
+			.update(order)
+			.set({
+				customerName: validatedData.customerName,
+				customerEmail: validatedData.customerEmail,
+				customerPhone: validatedData.customerPhone || null,
+				notes: validatedData.notes || null,
+				totalAmount: totalAmount.toString(),
+				updatedAt: new Date(),
+			})
+			.where(eq(order.id, validatedData.id))
+			.returning();
+
+		// Create new order items
+		const orderItems = validatedData.items.map((item) => ({
+			id: crypto.randomUUID(),
+			orderId: validatedData.id,
+			productId: item.productId,
+			quantity: item.quantity,
+			unitPrice: item.unitPrice,
+			totalPrice: (parseFloat(item.unitPrice) * item.quantity).toString(),
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		}));
+
+		await db.insert(orderItem).values(orderItems);
+
+		// Update product stock for new items
+		for (const item of validatedData.items) {
+			const productData = productsMap.get(item.productId);
+			if (productData) {
+				await db
+					.update(product)
+					.set({
+						stock: productData.stock - item.quantity,
+						updatedAt: new Date(),
+					})
+					.where(eq(product.id, item.productId));
+			}
+		}
+
+		revalidatePath("/pedidos");
+		revalidatePath("/produtos");
+		return { data: updatedOrder[0], success: "Pedido atualizado com sucesso" };
+	} catch (error) {
+		console.error("Erro ao atualizar pedido:", error);
 		if (error instanceof z.ZodError) {
 			return {
 				error: error.errors[0]?.message || "Dados inválidos fornecidos",
