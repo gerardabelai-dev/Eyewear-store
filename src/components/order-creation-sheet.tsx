@@ -1,5 +1,16 @@
 "use client";
 
+import {
+	Mail,
+	MessageSquare,
+	Phone,
+	Plus,
+	ShoppingCart,
+	User,
+	X,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,17 +35,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { createOrder } from "@/lib/actions/order";
 import { getProducts } from "@/lib/actions/product";
 import type { Product } from "@/lib/db/schema";
-import {
-	Mail,
-	MessageSquare,
-	Phone,
-	Plus,
-	ShoppingCart,
-	User,
-	X,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 interface OrderItem {
 	productId: string;

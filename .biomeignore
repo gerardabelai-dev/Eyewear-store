@@ -1,0 +1,17 @@
+# Build and generated directories
+.next/
+node_modules/
+dist/
+build/
+coverage/
+
+# Minified files
+*.min.js
+*.min.css
+
+# Auto-generated files
+*.d.ts
+
+# IDE and editor files
+.vscode/
+.idea/ 

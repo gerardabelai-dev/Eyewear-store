@@ -1,3 +1,12 @@
+import {
+	AlertCircle,
+	CheckCircle,
+	Clock,
+	Package,
+	ShoppingCart,
+	TrendingUp,
+} from "lucide-react";
+import { redirect } from "next/navigation";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { OrderCreationSheet } from "@/components/order-creation-sheet";
 import { OrdersTable } from "@/components/orders-table";
@@ -12,15 +21,6 @@ import {
 import { getOrderStats, getOrders } from "@/lib/actions/order";
 import { getUserProfile } from "@/lib/actions/user";
 import { getCurrentUser } from "@/lib/auth-server";
-import {
-	AlertCircle,
-	CheckCircle,
-	Clock,
-	Package,
-	ShoppingCart,
-	TrendingUp,
-} from "lucide-react";
-import { redirect } from "next/navigation";
 
 export default async function PedidosPage() {
 	const user = await getCurrentUser();
@@ -216,7 +216,7 @@ export default async function PedidosPage() {
 							{stats.totalOrders > 0
 								? `${stats.totalOrders} pedido${
 										stats.totalOrders > 1 ? "s" : ""
-								  } encontrado${stats.totalOrders > 1 ? "s" : ""}`
+									} encontrado${stats.totalOrders > 1 ? "s" : ""}`
 								: "Nenhum pedido registrado ainda"}
 						</CardDescription>
 					</CardHeader>
