@@ -25,7 +25,7 @@ interface DashboardHeaderProps {
 
 const navigationItems = [
 	{ name: "Produtos", href: "/produtos" },
-	{ name: "Pedidos", href: "#" },
+	{ name: "Pedidos", href: "/pedidos" },
 	{ name: "Clientes", href: "#" },
 ];
 
@@ -123,20 +123,6 @@ export function DashboardHeader({
 						</nav>
 					</div>
 					<div className="flex items-center space-x-2 sm:space-x-4">
-						{/* Search - Responsive width */}
-						<div className="relative hidden sm:block">
-							<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-							<Input
-								placeholder="Buscar"
-								className="pl-10 w-32 md:w-48 lg:w-64"
-							/>
-						</div>
-
-						{/* Mobile Search Button */}
-						<Button variant="ghost" size="sm" className="sm:hidden p-2">
-							<Search className="w-4 h-4" />
-						</Button>
-
 						{/* User Dropdown */}
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>

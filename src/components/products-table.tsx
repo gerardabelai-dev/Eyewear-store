@@ -6,6 +6,7 @@ import { useState } from "react";
 import { ProductForm } from "@/components/forms/product-form";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Drawer } from "@/components/ui/drawer";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -14,13 +15,6 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-	Sheet,
-	SheetContent,
-	SheetDescription,
-	SheetHeader,
-	SheetTitle,
-} from "@/components/ui/sheet";
 import {
 	Table,
 	TableBody,
@@ -150,7 +144,11 @@ export function ProductsTable({ products }: ProductsTableProps) {
 						{products.map((product) => {
 							const stockStatus = getStockStatus(product.stock);
 							return (
-								<TableRow key={product.id}>
+								<TableRow
+									key={product.id}
+									className="cursor-pointer hover:bg-muted/50"
+									onClick={() => setEditingProduct(product)}
+								>
 									<TableCell>
 										<ProductImages images={product.images || []} />
 									</TableCell>
@@ -176,7 +174,7 @@ export function ProductsTable({ products }: ProductsTableProps) {
 											{stockStatus.label}
 										</Badge>
 									</TableCell>
-									<TableCell>
+									<TableCell onClick={(e) => e.stopPropagation()}>
 										<DropdownMenu>
 											<DropdownMenuTrigger asChild>
 												<Button variant="ghost" className="h-8 w-8 p-0">
@@ -214,38 +212,25 @@ export function ProductsTable({ products }: ProductsTableProps) {
 				</Table>
 			</div>
 
-			{/* Edit Product Sheet */}
-			<Sheet
-				open={!!editingProduct}
-				onOpenChange={() => setEditingProduct(null)}
-			>
-				<SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
-					<div className="p-6">
-						<SheetHeader>
-							<SheetTitle className="flex items-center gap-2">
-								<Edit className="h-5 w-5" />
-								Editar Produto
-							</SheetTitle>
-							<SheetDescription>
-								Atualize as informações do produto. Modifique as imagens para
-								manter seu produto atrativo.
-							</SheetDescription>
-						</SheetHeader>
-
-						{editingProduct && (
-							<div className="mt-6">
-								<ProductForm
-									product={editingProduct}
-									onSuccess={() => {
-										setEditingProduct(null);
-										// The page will be revalidated automatically due to revalidatePath in the action
-									}}
-								/>
-							</div>
-						)}
-					</div>
-				</SheetContent>
-			</Sheet>
+			{/* Edit Product Drawer */}
+			{editingProduct && (
+				<Drawer
+					trigger={<></>}
+					title="Editar Produto"
+					description="Atualize as informações do produto. Modifique as imagens para manter seu produto atrativo."
+					icon={<Edit className="h-5 w-5" />}
+					open={!!editingProduct}
+					onOpenChange={(open) => !open && setEditingProduct(null)}
+				>
+					<ProductForm
+						product={editingProduct}
+						onSuccess={() => {
+							setEditingProduct(null);
+							// The page will be revalidated automatically due to revalidatePath in the action
+						}}
+					/>
+				</Drawer>
+			)}
 		</>
 	);
 }
