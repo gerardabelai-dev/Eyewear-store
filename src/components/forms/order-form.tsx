@@ -1,15 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-	Edit,
-	ImageOff,
-	MessageSquare,
-	Plus,
-	ShoppingCart,
-	User,
-	X,
-} from "lucide-react";
+import { Edit, ImageOff, MessageSquare, User, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -29,13 +21,6 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { createOrder, updateOrder } from "@/lib/actions/order";
 import { getProducts } from "@/lib/actions/product";
@@ -57,8 +42,8 @@ const orderFormSchema = z.object({
 		.max(100, "Nome deve ter no máximo 100 caracteres"),
 	customerEmail: z
 		.string()
-		.min(1, "E-mail é obrigatório")
-		.email("E-mail deve ser válido"),
+		.email("E-mail inválido")
+		.max(100, "E-mail deve ter no máximo 100 caracteres"),
 	customerPhone: z
 		.string()
 		.max(20, "Telefone deve ter no máximo 20 caracteres")
@@ -70,12 +55,6 @@ const orderFormSchema = z.object({
 	items: z
 		.array(orderItemSchema)
 		.min(1, "Adicione pelo menos um produto ao pedido"),
-	// Temporary field for product selection validation
-	selectedProduct: z.string().optional(),
-	selectedQuantity: z
-		.number()
-		.min(1, "Quantidade deve ser maior que 0")
-		.optional(),
 });
 
 type OrderFormData = z.infer<typeof orderFormSchema>;
@@ -94,7 +73,9 @@ interface OrderItem {
 
 interface OrderFormProps {
 	onSuccess?: () => void;
-	order?: Order & { items?: OrderItem[] }; // For edit mode
+	order?: Order & {
+		items?: OrderItem[];
+	};
 }
 
 // Product Images Component for Order Items
@@ -126,9 +107,8 @@ function ProductImageDisplay({ images }: { images: string[] | undefined }) {
 }
 
 export function OrderForm({ onSuccess, order }: OrderFormProps) {
-	const [products, setProducts] = useState<Product[]>([]);
-	const [loadingProducts, setLoadingProducts] = useState(false);
 	const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+	const [products, setProducts] = useState<Product[]>([]);
 	const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
 	const form = useForm<OrderFormData>({
@@ -139,136 +119,46 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 			customerPhone: order?.customerPhone || "",
 			notes: order?.notes || "",
 			items: [],
-			selectedProduct: "",
-			selectedQuantity: 1,
 		},
 	});
 
-	// Load products on mount
+	// Load products and set up order items
 	useEffect(() => {
+		const loadProducts = async () => {
+			try {
+				const result = await getProducts();
+				if (result.error) {
+					toast.error("Erro ao carregar produtos");
+				} else {
+					setProducts(result.data || []);
+				}
+			} catch (error) {
+				console.error("Error loading products:", error);
+				toast.error("Erro ao carregar produtos");
+			}
+		};
+
 		loadProducts();
 	}, []);
 
-	// Load existing order items if editing and products are loaded
+	// Set up order items when products are loaded or order changes
 	useEffect(() => {
 		if (order?.items && products.length > 0) {
-			// Match order items with current product data to get correct stock
-			const itemsWithStock = order.items.map((item) => {
-				const currentProduct = products.find((p) => p.id === item.productId);
+			const mappedItems: OrderItem[] = order.items.map((item) => {
+				const product = products.find((p) => p.id === item.productId);
 				return {
 					...item,
-					productStock: currentProduct?.stock || 0,
+					productStock: product?.stock || 0,
 				};
 			});
-			setOrderItems(itemsWithStock);
+			setOrderItems(mappedItems);
 		}
 	}, [order, products]);
 
 	// Update form items when orderItems change
 	useEffect(() => {
-		form.setValue(
-			"items",
-			orderItems.map((item) => ({
-				productId: item.productId,
-				quantity: item.quantity,
-				unitPrice: item.unitPrice,
-			})),
-		);
+		form.setValue("items", orderItems);
 	}, [orderItems, form]);
-
-	// Clear items error when user selects a product
-	useEffect(() => {
-		const subscription = form.watch((value, { name }) => {
-			if (name === "selectedProduct" && value.selectedProduct) {
-				form.clearErrors("items");
-			}
-		});
-		return () => subscription.unsubscribe();
-	}, [form]);
-
-	const loadProducts = async () => {
-		setLoadingProducts(true);
-		try {
-			const result = await getProducts();
-			if (result.error) {
-				toast.error("Erro ao carregar produtos");
-			} else {
-				setProducts(result.data || []);
-			}
-		} catch (error) {
-			console.error("Error loading products:", error);
-			toast.error("Erro ao carregar produtos");
-		} finally {
-			setLoadingProducts(false);
-		}
-	};
-
-	const addProductToOrder = () => {
-		const selectedProductId = form.getValues("selectedProduct");
-		const selectedQuantity = form.getValues("selectedQuantity");
-
-		// Clear any previous errors
-		form.clearErrors("selectedProduct");
-		form.clearErrors("selectedQuantity");
-
-		if (!selectedProductId) {
-			form.setError("selectedProduct", {
-				type: "manual",
-				message: "Selecione um produto",
-			});
-			return;
-		}
-
-		const product = products.find((p) => p.id === selectedProductId);
-		if (!product) {
-			form.setError("selectedProduct", {
-				type: "manual",
-				message: "Produto não encontrado",
-			});
-			return;
-		}
-
-		if (!selectedQuantity || selectedQuantity <= 0) {
-			form.setError("selectedQuantity", {
-				type: "manual",
-				message: "Quantidade deve ser maior que zero",
-			});
-			return;
-		}
-
-		if (selectedQuantity > product.stock) {
-			form.setError("selectedQuantity", {
-				type: "manual",
-				message: "Quantidade maior que o estoque disponível",
-			});
-			return;
-		}
-
-		// Check if product is already in order
-		const existingItem = orderItems.find(
-			(item) => item.productId === selectedProductId,
-		);
-		if (existingItem) {
-			form.setError("selectedProduct", {
-				type: "manual",
-				message: "Produto já adicionado ao pedido",
-			});
-			return;
-		}
-
-		const newItem: OrderItem = {
-			productId: selectedProductId,
-			quantity: selectedQuantity,
-			unitPrice: product.price,
-			productName: product.name,
-			productStock: product.stock,
-		};
-
-		setOrderItems([...orderItems, newItem]);
-		form.setValue("selectedProduct", "");
-		form.setValue("selectedQuantity", 1);
-		toast.success("Produto adicionado ao pedido");
-	};
 
 	const removeProductFromOrder = (productId: string) => {
 		setOrderItems(orderItems.filter((item) => item.productId !== productId));
@@ -306,29 +196,16 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 
 	const onSubmit = async (data: OrderFormData) => {
 		try {
-			// Check if user has selected a product but hasn't added it yet
-			if (orderItems.length === 0 && data.selectedProduct) {
-				form.setError("items", {
-					type: "manual",
-					message:
-						"Clique em 'Adicionar ao Pedido' para adicionar o produto selecionado",
-				});
-				return;
-			}
-
-			// Exclude temporary fields from the data
-			const { selectedProduct, selectedQuantity, ...orderData } = data;
-
 			let result: { error?: string; success?: string };
 			if (order) {
 				// Update existing order
 				result = await updateOrder({
 					id: order.id,
-					...orderData,
+					...data,
 				});
 			} else {
 				// Create new order
-				result = await createOrder(orderData);
+				result = await createOrder(data);
 			}
 
 			if (result.error) {
@@ -346,8 +223,6 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 			toast.error("Erro ao salvar pedido");
 		}
 	};
-
-	const availableProducts = products.filter((p) => p.stock > 0);
 
 	const openProductEdit = (productId: string) => {
 		const product = products.find((p) => p.id === productId);
@@ -417,104 +292,6 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 												placeholder="(11) 99999-9999"
 											/>
 										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</CardContent>
-					</Card>
-
-					{/* Product Selection */}
-					<Card>
-						<CardHeader>
-							<CardTitle className="text-lg flex items-center gap-2">
-								<ShoppingCart className="h-5 w-5" />
-								Adicionar Produtos
-							</CardTitle>
-						</CardHeader>
-						<CardContent className="space-y-4">
-							<div className="grid grid-cols-3 gap-4">
-								<div className="col-span-2">
-									<FormField
-										control={form.control}
-										name="selectedProduct"
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Produto</FormLabel>
-												<Select
-													onValueChange={field.onChange}
-													value={field.value}
-												>
-													<FormControl>
-														<SelectTrigger>
-															<SelectValue placeholder="Selecione um produto" />
-														</SelectTrigger>
-													</FormControl>
-													<SelectContent>
-														{loadingProducts && (
-															<SelectItem value="loading" disabled>
-																Carregando produtos...
-															</SelectItem>
-														)}
-														{availableProducts.map((product) => (
-															<SelectItem key={product.id} value={product.id}>
-																{product.name} - R${" "}
-																{parseFloat(product.price).toLocaleString(
-																	"pt-BR",
-																	{
-																		minimumFractionDigits: 2,
-																	},
-																)}{" "}
-																(Est: {product.stock})
-															</SelectItem>
-														))}
-													</SelectContent>
-												</Select>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-								<div>
-									<FormField
-										control={form.control}
-										name="selectedQuantity"
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Quantidade</FormLabel>
-												<FormControl>
-													<Input
-														type="number"
-														min="1"
-														{...field}
-														onChange={(e) =>
-															field.onChange(parseInt(e.target.value) || 1)
-														}
-														placeholder="1"
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-							</div>
-							<Button
-								type="button"
-								onClick={addProductToOrder}
-								variant="outline"
-								className="w-full"
-							>
-								<Plus className="mr-2 h-4 w-4" />
-								Adicionar ao Pedido
-							</Button>
-
-							{/* Items validation message */}
-							<FormField
-								control={form.control}
-								name="items"
-								render={() => (
-									<FormItem>
 										<FormMessage />
 									</FormItem>
 								)}
@@ -687,12 +464,13 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 								name="notes"
 								render={({ field }) => (
 									<FormItem>
+										<FormLabel>Observações do Pedido</FormLabel>
 										<FormControl>
 											<Textarea
 												{...field}
 												value={field.value || ""}
-												placeholder="Observações adicionais sobre o pedido..."
-												rows={3}
+												placeholder="Adicione observações sobre o pedido..."
+												className="min-h-[100px]"
 											/>
 										</FormControl>
 										<FormMessage />
@@ -703,28 +481,18 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 					</Card>
 
 					{/* Submit Button */}
-					<Button
-						type="submit"
-						className="w-full"
-						disabled={form.formState.isSubmitting}
-					>
-						{form.formState.isSubmitting
-							? order
-								? "Atualizando..."
-								: "Criando..."
-							: order
-								? "Atualizar Pedido"
-								: "Criar Pedido"}
+					<Button type="submit" className="w-full" size="lg">
+						{order ? "Atualizar Pedido" : "Criar Pedido"}
 					</Button>
 				</form>
 			</Form>
 
-			{/* Edit Product Drawer */}
+			{/* Product Edit Drawer */}
 			{editingProduct && (
 				<Drawer
 					trigger={<button type="button" style={{ display: "none" }}></button>}
 					title="Editar Produto"
-					description="Atualize as informações do produto. Modifique as imagens para manter seu produto atrativo."
+					description="Edite as informações do produto."
 					icon={<Edit className="h-5 w-5" />}
 					open={!!editingProduct}
 					onOpenChange={(open) => !open && setEditingProduct(null)}
@@ -733,7 +501,18 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 						product={editingProduct}
 						onSuccess={() => {
 							setEditingProduct(null);
-							loadProducts(); // Reload products to get updated data
+							// Reload products to get updated information
+							const loadProducts = async () => {
+								try {
+									const result = await getProducts();
+									if (result.data) {
+										setProducts(result.data);
+									}
+								} catch (error) {
+									console.error("Error reloading products:", error);
+								}
+							};
+							loadProducts();
 						}}
 					/>
 				</Drawer>
