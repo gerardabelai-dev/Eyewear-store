@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -36,6 +37,7 @@ type SignInValues = z.infer<typeof signInSchema>;
 
 export default function SignIn() {
 	const router = useRouter();
+	const toastShownRef = useRef(false);
 	const form = useForm<SignInValues>({
 		resolver: zodResolver(signInSchema),
 		defaultValues: {
@@ -46,6 +48,9 @@ export default function SignIn() {
 	});
 
 	const onSubmit = async (values: SignInValues) => {
+		// Reset toast flag for new submission
+		toastShownRef.current = false;
+
 		try {
 			await signIn.email(
 				{
@@ -54,20 +59,32 @@ export default function SignIn() {
 				},
 				{
 					onSuccess: () => {
-						toast.success("Bem-vindo de volta!");
-						router.push("/dashboard");
+						if (!toastShownRef.current) {
+							toast.success("Bem-vindo de volta!");
+							toastShownRef.current = true;
+							router.push("/dashboard");
+						}
 					},
 					onError: (ctx) => {
-						toast.error(ctx.error.message || "Falha ao fazer login");
+						if (!toastShownRef.current) {
+							toast.error(ctx.error.message || "Falha ao fazer login");
+							toastShownRef.current = true;
+						}
 					},
 				},
 			);
 		} catch (_errorrr) {
-			toast.error("Ocorreu um erro inesperado");
+			if (!toastShownRef.current) {
+				toast.error("Ocorreu um erro inesperado");
+				toastShownRef.current = true;
+			}
 		}
 	};
 
 	const handleGoogleSignIn = async () => {
+		// Reset toast flag for new submission
+		toastShownRef.current = false;
+
 		try {
 			await signIn.social(
 				{
@@ -76,15 +93,26 @@ export default function SignIn() {
 				},
 				{
 					onSuccess: () => {
-						toast.success("Bem-vindo de volta!");
+						if (!toastShownRef.current) {
+							toast.success("Bem-vindo de volta!");
+							toastShownRef.current = true;
+						}
 					},
 					onError: (ctx) => {
-						toast.error(ctx.error.message || "Falha ao fazer login com Google");
+						if (!toastShownRef.current) {
+							toast.error(
+								ctx.error.message || "Falha ao fazer login com Google",
+							);
+							toastShownRef.current = true;
+						}
 					},
 				},
 			);
 		} catch (_errorrr) {
-			toast.error("Ocorreu um erro inesperado");
+			if (!toastShownRef.current) {
+				toast.error("Ocorreu um erro inesperado");
+				toastShownRef.current = true;
+			}
 		}
 	};
 
