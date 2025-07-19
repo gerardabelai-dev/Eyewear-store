@@ -57,6 +57,13 @@
       "when": 1751664592816,
       "tag": "0007_slippery_lizard",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1752950104296,
+      "tag": "0008_modern_next_avengers",
+      "breakpoints": true
     }
   ]
 }

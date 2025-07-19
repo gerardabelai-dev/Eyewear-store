@@ -3,6 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "./db";
 import * as schema from "./db/schema";
 import { serverEnv } from "./env";
+import { enqueueEmailJob } from "./qstash";
 
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
@@ -12,9 +13,20 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: true,
 		requireEmailVerification: false,
-		async sendResetPassword(_data: any, _request: any) {
-			// Send an email to the user with a link to reset their password
-			console.log("Reset password email would be sent to:", _data.email);
+		async sendResetPassword(data: any, _request: any) {
+			// Queue password reset email job
+			try {
+				await enqueueEmailJob({
+					type: "password-reset",
+					email: data.email,
+					data: {
+						resetUrl: data.url,
+					},
+				});
+				console.log("Password reset email queued for:", data.email);
+			} catch (error) {
+				console.error("Failed to queue password reset email:", error);
+			}
 		},
 	},
 	socialProviders: {
@@ -40,18 +52,27 @@ export const auth = betterAuth({
 	databaseHooks: {
 		user: {
 			create: {
-				before: async (user) => {
-					// Automatically generate name from firstName and lastName
-					const userData = user as any;
-					if (userData.firstName && userData.lastName) {
-						return {
+				after: async (user) => {
+					// Queue welcome email job for new users
+					try {
+						const userData = user as any;
+						const userName =
+							userData.name ||
+							`${userData.firstName || ""} ${userData.lastName || ""}`.trim() ||
+							"Usuário";
+
+						await enqueueEmailJob({
+							type: "welcome",
+							userId: userData.id,
+							email: userData.email,
 							data: {
-								...user,
-								name: `${userData.firstName} ${userData.lastName}`,
+								name: userName,
 							},
-						};
+						});
+						console.log("Welcome email queued for:", userData.email);
+					} catch (error) {
+						console.error("Failed to queue welcome email:", error);
 					}
-					return { data: user };
 				},
 			},
 			update: {

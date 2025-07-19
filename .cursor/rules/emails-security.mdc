@@ -1,0 +1,391 @@
+---
+description: when tackling emails templates or sending emails follow those email security rules
+alwaysApply: false
+---
+# 🔒 Email Security & Authentication Requirements
+
+## ✅ Current Security Status
+
+### **Already Secured (Good!)**
+- ✅ **Order Management**: All server actions use `getCurrentUser()` 
+- ✅ **User Actions**: Profile updates require authentication
+- ✅ **Private Routes**: Layout enforces authentication with redirects
+- ✅ **Better Auth**: Handles core auth flows securely
+
+### **Needs Integration (Action Required)**
+- ❌ **Password Reset**: Currently just logs, needs email integration
+- ❌ **Welcome Emails**: Need to integrate with Better Auth signup
+- ❌ **API Routes**: Need to create secure endpoints for email jobs
+- ❌ **QStash Webhooks**: Need signature verification
+
+## 🚨 Security Requirements by Email Type
+
+### 1. **Welcome Email** (User Registration)
+```typescript
+// ✅ SECURE: Triggered only by Better Auth
+// Location: src/lib/auth.ts - databaseHooks.user.create
+// Authentication: Handled by Better Auth internally
+// Risk: LOW - Only triggered on legitimate signups
+
+export const auth = betterAuth({
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          // ✅ SECURE: Queue welcome email job
+          await enqueueEmailJob({
+            type: 'welcome',
+            userId: user.id,
+            email: user.email,
+            data: { name: user.name }
+          });
+          return { data: user };
+        },
+      },
+    },
+  },
+});
+```
+
+### 2. **Password Reset Email** (Forgot Password)
+```typescript
+// ✅ SECURE: Triggered only by Better Auth
+// Location: src/lib/auth.ts - sendResetPassword
+// Authentication: Handled by Better Auth internally  
+// Risk: LOW - Built-in rate limiting and validation
+
+export const auth = betterAuth({
+  emailAndPassword: {
+    async sendResetPassword(data: any, request: any) {
+      // ✅ SECURE: Queue password reset email job
+      await enqueueEmailJob({
+        type: 'password-reset',
+        email: data.email,
+        data: { 
+          resetUrl: data.url,
+          userAgent: request.headers['user-agent']
+        }
+      });
+    },
+  },
+});
+```
+
+### 3. **Order Confirmation Email** (Order Creation)
+```typescript
+// ✅ ALREADY SECURE: Uses getCurrentUser()
+// Location: src/lib/actions/order.ts - createOrder
+// Authentication: ✅ getCurrentUser() enforced
+// Risk: LOW - Proper user context validation
+
+export async function createOrder(data: CreateOrderData) {
+  const currentUser = await getCurrentUser();
+  if (!currentUser) {
+    return { error: "Usuário não autenticado" };
+  }
+
+  // ✅ SECURE: User can only create orders for themselves
+  const newOrder = await db.insert(order).values({
+    userId: currentUser.id, // ✅ User context enforced
+    ...orderData
+  });
+
+  // ✅ SECURE: Queue email for order customer
+  await enqueueEmailJob({
+    type: 'order-confirmation',
+    userId: currentUser.id,
+    email: data.customerEmail,
+    data: { orderNumber, items, total }
+  });
+}
+```
+
+### 4. **Order Update Email** (Status Changes)
+```typescript
+// ✅ ALREADY SECURE: Uses getCurrentUser()
+// Location: src/lib/actions/order.ts - updateOrderStatus  
+// Authentication: ✅ getCurrentUser() + order ownership check
+// Risk: LOW - Proper authorization validation
+
+export async function updateOrderStatus(data: UpdateStatusData) {
+  const currentUser = await getCurrentUser();
+  if (!currentUser) {
+    return { error: "Usuário não autenticado" };
+  }
+
+  // ✅ SECURE: Check order ownership
+  const existingOrder = await db
+    .select()
+    .from(order)
+    .where(and(
+      eq(order.id, data.id),
+      eq(order.userId, currentUser.id) // ✅ Authorization check
+    ));
+
+  if (!existingOrder.length) {
+    return { error: "Pedido não encontrado" };
+  }
+
+  // ✅ SECURE: Queue email for order customer
+  await enqueueEmailJob({
+    type: 'order-update',
+    userId: currentUser.id,
+    email: existingOrder[0].customerEmail,
+    data: { status: data.status, orderNumber }
+  });
+}
+```
+
+## 🛡️ Required Security Implementation
+
+### 1. **Create Secure QStash Job Processor**
+```typescript
+// src/app/api/jobs/process-email/route.ts
+import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
+
+async function handler(request: Request) {
+  try {
+    const { type, userId, email, data } = await request.json();
+
+    // ✅ SECURE: Validate job payload
+    const jobSchema = z.object({
+      type: z.enum(['welcome', 'password-reset', 'order-confirmation', 'order-update']),
+      userId: z.string().optional(),
+      email: z.string().email(),
+      data: z.record(z.any())
+    });
+
+    const validatedJob = jobSchema.parse({ type, userId, email, data });
+
+    // ✅ SECURE: Only process valid email types
+    switch (validatedJob.type) {
+      case 'welcome':
+        await sendWelcomeEmail(validatedJob);
+        break;
+      case 'password-reset':  
+        await sendPasswordResetEmail(validatedJob);
+        break;
+      case 'order-confirmation':
+        await sendOrderConfirmationEmail(validatedJob);
+        break;
+      case 'order-update':
+        await sendOrderUpdateEmail(validatedJob);
+        break;
+    }
+
+    return Response.json({ success: true });
+  } catch (error) {
+    return Response.json({ error: "Invalid job" }, { status: 400 });
+  }
+}
+
+// ✅ SECURE: Verify QStash signature
+export const POST = verifySignatureAppRouter(handler);
+```
+
+### 2. **Secure Email Queue Function**
+```typescript
+// src/lib/queue-service.ts
+import { QStash } from "@upstash/qstash";
+
+export async function enqueueEmailJob(job: EmailJob) {
+  try {
+    // ✅ SECURE: Validate job before queuing
+    const emailJobSchema = z.object({
+      type: z.enum(['welcome', 'password-reset', 'order-confirmation', 'order-update']),
+      userId: z.string().optional(),
+      email: z.string().email(),
+      data: z.record(z.any())
+    });
+
+    const validatedJob = emailJobSchema.parse(job);
+
+    await qstash.publishJSON({
+      url: `${process.env.NEXT_PUBLIC_APP_URL}/api/jobs/process-email`,
+      body: validatedJob,
+      retries: 3,
+      delay: 1000
+    });
+
+    // ✅ SECURE: Log job creation with user context
+    await db.insert(userNotification).values({
+      id: crypto.randomUUID(),
+      userId: validatedJob.userId,
+      type: validatedJob.type,
+      email: validatedJob.email,
+      status: 'queued',
+      createdAt: new Date()
+    });
+
+  } catch (error) {
+    console.error("Failed to queue email job:", error);
+    throw new Error("Email job validation failed");
+  }
+}
+```
+
+### 3. **Authorization Middleware for API Routes**
+```typescript
+// src/lib/middleware/auth.ts
+export async function requireAuth(request: Request) {
+  const session = await getSession();
+  
+  if (!session?.user) {
+    return Response.json(
+      { error: "Authentication required" }, 
+      { status: 401 }
+    );
+  }
+  
+  return session.user;
+}
+
+// Usage in API routes:
+export async function POST(request: Request) {
+  const user = await requireAuth(request);
+  if (user instanceof Response) return user; // Auth failed
+  
+  // ✅ SECURE: Continue with authenticated user
+}
+```
+
+## 🔍 Security Validation Checklist
+
+### **Authentication & Authorization**
+- [ ] ✅ All order operations check `getCurrentUser()`
+- [ ] ✅ Users can only access their own orders  
+- [ ] ✅ Email jobs include proper user context
+- [ ] ✅ QStash webhooks verify signatures
+- [ ] ✅ Better Auth handles signup/reset securely
+
+### **Input Validation**
+- [ ] ✅ All email job payloads validated with Zod
+- [ ] ✅ Email addresses validated before queuing
+- [ ] ✅ Order data validated before creating emails
+- [ ] ✅ User permissions checked before status updates
+
+### **Rate Limiting & Abuse Prevention**
+```typescript
+// Example rate limiting implementation
+import { Ratelimit } from "@upstash/ratelimit";
+
+const ratelimit = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(5, "1 m"), // 5 emails per minute
+});
+
+export async function checkEmailRateLimit(userId: string) {
+  const { success } = await ratelimit.limit(userId);
+  if (!success) {
+    throw new Error("Email rate limit exceeded");
+  }
+}
+```
+
+### **Secure Email Content**
+- [ ] ✅ Unsubscribe tokens are user-specific
+- [ ] ✅ Email templates escape user input
+- [ ] ✅ Links point to authenticated endpoints only
+- [ ] ✅ Sensitive data not exposed in email content
+
+## 🎯 Updated Testing Guide (Security-Focused)
+
+### **Test 1: Authentication Required**
+```bash
+# ❌ Should FAIL - No authentication
+curl -X POST http://localhost:3000/api/jobs/process-email \
+  -H "Content-Type: application/json" \
+  -d '{"type": "welcome", "email": "test@example.com"}'
+
+# Expected: 401 Unauthorized (missing QStash signature)
+```
+
+### **Test 2: Order Creation (Authenticated)**
+```bash
+# ✅ Should WORK - Proper authentication via UI
+# 1. Login to dashboard
+# 2. Create order through UI
+# 3. Verify only order customer receives email
+# 4. Verify order creator cannot send emails to arbitrary addresses
+```
+
+### **Test 3: Cross-User Access Prevention**
+```bash
+# ❌ Should FAIL - User A cannot update User B's orders
+# 1. User A logs in
+# 2. Try to update order belonging to User B
+# 3. Verify operation is denied
+# 4. Verify no email is sent
+```
+
+### **Test 4: QStash Signature Verification**
+```bash
+# ❌ Should FAIL - Invalid signature
+curl -X POST http://localhost:3000/api/jobs/process-email \
+  -H "Content-Type: application/json" \
+  -H "Upstash-Signature: invalid-signature" \
+  -d '{"type": "welcome", "email": "test@example.com"}'
+
+# Expected: 401 Unauthorized (invalid signature)
+```
+
+## 🚀 Implementation Priority
+
+### **Phase 1: Critical Security (Immediate)**
+1. ✅ **Verify Current Security**: Order actions already secure
+2. 🔧 **Create QStash Webhook**: With signature verification
+3. 🔧 **Integrate Better Auth**: Welcome/reset email hooks
+4. 🔧 **Add Rate Limiting**: Prevent email abuse
+
+### **Phase 2: Enhanced Security (Next)**
+1. 🔧 **Audit Logging**: Track all email operations
+2. 🔧 **IP Whitelisting**: Restrict QStash webhook access  
+3. 🔧 **Content Security**: Sanitize all email content
+4. 🔧 **Monitoring**: Alert on suspicious activity
+
+## ⚠️ Security Warnings
+
+### **NEVER Allow These Patterns:**
+```typescript
+// ❌ BAD: Arbitrary email sending
+export async function sendEmailToAnyone(email: string) {
+  await sendEmail(email, "spam"); // NO!
+}
+
+// ❌ BAD: No authentication check
+export async function updateOrder(orderId: string) {
+  // Missing: const user = await getCurrentUser();
+  await updateOrderInDB(orderId);
+}
+
+// ❌ BAD: Trust user input without validation
+export async function processEmailJob(data: any) {
+  await sendEmail(data.email, data.content); // NO!
+}
+```
+
+### **ALWAYS Follow These Patterns:**
+```typescript
+// ✅ GOOD: Authentication required
+export async function updateOrder(data: UpdateOrderData) {
+  const user = await getCurrentUser();
+  if (!user) return { error: "Authentication required" };
+  
+  // Check ownership before proceeding
+}
+
+// ✅ GOOD: Validate and sanitize
+export async function processEmailJob(rawData: unknown) {
+  const data = emailJobSchema.parse(rawData);
+  await sendValidatedEmail(data);
+}
+
+// ✅ GOOD: User context maintained
+export async function createOrder(data: OrderData) {
+  const user = await getCurrentUser();
+  const order = await createOrderWithUser(user.id, data);
+  await queueOrderEmail(user.id, order); // User context preserved
+}
+```
+
+This security implementation ensures that **only authenticated users can trigger emails for their own orders/accounts** and prevents any unauthorized email sending! 🛡️

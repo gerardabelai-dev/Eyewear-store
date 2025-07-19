@@ -1,0 +1,270 @@
+/**
+ * Integration Examples - How to use QStash, Resend, and Neon together
+ *
+ * This file shows examples of how to integrate the queue system with your existing
+ * user and order actions. You can copy these patterns into your actual action files.
+ */
+
+import { eq } from "drizzle-orm";
+import { db } from "./db";
+import { order, user } from "./db/schema";
+import { QueueService } from "./queue-service";
+import { sendEmail } from "./resend";
+
+// Example: User registration with welcome email
+export async function exampleUserRegistration(userData: {
+	id: string;
+	name: string;
+	email: string;
+}) {
+	try {
+		// 1. Create user in database
+		const [newUser] = await db
+			.insert(user)
+			.values({
+				id: userData.id,
+				name: userData.name,
+				email: userData.email,
+				emailVerified: false,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			})
+			.returning();
+
+		// 2. Queue welcome email (async)
+		await QueueService.user.sendWelcomeEmail(
+			newUser.id,
+			newUser.email,
+			newUser.name,
+		);
+
+		console.log(`User ${newUser.id} registered, welcome email queued`);
+		return { success: true, user: newUser };
+	} catch (error) {
+		console.error("Failed to register user:", error);
+		throw error;
+	}
+}
+
+// Example: Order creation with processing and email
+export async function exampleOrderCreation(orderData: {
+	id: string;
+	userId: string;
+	customerName: string;
+	customerEmail: string;
+	totalAmount: number;
+}) {
+	try {
+		// 1. Create order in database
+		const [newOrder] = await db
+			.insert(order)
+			.values({
+				id: orderData.id,
+				orderNumber: `ORD-${Date.now()}`,
+				userId: orderData.userId,
+				customerName: orderData.customerName,
+				customerEmail: orderData.customerEmail,
+				totalAmount: orderData.totalAmount.toString(),
+				status: "pending",
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			})
+			.returning();
+
+		// 2. Queue order processing (async)
+		await QueueService.order.processOrder(newOrder.id, newOrder.userId);
+
+		console.log(`Order ${newOrder.id} created, processing queued`);
+		return { success: true, order: newOrder };
+	} catch (error) {
+		console.error("Failed to create order:", error);
+		throw error;
+	}
+}
+
+// Example: Password reset request
+export async function examplePasswordReset(email: string) {
+	try {
+		// 1. Check if user exists
+		const [existingUser] = await db
+			.select()
+			.from(user)
+			.where(eq(user.email, email))
+			.limit(1);
+
+		if (!existingUser) {
+			// Don't reveal if email doesn't exist for security
+			return {
+				success: true,
+				message: "If the email exists, a reset link was sent",
+			};
+		}
+
+		// 2. Generate reset token (you would implement this)
+		const resetToken = `reset_${Date.now()}_${Math.random().toString(36)}`;
+
+		// 3. Queue password reset email
+		await QueueService.user.sendPasswordResetEmail(
+			existingUser.email,
+			resetToken,
+			existingUser.name,
+		);
+
+		console.log(`Password reset email queued for ${email}`);
+		return {
+			success: true,
+			message: "If the email exists, a reset link was sent",
+		};
+	} catch (error) {
+		console.error("Failed to process password reset:", error);
+		throw error;
+	}
+}
+
+// Example: Send immediate email (without queue)
+export async function exampleImmediateEmail(
+	to: string,
+	subject: string,
+	content: string,
+) {
+	try {
+		const result = await sendEmail({
+			to,
+			subject,
+			html: `
+				<html>
+					<body style="font-family: Arial, sans-serif;">
+						<h2>${subject}</h2>
+						<p>${content}</p>
+						<p>Best regards,<br>DrVista Team</p>
+					</body>
+				</html>
+			`,
+			text: `${subject}\n\n${content}\n\nBest regards,\nDrVista Team`,
+		});
+
+		console.log(`Immediate email sent to ${to}:`, result.data?.id);
+		return result;
+	} catch (error) {
+		console.error("Failed to send immediate email:", error);
+		throw error;
+	}
+}
+
+// Example: Batch email operations
+export async function exampleBatchEmails() {
+	try {
+		// Get users who need welcome emails (example query)
+		const newUsers = await db
+			.select()
+			.from(user)
+			.where(eq(user.emailVerified, false))
+			.limit(10);
+
+		// Prepare batch email jobs
+		const emailJobs = newUsers.map((userData) => ({
+			type: "welcome" as const,
+			payload: {
+				userId: userData.id,
+				email: userData.email,
+				name: userData.name,
+			},
+			delay: Math.floor(Math.random() * 30), // Spread emails over 30 seconds
+		}));
+
+		// Queue all emails
+		const results = await QueueService.batch.sendMultipleEmails(emailJobs);
+
+		const successCount = results.filter((r) => r.success).length;
+		console.log(`Queued ${successCount}/${emailJobs.length} welcome emails`);
+
+		return { success: true, queued: successCount, total: emailJobs.length };
+	} catch (error) {
+		console.error("Failed to queue batch emails:", error);
+		throw error;
+	}
+}
+
+// Example: System maintenance
+export async function exampleSystemMaintenance() {
+	try {
+		// Queue session cleanup
+		const result = await QueueService.system.cleanupSessions(30); // 30 days old
+
+		console.log("Session cleanup queued:", result.messageId);
+		return { success: true, messageId: result.messageId };
+	} catch (error) {
+		console.error("Failed to queue system maintenance:", error);
+		throw error;
+	}
+}
+
+// Example: Integration with existing order action
+export async function updateExistingOrderAction(
+	orderId: string,
+	newStatus: string,
+) {
+	try {
+		// 1. Update order in database
+		const [updatedOrder] = await db
+			.update(order)
+			.set({
+				status: newStatus,
+				updatedAt: new Date(),
+			})
+			.where(eq(order.id, orderId))
+			.returning();
+
+		if (!updatedOrder) {
+			throw new Error("Order not found");
+		}
+
+		// 2. Queue status update email
+		await QueueService.order.sendUpdateEmail(
+			updatedOrder.id,
+			updatedOrder.userId,
+			updatedOrder.customerEmail,
+			newStatus,
+			`Your order status has been updated to: ${newStatus}`,
+		);
+
+		console.log(`Order ${orderId} updated to ${newStatus}, email queued`);
+		return { success: true, order: updatedOrder };
+	} catch (error) {
+		console.error("Failed to update order:", error);
+		throw error;
+	}
+}
+
+// Example: Error handling and retry
+export async function exampleErrorHandling(orderId: string, userId: string) {
+	try {
+		// Try to process order
+		await QueueService.order.processOrder(orderId, userId);
+	} catch (error) {
+		console.error("Order processing failed, retrying:", error);
+
+		// Retry with different configuration
+		try {
+			await QueueService.retry.orderProcessing(orderId, userId);
+			console.log("Order processing retry queued");
+		} catch (retryError) {
+			console.error("Retry also failed:", retryError);
+			// Handle final failure (notify admin, log to error tracking, etc.)
+		}
+	}
+}
+
+// Export all examples for easy testing
+export const IntegrationExamples = {
+	userRegistration: exampleUserRegistration,
+	orderCreation: exampleOrderCreation,
+	passwordReset: examplePasswordReset,
+	immediateEmail: exampleImmediateEmail,
+	batchEmails: exampleBatchEmails,
+	systemMaintenance: exampleSystemMaintenance,
+	updateOrder: updateExistingOrderAction,
+	errorHandling: exampleErrorHandling,
+};
+
+export default IntegrationExamples;

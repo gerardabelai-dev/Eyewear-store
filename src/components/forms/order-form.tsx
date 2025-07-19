@@ -5,6 +5,7 @@ import {
 	Edit,
 	ImageOff,
 	MessageSquare,
+	Package,
 	Plus,
 	ShoppingCart,
 	User,
@@ -68,7 +69,12 @@ const orderFormSchema = z.object({
 		.max(500, "Observações devem ter no máximo 500 caracteres")
 		.optional(),
 	items: z.array(orderItemSchema),
-	// Temporary fields for product selection validation (only for new orders)
+	status: z
+		.enum(["pending", "processing", "completed", "cancelled"], {
+			errorMap: () => ({ message: "Status inválido" }),
+		})
+		.optional(),
+	// Temporary fields for product selection validation
 	selectedProduct: z.string().optional(),
 	selectedQuantity: z
 		.number()
@@ -140,6 +146,12 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 			customerEmail: order?.customerEmail || "",
 			customerPhone: order?.customerPhone || "",
 			notes: order?.notes || "",
+			status:
+				(order?.status as
+					| "pending"
+					| "processing"
+					| "completed"
+					| "cancelled") || "pending",
 			items: [],
 			selectedProduct: "",
 			selectedQuantity: 1,
@@ -155,7 +167,7 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 				if (result.error) {
 					toast.error("Erro ao carregar produtos");
 				} else {
-					setProducts(result.data || []);
+					setProducts((result.data as Product[]) || []);
 				}
 			} catch (error) {
 				console.error("Error loading products:", error);
@@ -321,14 +333,16 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 
 			let result: { error?: string; success?: string };
 			if (order) {
-				// Update existing order
+				// Update existing order - include status if provided
 				result = await updateOrder({
 					id: order.id,
 					...orderData,
+					status: data.status,
 				});
 			} else {
-				// Create new order
-				result = await createOrder(orderData);
+				// Create new order - exclude status for new orders
+				const { status, ...createData } = orderData;
+				result = await createOrder(createData);
 			}
 
 			if (result.error) {
@@ -424,98 +438,58 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 						</CardContent>
 					</Card>
 
-					{/* Product Selection - Only show for new orders */}
-					{!isEditing && (
+					{/* Order Status - Only show for editing orders */}
+					{isEditing && (
 						<Card>
 							<CardHeader>
 								<CardTitle className="text-lg flex items-center gap-2">
-									<ShoppingCart className="h-5 w-5" />
-									Adicionar Produtos
+									<Package className="h-5 w-5" />
+									Status do Pedido
 								</CardTitle>
 							</CardHeader>
-							<CardContent className="space-y-4">
-								<div className="grid grid-cols-3 gap-4">
-									<div className="col-span-2">
-										<FormField
-											control={form.control}
-											name="selectedProduct"
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Produto</FormLabel>
-													<Select
-														onValueChange={field.onChange}
-														value={field.value}
-													>
-														<FormControl>
-															<SelectTrigger>
-																<SelectValue placeholder="Selecione um produto" />
-															</SelectTrigger>
-														</FormControl>
-														<SelectContent>
-															{loadingProducts && (
-																<SelectItem value="loading" disabled>
-																	Carregando produtos...
-																</SelectItem>
-															)}
-															{availableProducts.map((product) => (
-																<SelectItem key={product.id} value={product.id}>
-																	{product.name} - R${" "}
-																	{parseFloat(product.price).toLocaleString(
-																		"pt-BR",
-																		{
-																			minimumFractionDigits: 2,
-																		},
-																	)}{" "}
-																	(Est: {product.stock})
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-									</div>
-									<div>
-										<FormField
-											control={form.control}
-											name="selectedQuantity"
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Quantidade</FormLabel>
-													<FormControl>
-														<Input
-															type="number"
-															min="1"
-															{...field}
-															onChange={(e) =>
-																field.onChange(parseInt(e.target.value) || 1)
-															}
-															placeholder="1"
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-									</div>
-								</div>
-								<Button
-									type="button"
-									onClick={addProductToOrder}
-									variant="outline"
-									className="w-full"
-								>
-									<Plus className="mr-2 h-4 w-4" />
-									Adicionar ao Pedido
-								</Button>
-
-								{/* Items validation message */}
+							<CardContent>
 								<FormField
 									control={form.control}
-									name="items"
-									render={() => (
+									name="status"
+									render={({ field }) => (
 										<FormItem>
+											<FormLabel>Status *</FormLabel>
+											<Select
+												onValueChange={field.onChange}
+												value={field.value}
+											>
+												<FormControl>
+													<SelectTrigger>
+														<SelectValue placeholder="Selecione o status" />
+													</SelectTrigger>
+												</FormControl>
+												<SelectContent>
+													<SelectItem value="pending">
+														<div className="flex items-center gap-2">
+															<div className="w-2 h-2 rounded-full bg-gray-500" />
+															Pendente
+														</div>
+													</SelectItem>
+													<SelectItem value="processing">
+														<div className="flex items-center gap-2">
+															<div className="w-2 h-2 rounded-full bg-blue-500" />
+															Em Processamento
+														</div>
+													</SelectItem>
+													<SelectItem value="completed">
+														<div className="flex items-center gap-2">
+															<div className="w-2 h-2 rounded-full bg-green-500" />
+															Concluído
+														</div>
+													</SelectItem>
+													<SelectItem value="cancelled">
+														<div className="flex items-center gap-2">
+															<div className="w-2 h-2 rounded-full bg-red-500" />
+															Cancelado
+														</div>
+													</SelectItem>
+												</SelectContent>
+											</Select>
 											<FormMessage />
 										</FormItem>
 									)}
@@ -523,6 +497,104 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 							</CardContent>
 						</Card>
 					)}
+
+					{/* Product Selection - Show for new orders AND editing orders */}
+					<Card>
+						<CardHeader>
+							<CardTitle className="text-lg flex items-center gap-2">
+								<ShoppingCart className="h-5 w-5" />
+								{isEditing ? "Adicionar Mais Produtos" : "Adicionar Produtos"}
+							</CardTitle>
+						</CardHeader>
+						<CardContent className="space-y-4">
+							<div className="grid grid-cols-3 gap-4">
+								<div className="col-span-2">
+									<FormField
+										control={form.control}
+										name="selectedProduct"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Produto</FormLabel>
+												<Select
+													onValueChange={field.onChange}
+													value={field.value}
+												>
+													<FormControl>
+														<SelectTrigger>
+															<SelectValue placeholder="Selecione um produto" />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														{loadingProducts && (
+															<SelectItem value="loading" disabled>
+																Carregando produtos...
+															</SelectItem>
+														)}
+														{availableProducts.map((product) => (
+															<SelectItem key={product.id} value={product.id}>
+																{product.name} - R${" "}
+																{parseFloat(product.price).toLocaleString(
+																	"pt-BR",
+																	{
+																		minimumFractionDigits: 2,
+																	},
+																)}{" "}
+																(Est: {product.stock})
+															</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
+								<div>
+									<FormField
+										control={form.control}
+										name="selectedQuantity"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Quantidade</FormLabel>
+												<FormControl>
+													<Input
+														type="number"
+														min="1"
+														{...field}
+														onChange={(e) =>
+															field.onChange(parseInt(e.target.value) || 1)
+														}
+														placeholder="1"
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
+							</div>
+							<Button
+								type="button"
+								onClick={addProductToOrder}
+								variant="outline"
+								className="w-full"
+							>
+								<Plus className="mr-2 h-4 w-4" />
+								Adicionar ao Pedido
+							</Button>
+
+							{/* Items validation message */}
+							<FormField
+								control={form.control}
+								name="items"
+								render={() => (
+									<FormItem>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</CardContent>
+					</Card>
 
 					{/* Order Items */}
 					{orderItems.length > 0 && (
@@ -731,7 +803,7 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 								try {
 									const result = await getProducts();
 									if (result.data) {
-										setProducts(result.data);
+										setProducts(result.data as Product[]);
 									}
 								} catch (error) {
 									console.error("Error reloading products:", error);

@@ -1,0 +1,343 @@
+# Email Development Rules - Tailwind Only Approach
+
+## 🚫 Critical Limitations - What NOT to Use
+
+### 1. Interactive CSS Classes (React Email Can't Inline)
+```tsx
+// ❌ NEVER use these in emails
+className="hover:bg-blue-700"        // Hover states don't work in most email clients
+className="transition-colors"        // Transitions are not supported
+className="focus:ring-2"            // Focus states are irrelevant in emails
+className="active:scale-95"         // Active states don't work
+```
+
+### 2. Complex Pseudo-Selectors
+```tsx
+// ❌ React Email can't inline these
+className="last:border-b-0"         // Use conditional rendering instead
+className="first:mt-0"              // Use conditional styling
+className="nth-child(2):bg-gray"    // Not supported in emails
+className="before:content-['']"     // Pseudo-elements don't work
+className="after:absolute"          // Pseudo-elements don't work
+```
+
+### 3. Complex Layout Utilities  
+```tsx
+// ❌ Can't be reliably inlined
+className="space-y-4"               // Use manual mb-4 on each element
+className="space-x-3"               // Use manual margins
+className="divide-y"                // Use manual borders
+className="grid-cols-auto"          // Use explicit grid definitions
+```
+
+## ✅ Email-Safe Tailwind Patterns
+
+### 1. Use cn() Utility for Conditional Classes
+```tsx
+// ✅ ALWAYS use cn() instead of template literals for conditional classes
+import { cn } from "@/lib/utils";
+
+// ✅ Good: Clean conditional classes with cn()
+className={cn(
+  "base-classes",
+  condition && "conditional-class",
+  anotherCondition && "another-class",
+  status === "active" && "bg-green-100",
+  status === "inactive" && "bg-gray-100"
+)}
+
+// ❌ Bad: Template literal string interpolation
+className={`base-classes ${condition ? "conditional-class" : ""} ${
+  status === "active" ? "bg-green-100" : "bg-gray-100"
+}`}
+
+// ✅ Perfect for complex conditional styling
+className={cn(
+  "inline-block p-4 rounded-full mb-4",
+  status === "processing" && "bg-yellow-100",
+  status === "shipped" && "bg-blue-100", 
+  status === "delivered" && "bg-green-100",
+  status === "cancelled" && "bg-red-100",
+  !["processing", "shipped", "delivered", "cancelled"].includes(status) && "bg-gray-100"
+)}
+```
+
+### 2. Replace Complex Classes with Simple Alternatives
+```tsx
+// ✅ Instead of space-y-4, use manual margins
+<div>
+  <div className="mb-4">Item 1</div>
+  <div className="mb-4">Item 2</div>
+  <div>Item 3</div> {/* Last item has no margin */}
+</div>
+
+// ✅ Instead of last:border-b-0, use conditional rendering
+{items.map((item, index) => (
+  <div 
+    key={item.id}
+    className={`px-4 py-3 ${index < items.length - 1 ? 'border-b border-gray-100' : ''}`}
+  >
+    {item.content}
+  </div>
+))}
+
+// ✅ Use solid colors only (no hover/focus states)
+className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-base"
+```
+
+### 2. Email-Safe Layout Structure
+```tsx
+// ✅ Always use this structure
+<Html lang="pt-BR">
+  <Head>  {/* CRITICAL: Must have <Head> for Tailwind to work */}
+    <title>Email Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta httpEquiv="Content-Type" content="text/html; charset=UTF-8" />
+  </Head>
+  <Preview>Preview text here</Preview>
+  <Tailwind config={tailwindConfig}>
+    <Body className="bg-white font-sans">
+      <Container className="mx-auto max-w-2xl">
+        {/* Content */}
+      </Container>
+    </Body>
+  </Tailwind>
+</Html>
+```
+
+### 3. Safe Styling Patterns - Tailwind Only
+```tsx
+// ✅ Use these email-safe Tailwind patterns with cn()
+import { cn } from "@/lib/utils";
+
+const emailSafeClasses = {
+  // Layout
+  container: "mx-auto max-w-2xl bg-white",
+  section: "px-6 py-6",
+  
+  // Typography
+  heading: "text-xl font-semibold text-gray-900 mb-4 text-center",
+  text: "text-base text-gray-700 leading-6 mb-4",
+  
+  // Buttons - NO hover states
+  button: "bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-base text-center inline-block no-underline",
+  
+  // Tables for complex layouts
+  table: "w-full border-collapse",
+  tableRow: "border-b border-gray-100",
+  tableCell: "px-4 py-3 text-left",
+  
+  // Brand colors using config
+  brandButton: "bg-brand-primary text-white px-8 py-4 rounded-lg font-semibold text-base",
+  brandText: "text-brand-text",
+  brandAccent: "bg-brand-accent",
+}
+
+// ✅ Use cn() for dynamic styling
+<div className={cn(
+  "status-indicator", 
+  emailSafeClasses.button,
+  isActive && "bg-green-600",
+  isPending && "bg-yellow-600"
+)} />
+```
+
+## 🏗️ Architecture Patterns
+
+### 1. Layout Component Pattern
+```tsx
+// ✅ Perfect email layout structure - Tailwind only
+export function EmailLayout({ children, preview, unsubscribeUrl }: Props) {
+  return (
+    <Html lang="pt-BR">
+      <Head>  {/* ESSENTIAL for Tailwind */}
+        <title>DrVista</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        {/* Gmail thread prevention */}
+        <meta name="message-id" content={`${Date.now()}-${Math.random()}`} />
+        <meta name="date" content={new Date().toISOString()} />
+      </Head>
+      <Preview>{preview}</Preview>
+      <Tailwind config={pixelBasedPreset}>
+        <Body className="bg-white font-sans">
+          <Container className="mx-auto max-w-2xl">
+            <EmailHeader />
+            {children}
+            <EmailFooter unsubscribeUrl={unsubscribeUrl} />
+          </Container>
+        </Body>
+      </Tailwind>
+    </Html>
+  );
+}
+```
+
+### 2. Button Best Practices - Tailwind Only
+```tsx
+// ✅ Email-safe button with Tailwind only
+<Button
+  href={actionUrl}
+  className="bg-brand-primary text-white px-8 py-4 rounded-lg font-semibold text-base text-center inline-block no-underline"
+>
+  Button Text
+</Button>
+```
+
+### 3. Responsive Patterns
+```tsx
+// ✅ Email-safe responsive classes
+className="w-full max-w-2xl mx-auto"        // Container sizing
+className="px-4 py-6 sm:px-6"              // Responsive padding  
+className="text-sm sm:text-base"           // Responsive text
+className="block sm:inline-block"          // Responsive display
+```
+
+## 🔧 Integration Patterns
+
+### 1. Resend + React Email Integration
+```tsx
+// ✅ Perfect integration pattern
+export async function sendWelcomeEmail({ name, email, unsubscribeUrl }: Props) {
+  try {
+    const result = await resend.emails.send({
+      from: "DrVista <noreply@drvista.com>",
+      to: [email],
+      subject: "Bem-vindo à DrVista!",
+      react: WelcomeEmail({ name, unsubscribeUrl }),
+      headers: {
+        // Gmail thread prevention
+        'Message-ID': `welcome-${Date.now()}-${Math.random()}@drvista.com`,
+        'Date': new Date().toUTCString(),
+        // Unsubscribe headers
+        'List-Unsubscribe': `<${unsubscribeUrl}>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      },
+    });
+
+    return { success: true, messageId: result.data?.id };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+```
+
+## 📱 Mobile-First Patterns
+
+### 1. Always Use Pixel-Based Preset
+```tsx
+// ✅ Use pixel-based measurements for email compatibility
+import { pixelBasedPreset } from "@react-email/tailwind";
+
+<Tailwind config={{ 
+  presets: [pixelBasedPreset],
+  theme: {
+    extend: {
+      colors: {
+        brand: {
+          primary: "#2563eb",
+          secondary: "#1e40af", 
+          accent: "#3b82f6",
+          text: "#1f2937",
+          gray: "#6b7280"
+        }
+      }
+    }
+  }
+}}>
+```
+
+## 🧪 Testing Patterns
+
+### 1. Test API Pattern
+```tsx
+// ✅ Create test endpoints for manual testing
+// /api/test-emails/route.ts
+export async function POST(request: NextRequest) {
+  const { type, email } = await request.json();
+  
+  switch (type) {
+    case "welcome":
+      return await sendWelcomeEmail({ email, name: "Test User", unsubscribeUrl });
+    // ... other cases
+  }
+}
+```
+
+### 2. Preview Files Structure
+```
+emails/
+├── welcome.tsx           # Preview files for React Email dev server
+├── order-confirmation.tsx
+├── password-reset.tsx
+└── order-update.tsx
+```
+
+## ⚡ Performance & Optimization
+
+### 1. Minimize Bundle Size
+```tsx
+// ✅ Import only what you need
+import { Html, Head, Body, Container, Section, Text, Button } from "@react-email/components";
+// ❌ Don't import entire library
+```
+
+### 2. Image Optimization
+```tsx
+// ✅ Use optimized images with explicit dimensions
+<Img
+  src="https://cdn.drvista.com/logo.png"
+  alt="DrVista Logo"
+  width="120"
+  height="40"
+  className="mx-auto"
+/>
+```
+
+## 🔐 Security & Compliance
+
+### 1. Unsubscribe Token Security
+```tsx
+// ✅ Include timestamp and user verification
+const tokenData = {
+  userId,
+  notificationId,
+  email,      // For additional verification
+  iat: Date.now(),  // Timestamp (optional expiry)
+};
+```
+
+### 2. Headers for Deliverability
+```tsx
+// ✅ Always include these headers
+headers: {
+  'List-Unsubscribe': `<${unsubscribeUrl}>`,
+  'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+  'Message-ID': `unique-id@yourdomain.com`,
+  'Date': new Date().toUTCString(),
+}
+```
+
+## 📋 Final Architecture Summary
+
+**The Perfect Email Structure (Tailwind Only):**
+1. ✅ **Layout**: Html → Head → Preview → Tailwind → Body → Container
+2. ✅ **Styling**: Pixel-based preset + email-safe Tailwind classes only
+3. ✅ **Components**: Shared layout, header, footer with consistent branding
+4. ✅ **Responsiveness**: Simple responsive classes that work across clients
+5. ✅ **Integration**: Queue → Job → Send with unsubscribe URLs
+6. ✅ **Testing**: Preview files + test API endpoints  
+7. ✅ **Security**: Token-based unsubscribe + proper headers
+
+**Key Rules:**
+- NEVER use hover, focus, active, or transition classes
+- NEVER use complex pseudo-selectors (last:, first:, nth-child)
+- NEVER use space-y, space-x, or divide utilities
+- ALWAYS use manual margins/padding for spacing
+- ALWAYS use conditional rendering for borders/styling
+- ALWAYS include <Head> element for Tailwind processing
+- ALWAYS use pixel-based preset for email compatibility
+- ALWAYS use cn() utility for conditional classes instead of template literals
+description:
+globs:
+alwaysApply: false
+---

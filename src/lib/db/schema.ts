@@ -129,6 +129,59 @@ export const orderItem = pgTable("orderItem", {
 	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
 
+// Notification system tables
+export const userNotificationSettings = pgTable("user_notification_settings", {
+	id: text("id").primaryKey(),
+	userId: text("userId")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" })
+		.unique(),
+	// Notification preferences - true means enabled
+	marketing: boolean("marketing").notNull().default(true),
+	orderUpdates: boolean("order_updates").notNull().default(true),
+	systemNotifications: boolean("system_notifications").notNull().default(true),
+	promotions: boolean("promotions").notNull().default(true),
+	newsletters: boolean("newsletters").notNull().default(true),
+	// Channel preferences
+	emailEnabled: boolean("email_enabled").notNull().default(true),
+	smsEnabled: boolean("sms_enabled").notNull().default(false),
+	pushEnabled: boolean("push_enabled").notNull().default(true),
+	whatsappEnabled: boolean("whatsapp_enabled").notNull().default(false),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
+
+export const userNotification = pgTable("user_notification", {
+	id: text("id").primaryKey(),
+	userId: text("userId")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	// Notification type
+	notificationType: text("notification_type").notNull(), // "marketing", "order_updates", "system_notifications", "transactional", "promotions", "newsletters"
+	// Channel used
+	channel: text("channel").notNull(), // "email", "sms", "push", "whatsapp", "web"
+	// Content and metadata
+	subject: text("subject"),
+	content: text("content"),
+	metadata: json("metadata").$type<Record<string, any>>().default({}),
+	// External service tracking
+	externalId: text("external_id"), // Resend message ID, SMS gateway ID, etc.
+	externalProvider: text("external_provider"), // "resend", "twilio", "firebase", etc.
+	// Status tracking
+	status: text("status").notNull().default("pending"), // "pending", "sent", "delivered", "failed", "opened", "clicked"
+	sentAt: timestamp("sent_at"),
+	deliveredAt: timestamp("delivered_at"),
+	openedAt: timestamp("opened_at"),
+	clickedAt: timestamp("clicked_at"),
+	failedAt: timestamp("failed_at"),
+	failureReason: text("failure_reason"),
+	// Unsubscribe tracking
+	unsubscribeToken: text("unsubscribe_token").unique(),
+	unsubscribedAt: timestamp("unsubscribed_at"),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
+
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
 export type Session = typeof session.$inferSelect;
@@ -147,3 +200,9 @@ export type Order = typeof order.$inferSelect;
 export type NewOrder = typeof order.$inferInsert;
 export type OrderItem = typeof orderItem.$inferSelect;
 export type NewOrderItem = typeof orderItem.$inferInsert;
+export type UserNotificationSettings =
+	typeof userNotificationSettings.$inferSelect;
+export type NewUserNotificationSettings =
+	typeof userNotificationSettings.$inferInsert;
+export type UserNotification = typeof userNotification.$inferSelect;
+export type NewUserNotification = typeof userNotification.$inferInsert;

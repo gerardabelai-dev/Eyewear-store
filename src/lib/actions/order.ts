@@ -1,6 +1,6 @@
 "use server";
 
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth-server";
@@ -13,6 +13,7 @@ import {
 	subcategory,
 	user,
 } from "@/lib/db/schema";
+import { enqueueEmailJob } from "@/lib/qstash";
 
 // Schemas for validation
 const orderItemSchema = z.object({
@@ -46,6 +47,11 @@ const updateOrderSchema = z.object({
 	customerPhone: z.string().optional(),
 	notes: z.string().optional(),
 	items: z.array(orderItemSchema).min(1, "Pelo menos um item é obrigatório"),
+	status: z
+		.enum(["pending", "processing", "completed", "cancelled"], {
+			errorMap: () => ({ message: "Status inválido" }),
+		})
+		.optional(),
 });
 
 // Generate order number
@@ -221,23 +227,45 @@ export async function createOrder(data: z.infer<typeof createOrderSchema>) {
 
 		await db.insert(orderItem).values(orderItems);
 
-		// Update product stock
+		// Reduce stock for each item
 		for (const item of validatedData.items) {
-			const productData = productsMap.get(item.productId);
-			if (productData) {
-				await db
-					.update(product)
-					.set({
-						stock: productData.stock - item.quantity,
-						updatedAt: new Date(),
-					})
-					.where(eq(product.id, item.productId));
-			}
+			await db
+				.update(product)
+				.set({
+					stock: sql`${product.stock} - ${item.quantity}`,
+					updatedAt: new Date(),
+				})
+				.where(eq(product.id, item.productId));
+		}
+
+		// Queue order confirmation email
+		try {
+			await enqueueEmailJob({
+				type: "order-confirmation",
+				userId: currentUser.id,
+				email: validatedData.customerEmail,
+				data: {
+					orderNumber: newOrder[0].orderNumber,
+					customerName: validatedData.customerName,
+					totalAmount: totalAmount,
+					items: validatedData.items.map((item) => ({
+						name: productsMap.get(item.productId)?.name || "Produto",
+						quantity: item.quantity,
+						price: parseFloat(item.unitPrice),
+					})),
+				},
+			});
+		} catch (emailError) {
+			console.error("Failed to queue order confirmation email:", emailError);
+			// Don't fail the order creation if email fails
 		}
 
 		revalidatePath("/pedidos");
 		revalidatePath("/produtos");
-		return { data: newOrder[0], success: "Pedido criado com sucesso" };
+		return {
+			success: "Pedido criado com sucesso!",
+			data: newOrder[0],
+		};
 	} catch (error) {
 		console.error("Erro ao criar pedido:", error);
 		if (error instanceof z.ZodError) {
@@ -332,16 +360,31 @@ export async function updateOrder(data: z.infer<typeof updateOrderSchema>) {
 		await db.delete(orderItem).where(eq(orderItem.orderId, validatedData.id));
 
 		// Update order
+		const updateData: any = {
+			customerName: validatedData.customerName,
+			customerEmail: validatedData.customerEmail,
+			customerPhone: validatedData.customerPhone || null,
+			notes: validatedData.notes || null,
+			totalAmount: totalAmount.toString(),
+			updatedAt: new Date(),
+		};
+
+		// Handle status change if provided
+		if (validatedData.status) {
+			// If cancelling order, restore product stock
+			if (
+				validatedData.status === "cancelled" &&
+				existingOrder[0].status !== "cancelled"
+			) {
+				// Stock was already restored when we deleted existing items above
+				// No additional stock restoration needed
+			}
+			updateData.status = validatedData.status;
+		}
+
 		const updatedOrder = await db
 			.update(order)
-			.set({
-				customerName: validatedData.customerName,
-				customerEmail: validatedData.customerEmail,
-				customerPhone: validatedData.customerPhone || null,
-				notes: validatedData.notes || null,
-				totalAmount: totalAmount.toString(),
-				updatedAt: new Date(),
-			})
+			.set(updateData)
 			.where(eq(order.id, validatedData.id))
 			.returning();
 

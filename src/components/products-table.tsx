@@ -215,7 +215,7 @@ export function ProductsTable({ products }: ProductsTableProps) {
 			{/* Edit Product Drawer */}
 			{editingProduct && (
 				<Drawer
-					trigger={<></>}
+					trigger={<button type="button" style={{ display: "none" }} />}
 					title="Editar Produto"
 					description="Atualize as informações do produto. Modifique as imagens para manter seu produto atrativo."
 					icon={<Edit className="h-5 w-5" />}
