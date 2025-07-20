@@ -15,7 +15,7 @@ import { getProducts } from "@/lib/actions/product";
 export default async function ProdutosPage() {
 	const result = await getProducts();
 	if (result.error) {
-		redirect("/dashboard");
+		redirect("/account");
 	}
 
 	const products = result.data || [];

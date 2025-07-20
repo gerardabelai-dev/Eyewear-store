@@ -415,7 +415,7 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 							)}
 						/>
 
-						<div className="grid grid-cols-2 gap-4">
+						<div className="space-y-4">
 							<FormField
 								control={form.control}
 								name="price"
@@ -428,6 +428,7 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 												step="0.01"
 												min="0"
 												placeholder="99.99"
+												className="w-full"
 												{...field}
 											/>
 										</FormControl>
@@ -447,6 +448,7 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 												type="number"
 												min="0"
 												placeholder="10"
+												className="w-full"
 												{...field}
 											/>
 										</FormControl>

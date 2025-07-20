@@ -58,7 +58,7 @@ export function WelcomeEmail({
 			{/* CTA Section */}
 			<Section className="px-6 py-4 text-center">
 				<Button
-					href={`${BRAND_CONFIG.website}/dashboard`}
+					href={`${BRAND_CONFIG.website}/account`}
 					className="bg-brand-primary text-white px-8 py-4 rounded-lg font-semibold text-base text-center inline-block no-underline"
 				>
 					Acessar Dashboard

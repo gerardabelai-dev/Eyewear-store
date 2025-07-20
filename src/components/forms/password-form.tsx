@@ -152,7 +152,7 @@ export function PasswordForm({ hasPassword }: PasswordFormProps) {
 								/>
 							</div>
 
-							<div className="max-w-md grid sm:grid-cols-2 gap-4">
+							<div className="space-y-6">
 								<FormField
 									control={changePasswordForm.control}
 									name="newPassword"
@@ -160,7 +160,7 @@ export function PasswordForm({ hasPassword }: PasswordFormProps) {
 										<FormItem className="space-y-2">
 											<FormLabel>Nova Senha</FormLabel>
 											<FormControl>
-												<Input type="password" {...field} />
+												<Input type="password" className="w-full" {...field} />
 											</FormControl>
 											<div className="min-h-[20px]">
 												<FormMessage />
@@ -176,7 +176,7 @@ export function PasswordForm({ hasPassword }: PasswordFormProps) {
 										<FormItem className="space-y-2">
 											<FormLabel>Confirmar Nova Senha</FormLabel>
 											<FormControl>
-												<Input type="password" {...field} />
+												<Input type="password" className="w-full" {...field} />
 											</FormControl>
 											<div className="min-h-[20px]">
 												<FormMessage />

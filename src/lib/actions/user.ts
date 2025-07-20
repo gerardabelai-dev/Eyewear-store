@@ -124,7 +124,7 @@ export async function updateUserProfile(
 				image: user.image,
 			});
 
-		revalidatePath("/dashboard");
+		revalidatePath("/account");
 		return { data: updatedUser[0], success: "Perfil atualizado com sucesso" };
 	} catch (error) {
 		console.error("Erro ao atualizar perfil:", error);
@@ -165,7 +165,7 @@ export async function updateUserEmail(data: z.infer<typeof updateEmailSchema>) {
 			})
 			.where(eq(user.id, currentUser.id));
 
-		revalidatePath("/dashboard");
+		revalidatePath("/account");
 		return {
 			success: "Email atualizado com sucesso. Verifique seu novo email.",
 		};
@@ -233,7 +233,7 @@ export async function updateUserAvatar(
 				image: user.image,
 			});
 
-		revalidatePath("/dashboard");
+		revalidatePath("/account");
 		return { data: updatedUser[0], success: "Avatar atualizado com sucesso" };
 	} catch (error) {
 		console.error("Erro ao atualizar avatar:", error);
@@ -299,7 +299,7 @@ export async function setUserPassword(formData: FormData) {
 			});
 		}
 
-		revalidatePath("/dashboard");
+		revalidatePath("/account");
 		return { success: "Senha definida com sucesso!" };
 	} catch (error) {
 		if (error instanceof z.ZodError) {

@@ -54,8 +54,8 @@ export function DashboardHeader({
 	};
 
 	const isActivePath = (href: string) => {
-		if (href === "/dashboard") {
-			return pathname === "/dashboard";
+		if (href === "/account") {
+			return pathname === "/account";
 		}
 		return pathname.startsWith(href) && href !== "#";
 	};
@@ -66,7 +66,7 @@ export function DashboardHeader({
 				<div className="flex justify-between items-center h-14 sm:h-16">
 					<div className="flex items-center space-x-4 sm:space-x-8 min-w-0">
 						<Link
-							href="/dashboard"
+							href="/account"
 							className="flex items-center space-x-2 shrink-0"
 						>
 							<AppLogo size="md" showText={true} />
@@ -102,11 +102,11 @@ export function DashboardHeader({
 									</Link>
 								);
 							})}
-							<Link href="/dashboard">
+							<Link href="/account">
 								<Button
 									variant="ghost"
 									className={
-										isActivePath("/dashboard")
+										isActivePath("/account")
 											? "text-foreground"
 											: "text-muted-foreground"
 									}
@@ -164,7 +164,7 @@ export function DashboardHeader({
 									<DropdownMenuSeparator />
 								</div>
 
-								<Link href="/dashboard">
+								<Link href="/account">
 									<DropdownMenuItem>
 										<Settings className="mr-2 h-4 w-4" />
 										Configurações

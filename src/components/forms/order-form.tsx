@@ -485,42 +485,42 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 								Dados do Cliente
 							</CardTitle>
 						</CardHeader>
-						<CardContent className="space-y-4">
-							<div className="grid grid-cols-2 gap-4">
-								<FormField
-									control={form.control}
-									name="customerName"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Nome *</FormLabel>
-											<FormControl>
-												<Input
-													{...field}
-													placeholder="Nome completo do cliente"
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name="customerEmail"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>E-mail *</FormLabel>
-											<FormControl>
-												<Input
-													{...field}
-													type="email"
-													placeholder="cliente@email.com"
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
+						<CardContent className="space-y-6">
+							<FormField
+								control={form.control}
+								name="customerName"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Nome *</FormLabel>
+										<FormControl>
+											<Input
+												{...field}
+												placeholder="Nome completo do cliente"
+												className="w-full"
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="customerEmail"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>E-mail *</FormLabel>
+										<FormControl>
+											<Input
+												{...field}
+												type="email"
+												placeholder="cliente@email.com"
+												className="w-full"
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 							<FormField
 								control={form.control}
 								name="customerPhone"
@@ -532,6 +532,7 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 												{...field}
 												value={field.value || ""}
 												placeholder="(11) 99999-9999"
+												className="w-full"
 											/>
 										</FormControl>
 										<FormMessage />
@@ -587,60 +588,55 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 								{isEditing ? "Adicionar Mais Produtos" : "Adicionar Produtos"}
 							</CardTitle>
 						</CardHeader>
-						<CardContent className="space-y-4">
-							<div className="grid grid-cols-3 gap-4">
-								<div className="col-span-2">
-									<FormField
-										control={form.control}
-										name="selectedProduct"
-										render={({ field }) => (
-											<FormItem>
-												<SearchableSelect
-													options={availableProducts.map((product) => ({
-														value: product.id,
-														label: `${product.name} - R$ ${parseFloat(product.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })} (Est: ${product.stock})`,
-													}))}
-													value={field.value}
-													onValueChange={field.onChange}
-													label="Produto"
-													placeholder="Selecione um produto"
-													searchPlaceholder="Buscar produtos..."
-													emptyText="Nenhum produto encontrado."
-													addNewText="Novo Produto"
-													showAddNew={true}
-													onAddNew={() => setShowProductCreation(true)}
-													loading={loadingProducts}
-													loadingText="Carregando produtos..."
-												/>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-								<div>
-									<FormField
-										control={form.control}
-										name="selectedQuantity"
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Quantidade</FormLabel>
-												<FormControl>
-													<Input
-														type="number"
-														min="1"
-														{...field}
-														onChange={(e) =>
-															field.onChange(parseInt(e.target.value) || 1)
-														}
-														placeholder="1"
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</div>
-							</div>
+						<CardContent className="space-y-6">
+							<FormField
+								control={form.control}
+								name="selectedProduct"
+								render={({ field }) => (
+									<FormItem>
+										<SearchableSelect
+											options={availableProducts.map((product) => ({
+												value: product.id,
+												label: `${product.name} - R$ ${parseFloat(product.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })} (Est: ${product.stock})`,
+											}))}
+											value={field.value}
+											onValueChange={field.onChange}
+											label="Produto"
+											placeholder="Selecione um produto"
+											searchPlaceholder="Buscar produtos..."
+											emptyText="Nenhum produto encontrado."
+											addNewText="Novo Produto"
+											showAddNew={true}
+											onAddNew={() => setShowProductCreation(true)}
+											loading={loadingProducts}
+											loadingText="Carregando produtos..."
+										/>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="selectedQuantity"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Quantidade</FormLabel>
+										<FormControl>
+											<Input
+												type="number"
+												min="1"
+												{...field}
+												onChange={(e) =>
+													field.onChange(parseInt(e.target.value) || 1)
+												}
+												placeholder="1"
+												className="w-full"
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 							<Button
 								type="button"
 								onClick={addProductToOrder}
@@ -675,10 +671,10 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 									{orderItems.map((item) => (
 										<div
 											key={item.productId}
-											className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+											className="p-4 border rounded-lg hover:bg-muted/50 transition-colors space-y-4"
 										>
-											{/* Mobile: Image and Product Info Row */}
-											<div className="flex items-start gap-3 flex-1">
+											{/* Product Header Row */}
+											<div className="flex items-start gap-3">
 												{/* Product Image */}
 												<div
 													className="cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0"
@@ -708,7 +704,7 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 																	openProductEdit(item.productId);
 																}
 															}}
-															className="font-medium text-left hover:text-primary transition-colors cursor-pointer flex-1"
+															className="font-medium text-left hover:text-primary transition-colors cursor-pointer flex-1 truncate"
 														>
 															{item.productName}
 														</button>
@@ -736,47 +732,49 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 														)}
 													</div>
 
-													<div className="text-sm text-muted-foreground mb-2">
-														R${" "}
-														{parseFloat(item.unitPrice).toLocaleString(
-															"pt-BR",
-															{
-																minimumFractionDigits: 2,
-															},
-														)}{" "}
-														x {item.quantity}
-													</div>
-
 													{item.productDescription && (
-														<p className="text-xs text-muted-foreground line-clamp-2">
+														<p className="text-xs text-muted-foreground line-clamp-2 mb-2">
 															{item.productDescription}
 														</p>
 													)}
 												</div>
 											</div>
 
-											{/* Mobile: Controls Row */}
-											<div className="flex items-center justify-between sm:justify-end gap-2 sm:flex-shrink-0">
-												<div className="flex items-center gap-2">
-													<label className="text-sm font-medium sm:hidden">
-														Qtd:
-													</label>
-													<Input
-														type="number"
-														min="1"
-														max={item.productStock}
-														value={item.quantity}
-														onChange={(e) =>
-															updateItemQuantity(
-																item.productId,
-																parseInt(e.target.value) || 0,
-															)
-														}
-														className="w-20"
-													/>
+											{/* Price and Controls Row */}
+											<div className="flex items-center justify-between gap-4 pt-2 border-t border-muted">
+												{/* Unit Price Info */}
+												<div className="text-sm text-muted-foreground">
+													R${" "}
+													{parseFloat(item.unitPrice).toLocaleString("pt-BR", {
+														minimumFractionDigits: 2,
+													})}{" "}
+													por unidade
 												</div>
-												<div className="flex items-center gap-2">
-													<Badge variant="outline" className="min-w-fit">
+
+												{/* Controls */}
+												<div className="flex items-center gap-3">
+													{/* Quantity Control */}
+													<div className="flex items-center gap-2">
+														<label className="text-sm font-medium text-muted-foreground">
+															Qtd:
+														</label>
+														<Input
+															type="number"
+															min="1"
+															max={item.productStock}
+															value={item.quantity}
+															onChange={(e) =>
+																updateItemQuantity(
+																	item.productId,
+																	parseInt(e.target.value) || 0,
+																)
+															}
+															className="w-16 h-8 text-center"
+														/>
+													</div>
+
+													{/* Total Price */}
+													<Badge variant="outline" className="font-semibold">
 														R${" "}
 														{(
 															parseFloat(item.unitPrice) * item.quantity
@@ -784,6 +782,8 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 															minimumFractionDigits: 2,
 														})}
 													</Badge>
+
+													{/* Remove Button */}
 													<Button
 														type="button"
 														variant="ghost"
@@ -791,7 +791,7 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 														onClick={() =>
 															removeProductFromOrder(item.productId)
 														}
-														className="text-destructive hover:text-destructive"
+														className="text-destructive hover:text-destructive h-8 w-8 p-0"
 													>
 														<X className="h-4 w-4" />
 													</Button>

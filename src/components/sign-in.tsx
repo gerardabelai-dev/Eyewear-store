@@ -78,7 +78,7 @@ export default function SignIn() {
 						const message = "Bem-vindo de volta!";
 						if (globalToastTracker.canShowToast(message)) {
 							toast.success(message);
-							router.push("/dashboard");
+							router.push("/account");
 						}
 					},
 					onError: (ctx) => {
@@ -102,7 +102,7 @@ export default function SignIn() {
 			await signIn.social(
 				{
 					provider: "google",
-					callbackURL: "/dashboard",
+					callbackURL: "/account",
 				},
 				{
 					onSuccess: () => {

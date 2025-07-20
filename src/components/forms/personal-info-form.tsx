@@ -92,7 +92,7 @@ export function PersonalInfoForm({
 						})}
 						className="space-y-6"
 					>
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
+						<div className="space-y-6">
 							<FormField
 								control={form.control}
 								name="firstName"
@@ -102,6 +102,7 @@ export function PersonalInfoForm({
 										<FormControl>
 											<Input
 												placeholder="Digite seu primeiro nome"
+												className="w-full"
 												{...field}
 											/>
 										</FormControl>
@@ -118,7 +119,11 @@ export function PersonalInfoForm({
 									<FormItem className="space-y-2">
 										<FormLabel>Sobrenome</FormLabel>
 										<FormControl>
-											<Input placeholder="Digite seu sobrenome" {...field} />
+											<Input
+												placeholder="Digite seu sobrenome"
+												className="w-full"
+												{...field}
+											/>
 										</FormControl>
 										<div className="min-h-[20px]">
 											<FormMessage />

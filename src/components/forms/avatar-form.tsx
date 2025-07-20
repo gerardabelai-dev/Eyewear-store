@@ -120,7 +120,7 @@ export function AvatarForm({ userImage, userInitials }: AvatarFormProps) {
 					</div>
 				</div>
 
-				<div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+				<div className="flex flex-col items-center gap-6">
 					{/* Avatar Preview */}
 					<div className="relative shrink-0">
 						<UserAvatar
@@ -140,7 +140,7 @@ export function AvatarForm({ userImage, userInitials }: AvatarFormProps) {
 					</div>
 
 					{/* Upload Controls */}
-					<div className="flex-1 w-full sm:w-auto text-center sm:text-left">
+					<div className="flex-1 w-full text-center">
 						<input
 							ref={fileInputRef}
 							type="file"
@@ -149,7 +149,7 @@ export function AvatarForm({ userImage, userInitials }: AvatarFormProps) {
 							className="hidden"
 						/>
 
-						<div className="flex flex-col sm:flex-row items-center gap-3">
+						<div className="flex flex-col items-center gap-3">
 							<Button
 								type="button"
 								variant="outline"

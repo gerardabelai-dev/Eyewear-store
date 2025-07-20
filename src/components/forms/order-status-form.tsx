@@ -155,7 +155,7 @@ export function OrderStatusForm({
 					)}
 				/>
 
-				<div className="grid grid-cols-2 gap-4">
+				<div className="space-y-6">
 					<FormField
 						control={form.control}
 						name="color"
@@ -192,7 +192,7 @@ export function OrderStatusForm({
 							<FormItem>
 								<FormLabel>Ícone</FormLabel>
 								<FormControl>
-									<Input placeholder="Package" {...field} />
+									<Input placeholder="Package" className="w-full" {...field} />
 								</FormControl>
 								<FormDescription>Nome do ícone Lucide React</FormDescription>
 								<FormMessage />

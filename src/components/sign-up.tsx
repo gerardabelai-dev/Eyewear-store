@@ -116,7 +116,7 @@ export default function SignUp() {
 						const message = "Conta criada com sucesso!";
 						if (globalToastTracker.canShowToast(message)) {
 							toast.success(message);
-							router.push("/dashboard");
+							router.push("/account");
 						}
 					},
 					onError: (ctx) => {
@@ -140,7 +140,7 @@ export default function SignUp() {
 			await signIn.social(
 				{
 					provider: "google",
-					callbackURL: "/dashboard",
+					callbackURL: "/account",
 				},
 				{
 					onSuccess: () => {
@@ -237,7 +237,7 @@ export default function SignUp() {
 								/>
 							</div>
 
-							<div className="grid grid-cols-2 gap-4">
+							<div className="space-y-4">
 								<FormField
 									control={form.control}
 									name="firstName"
@@ -245,7 +245,11 @@ export default function SignUp() {
 										<FormItem>
 											<FormLabel>Nome</FormLabel>
 											<FormControl>
-												<Input placeholder="João" {...field} />
+												<Input
+													placeholder="João"
+													className="w-full"
+													{...field}
+												/>
 											</FormControl>
 											<FormMessage />
 										</FormItem>
@@ -258,7 +262,11 @@ export default function SignUp() {
 										<FormItem>
 											<FormLabel>Sobrenome</FormLabel>
 											<FormControl>
-												<Input placeholder="Silva" {...field} />
+												<Input
+													placeholder="Silva"
+													className="w-full"
+													{...field}
+												/>
 											</FormControl>
 											<FormMessage />
 										</FormItem>
