@@ -3,13 +3,13 @@
 import { Shield } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 import SignIn from "@/components/sign-in";
 import SignUp from "@/components/sign-up";
 import { Button } from "@/components/ui/button";
 
-export default function AuthPage() {
+function AuthPageContent() {
 	const [showSignUp, setShowSignUp] = useState(false);
 	const [isProcessingImpersonation, setIsProcessingImpersonation] =
 		useState(false);
@@ -131,5 +131,31 @@ export default function AuthPage() {
 				<div className="w-full">{showSignUp ? <SignUp /> : <SignIn />}</div>
 			</div>
 		</div>
+	);
+}
+
+export default function AuthPage() {
+	return (
+		<Suspense
+			fallback={
+				<div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center p-6">
+					<div className="w-full max-w-md space-y-6">
+						<div className="text-center space-y-2">
+							<div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mb-4">
+								<Shield className="w-8 h-8 text-white" />
+							</div>
+							<h1 className="text-2xl font-bold text-gray-900">
+								Carregando...
+							</h1>
+							<p className="text-gray-600">
+								Preparando a página de autenticação.
+							</p>
+						</div>
+					</div>
+				</div>
+			}
+		>
+			<AuthPageContent />
+		</Suspense>
 	);
 }

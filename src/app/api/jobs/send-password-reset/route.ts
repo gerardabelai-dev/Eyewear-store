@@ -46,20 +46,26 @@ export async function POST(request: NextRequest) {
 		// Send the password reset email
 		console.log(`Sending password reset email to ${payload.email}`);
 
+		// Construct the reset URL from the token
+		const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password?token=${payload.resetToken}`;
+
 		const result = await sendPasswordResetEmail(
+			{
+				name: payload.name,
+				resetUrl: resetUrl,
+				unsubscribeUrl: payload.unsubscribeUrl,
+			},
 			payload.email,
-			payload.resetToken,
-			payload.name,
 		);
 
 		console.log(
 			`Password reset email sent successfully to ${payload.email}:`,
-			result.data?.id,
+			result.data,
 		);
 
 		return NextResponse.json({
 			success: true,
-			messageId: result.data?.id,
+			messageId: result.messageId,
 			email: payload.email,
 		});
 	} catch (error) {

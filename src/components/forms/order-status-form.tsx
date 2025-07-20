@@ -36,14 +36,16 @@ const orderStatusFormSchema = z.object({
 	color: z
 		.string()
 		.regex(/^#[0-9A-F]{6}$/i, "Cor deve ser um código hexadecimal válido")
+		.optional()
 		.default("#6b7280"),
 	icon: z
 		.string()
 		.max(50, "Ícone deve ter no máximo 50 caracteres")
+		.optional()
 		.default("Package"),
-	isDefault: z.boolean().default(false),
-	isActive: z.boolean().default(true),
-	sortOrder: z.number().int().min(0).default(0),
+	isDefault: z.boolean().optional().default(false),
+	isActive: z.boolean().optional().default(true),
+	sortOrder: z.number().int().min(0).optional().default(0),
 });
 
 type OrderStatusFormData = z.infer<typeof orderStatusFormSchema>;
@@ -60,14 +62,14 @@ export function OrderStatusForm({
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const isEditing = !!orderStatus;
 
-	const form = useForm<OrderStatusFormData>({
+	const form = useForm({
 		resolver: zodResolver(orderStatusFormSchema),
 		defaultValues: {
 			name: orderStatus?.name || "",
 			description: orderStatus?.description || "",
 			color: orderStatus?.color || "#6b7280",
 			icon: orderStatus?.icon || "Package",
-			isDefault: orderStatus?.isDefault || false,
+			isDefault: orderStatus?.isDefault ?? false,
 			isActive: orderStatus?.isActive ?? true,
 			sortOrder: orderStatus?.sortOrder || 0,
 		},

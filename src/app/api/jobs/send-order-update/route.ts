@@ -1,4 +1,7 @@
+import { eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { order } from "@/lib/db/schema";
 import type { SendOrderUpdatePayload } from "@/lib/qstash";
 import { verifyQStashSignature } from "@/lib/qstash";
 import { sendOrderUpdateEmail } from "@/lib/resend";
@@ -48,28 +51,46 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
+		// Fetch order details from database to get orderNumber and customerName
+		const [orderRecord] = await db
+			.select({
+				orderNumber: order.orderNumber,
+				customerName: order.customerName,
+			})
+			.from(order)
+			.where(eq(order.id, payload.orderId));
+
+		if (!orderRecord) {
+			console.error(`Order ${payload.orderId} not found`);
+			return NextResponse.json({ error: "Order not found" }, { status: 404 });
+		}
+
 		// Send the order update email
 		console.log(
 			`Sending order update email to ${payload.email} for order ${payload.orderId} with status ${payload.status}`,
 		);
 
-		const result = await sendOrderUpdateEmail(payload.email, {
-			orderId: payload.orderId,
-			status: payload.status,
-			message: payload.message,
-		});
+		const result = await sendOrderUpdateEmail(
+			{
+				orderNumber: orderRecord.orderNumber,
+				customerName: orderRecord.customerName,
+				status: payload.status,
+				message: payload.message,
+				unsubscribeUrl: payload.unsubscribeUrl,
+			},
+			payload.email,
+		);
 
 		console.log(
 			`Order update email sent successfully to ${payload.email}:`,
-			result.data?.id,
+			result.data,
 		);
 
 		return NextResponse.json({
 			success: true,
-			messageId: result.data?.id,
+			messageId: result.messageId,
 			orderId: payload.orderId,
 			userId: payload.userId,
-			status: payload.status,
 		});
 	} catch (error) {
 		console.error("Error in send-order-update job:", error);

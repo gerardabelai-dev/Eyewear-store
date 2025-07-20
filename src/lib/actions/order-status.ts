@@ -102,8 +102,11 @@ export async function createOrderStatus(data: OrderStatusFormData) {
 		const newStatus = await db
 			.insert(orderStatus)
 			.values({
+				id: crypto.randomUUID(),
 				...validatedData,
 				slug,
+				createdAt: new Date(),
+				updatedAt: new Date(),
 			})
 			.returning();
 

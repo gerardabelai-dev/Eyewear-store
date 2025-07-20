@@ -48,16 +48,20 @@ export async function POST(request: NextRequest) {
 			`Sending welcome email to ${payload.email} for user ${payload.userId}`,
 		);
 
-		const result = await sendWelcomeEmail(payload.email, payload.name);
+		const result = await sendWelcomeEmail({
+			name: payload.name,
+			email: payload.email,
+			unsubscribeUrl: payload.unsubscribeUrl,
+		});
 
 		console.log(
 			`Welcome email sent successfully to ${payload.email}:`,
-			result.data?.id,
+			result.data,
 		);
 
 		return NextResponse.json({
 			success: true,
-			messageId: result.data?.id,
+			messageId: result.messageId,
 			userId: payload.userId,
 		});
 	} catch (error) {

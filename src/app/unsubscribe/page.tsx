@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import {
 	AppCompanyInfo,
 	AppLogo,
@@ -33,7 +33,7 @@ interface UserPreferences extends NotificationPreferences {
 	userId: string;
 }
 
-export default function UnsubscribePage() {
+function UnsubscribePageContent() {
 	const searchParams = useSearchParams();
 	const token = searchParams.get("token");
 
@@ -485,5 +485,29 @@ export default function UnsubscribePage() {
 				</div>
 			</div>
 		</div>
+	);
+}
+
+export default function UnsubscribePage() {
+	return (
+		<Suspense
+			fallback={
+				<div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center p-6">
+					<Card className="w-full max-w-2xl">
+						<CardHeader className="text-center">
+							<div className="flex justify-center mb-4">
+								<AppLogo />
+							</div>
+							<CardTitle>Carregando...</CardTitle>
+							<CardDescription>
+								Processando sua solicitação de cancelamento de inscrição.
+							</CardDescription>
+						</CardHeader>
+					</Card>
+				</div>
+			}
+		>
+			<UnsubscribePageContent />
+		</Suspense>
 	);
 }

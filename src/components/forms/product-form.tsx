@@ -36,6 +36,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { useFileUpload } from "@/hooks/use-file-upload";
 import {
 	getCategories,
 	getSubcategoriesByCategory,
@@ -64,6 +65,7 @@ const productFormSchema = z.object({
 		.enum(["active", "inactive", "draft", "discontinued"], {
 			errorMap: () => ({ message: "Status inválido" }),
 		})
+		.optional()
 		.default("active"),
 	categoryId: z.string().min(1, "Categoria é obrigatória"),
 	subcategoryId: z.string().optional(),
@@ -282,7 +284,7 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 	const [showSubcategoryCreation, setShowSubcategoryCreation] = useState(false);
 	const isEditing = !!product;
 
-	const form = useForm<ProductFormData>({
+	const form = useForm({
 		resolver: zodResolver(productFormSchema),
 		defaultValues: {
 			name: product?.name || "",

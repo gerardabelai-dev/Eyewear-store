@@ -9,7 +9,7 @@ import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { order, user } from "./db/schema";
 import { QueueService } from "./queue-service";
-import { sendEmail } from "./resend";
+import { sendCustomEmail } from "./resend";
 
 // Example: User registration with welcome email
 export async function exampleUserRegistration(userData: {
@@ -128,10 +128,10 @@ export async function exampleImmediateEmail(
 	content: string,
 ) {
 	try {
-		const result = await sendEmail({
+		const result = await sendCustomEmail(
 			to,
 			subject,
-			html: `
+			`
 				<html>
 					<body style="font-family: Arial, sans-serif;">
 						<h2>${subject}</h2>
