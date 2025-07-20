@@ -1,15 +1,23 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { IBM_Plex_Mono, Libre_Baskerville, Lora } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const geistSans = Geist({
-	variable: "--font-geist-sans",
+const libreBaskerville = Libre_Baskerville({
+	weight: ["400", "700"],
+	variable: "--font-sans",
 	subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
+const lora = Lora({
+	variable: "--font-serif",
+	subsets: ["latin"],
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+	weight: ["400", "500", "600"],
+	variable: "--font-mono",
 	subsets: ["latin"],
 });
 
@@ -17,6 +25,11 @@ export const metadata: Metadata = {
 	title: "DrVista Admin - Plataforma de Autenticação Segura",
 	description:
 		"Sistema administrativo moderno com autenticação segura e interface intuitiva para gestão completa",
+	icons: {
+		icon: "/drvista-favicon.svg",
+		shortcut: "/drvista-favicon.svg",
+		apple: "/drvista-favicon.svg",
+	},
 };
 
 export default function RootLayout({
@@ -25,17 +38,24 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="pt-BR">
+		<html lang="pt-BR" suppressHydrationWarning>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+				className={`${libreBaskerville.variable} ${lora.variable} ${ibmPlexMono.variable} font-sans antialiased bg-background text-foreground`}
 			>
-				{children}
-				<Toaster
-					richColors
-					position="bottom-right"
-					expand={false}
-					closeButton={true}
-				/>
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="system"
+					enableSystem
+					disableTransitionOnChange
+				>
+					{children}
+					<Toaster
+						richColors
+						position="bottom-right"
+						expand={false}
+						closeButton={true}
+					/>
+				</ThemeProvider>
 			</body>
 		</html>
 	);

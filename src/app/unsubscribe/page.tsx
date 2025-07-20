@@ -182,10 +182,12 @@ function UnsubscribePageContent() {
 
 	if (isLoading) {
 		return (
-			<div className="min-h-screen bg-gray-50 flex items-center justify-center">
+			<div className="min-h-screen bg-background flex items-center justify-center">
 				<div className="text-center">
-					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-					<p className="text-gray-600">Carregando suas preferências...</p>
+					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+					<p className="text-muted-foreground">
+						Carregando suas preferências...
+					</p>
 				</div>
 			</div>
 		);
@@ -193,14 +195,14 @@ function UnsubscribePageContent() {
 
 	if (error) {
 		return (
-			<div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+			<div className="min-h-screen bg-background flex items-center justify-center p-4">
 				<Card className="max-w-md w-full">
 					<CardHeader className="text-center">
 						<AppLogo size="lg" />
-						<CardTitle className="text-red-600">Erro</CardTitle>
+						<CardTitle className="text-destructive">Erro</CardTitle>
 					</CardHeader>
 					<CardContent className="text-center">
-						<p className="text-gray-600 mb-4">{error}</p>
+						<p className="text-muted-foreground mb-4">{error}</p>
 						<Button
 							onClick={() => {
 								window.location.href = BRAND_CONFIG.website;
@@ -216,15 +218,15 @@ function UnsubscribePageContent() {
 	}
 
 	return (
-		<div className="min-h-screen bg-gray-50 py-8">
+		<div className="min-h-screen bg-background py-8">
 			<div className="max-w-2xl mx-auto p-4">
 				{/* Header */}
 				<div className="text-center mb-8">
 					<AppLogo size="xl" className="justify-center mb-4" />
-					<h1 className="text-3xl font-bold text-gray-900 mb-2">
+					<h1 className="text-3xl font-bold text-foreground mb-2">
 						Preferências de Notificação
 					</h1>
-					<p className="text-gray-600">
+					<p className="text-muted-foreground">
 						Gerencie como e quando você deseja receber nossas comunicações
 					</p>
 					{tokenData?.email && (
@@ -236,13 +238,13 @@ function UnsubscribePageContent() {
 
 				{/* Success message */}
 				{success && (
-					<div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+					<div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
 						<div className="flex items-center">
 							<div className="flex-shrink-0">
-								<span className="text-green-600 text-xl">✓</span>
+								<span className="text-primary text-xl">✓</span>
 							</div>
 							<div className="ml-3">
-								<p className="text-green-800">
+								<p className="text-primary">
 									Suas preferências foram atualizadas com sucesso!
 								</p>
 							</div>
@@ -433,9 +435,9 @@ function UnsubscribePageContent() {
 				</Card>
 
 				{/* Unsubscribe all section */}
-				<Card className="border-red-200">
+				<Card className="border-destructive/20">
 					<CardHeader>
-						<CardTitle className="text-red-600">
+						<CardTitle className="text-destructive">
 							Cancelar Todas as Inscrições
 						</CardTitle>
 						<CardDescription>

@@ -9,7 +9,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 
-export default function Component() {
+export default function SelectWithDescription() {
 	const id = useId();
 	return (
 		<div className="*:not-first:mt-2">

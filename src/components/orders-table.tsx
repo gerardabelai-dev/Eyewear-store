@@ -59,26 +59,26 @@ function OrderFormSkeleton() {
 		<div className="space-y-6 p-6">
 			{/* Customer Information Section */}
 			<div className="space-y-4">
-				<div className="h-6 w-48 bg-gray-200 rounded animate-pulse"></div>
+				<div className="h-6 w-48 bg-muted rounded animate-pulse"></div>
 				<div className="grid grid-cols-2 gap-4">
 					<div className="space-y-2">
-						<div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
-						<div className="h-10 w-full bg-gray-200 rounded animate-pulse"></div>
+						<div className="h-4 w-24 bg-muted rounded animate-pulse"></div>
+						<div className="h-10 w-full bg-muted rounded animate-pulse"></div>
 					</div>
 					<div className="space-y-2">
-						<div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
-						<div className="h-10 w-full bg-gray-200 rounded animate-pulse"></div>
+						<div className="h-4 w-24 bg-muted rounded animate-pulse"></div>
+						<div className="h-10 w-full bg-muted rounded animate-pulse"></div>
 					</div>
 				</div>
 				<div className="space-y-2">
-					<div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
-					<div className="h-10 w-full bg-gray-200 rounded animate-pulse"></div>
+					<div className="h-4 w-24 bg-muted rounded animate-pulse"></div>
+					<div className="h-10 w-full bg-muted rounded animate-pulse"></div>
 				</div>
 			</div>
 
 			{/* Order Items Section */}
 			<div className="space-y-4">
-				<div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
+				<div className="h-6 w-32 bg-muted rounded animate-pulse"></div>
 				<div className="space-y-3">
 					{[1, 2, 3].map((i) => (
 						<div
@@ -86,12 +86,12 @@ function OrderFormSkeleton() {
 							className="flex items-center justify-between p-3 border rounded"
 						>
 							<div className="flex-1 space-y-1">
-								<div className="h-4 w-48 bg-gray-200 rounded animate-pulse"></div>
-								<div className="h-3 w-32 bg-gray-200 rounded animate-pulse"></div>
+								<div className="h-4 w-48 bg-muted rounded animate-pulse"></div>
+								<div className="h-3 w-32 bg-muted rounded animate-pulse"></div>
 							</div>
 							<div className="flex items-center gap-2">
-								<div className="h-8 w-16 bg-gray-200 rounded animate-pulse"></div>
-								<div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
+								<div className="h-8 w-16 bg-muted rounded animate-pulse"></div>
+								<div className="h-8 w-8 bg-muted rounded animate-pulse"></div>
 							</div>
 						</div>
 					))}
@@ -100,12 +100,12 @@ function OrderFormSkeleton() {
 
 			{/* Notes Section */}
 			<div className="space-y-4">
-				<div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
-				<div className="h-24 w-full bg-gray-200 rounded animate-pulse"></div>
+				<div className="h-4 w-24 bg-muted rounded animate-pulse"></div>
+				<div className="h-24 w-full bg-muted rounded animate-pulse"></div>
 			</div>
 
 			{/* Submit Button */}
-			<div className="h-10 w-full bg-gray-200 rounded animate-pulse"></div>
+			<div className="h-10 w-full bg-muted rounded animate-pulse"></div>
 		</div>
 	);
 }
@@ -120,44 +120,35 @@ export function OrdersTable({ orders }: OrdersTableProps) {
 			case "pending":
 				return (
 					<Badge variant="secondary" className="gap-1">
-						<Clock className="h-3 w-3" />
+						<Clock className="h-3 w-3 text-foreground" />
 						Pendente
 					</Badge>
 				);
 			case "processing":
 				return (
-					<Badge
-						variant="outline"
-						className="gap-1 border-blue-200 text-blue-700"
-					>
-						<Package className="h-3 w-3" />
+					<Badge variant="default" className="gap-1">
+						<Package className="h-3 w-3 text-primary-foreground" />
 						Em Processamento
 					</Badge>
 				);
 			case "completed":
 				return (
-					<Badge
-						variant="outline"
-						className="gap-1 border-green-200 text-green-700"
-					>
+					<Badge variant="outline" className="gap-1">
 						<CheckCircle className="h-3 w-3" />
 						Concluído
 					</Badge>
 				);
 			case "cancelled":
 				return (
-					<Badge
-						variant="outline"
-						className="gap-1 border-red-200 text-red-700"
-					>
-						<XCircle className="h-3 w-3" />
+					<Badge variant="destructive" className="gap-1">
+						<XCircle className="h-3 w-3 text-destructive-foreground" />
 						Cancelado
 					</Badge>
 				);
 			default:
 				return (
 					<Badge variant="secondary" className="gap-1">
-						<Clock className="h-3 w-3" />
+						<Clock className="h-3 w-3 text-foreground" />
 						Pendente
 					</Badge>
 				);

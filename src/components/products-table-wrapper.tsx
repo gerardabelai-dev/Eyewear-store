@@ -38,8 +38,7 @@ export function ProductsTableWrapper({ products }: ProductsTableWrapperProps) {
 				toast.error(result.error);
 			} else {
 				toast.success("Produto excluído com sucesso!");
-				// Refresh the page to show updated data
-				window.location.reload();
+				// Data will be automatically revalidated by server action
 			}
 		} catch (error) {
 			console.error("Error deleting product:", error);
@@ -50,8 +49,7 @@ export function ProductsTableWrapper({ products }: ProductsTableWrapperProps) {
 	const handleEditSuccess = () => {
 		setIsEditDrawerOpen(false);
 		setEditingProduct(null);
-		// Refresh the page to show updated data
-		window.location.reload();
+		// Data will be automatically revalidated by server action
 	};
 
 	const handleEditCancel = () => {

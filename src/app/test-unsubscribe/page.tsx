@@ -39,7 +39,7 @@ export default function TestUnsubscribePage() {
 	};
 
 	return (
-		<div className="min-h-screen bg-gray-50 py-8">
+		<div className="min-h-screen bg-background py-8">
 			<div className="max-w-2xl mx-auto p-4">
 				<Card>
 					<CardHeader>
@@ -80,19 +80,19 @@ export default function TestUnsubscribePage() {
 						{token && (
 							<div className="space-y-4">
 								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-1">
+									<label className="block text-sm font-medium text-foreground mb-1">
 										Generated Token
 									</label>
-									<div className="bg-gray-100 p-3 rounded text-xs break-all font-mono">
+									<div className="bg-muted p-3 rounded text-xs break-all font-mono">
 										{token}
 									</div>
 								</div>
 
 								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-1">
+									<label className="block text-sm font-medium text-foreground mb-1">
 										Unsubscribe URL
 									</label>
-									<div className="bg-gray-100 p-3 rounded text-xs break-all">
+									<div className="bg-muted p-3 rounded text-xs break-all">
 										{unsubscribeUrl}
 									</div>
 								</div>

@@ -80,7 +80,7 @@ export default async function PedidosPage() {
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle className="text-sm font-medium">Pendentes</CardTitle>
-						<Clock className="h-4 w-4 text-yellow-600" />
+						<Clock className="h-4 w-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">{stats.pendingOrders}</div>
@@ -95,7 +95,7 @@ export default async function PedidosPage() {
 						<CardTitle className="text-sm font-medium">
 							Em Processamento
 						</CardTitle>
-						<Package className="h-4 w-4 text-blue-600" />
+						<Package className="h-4 w-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">{stats.processingOrders}</div>
@@ -106,7 +106,7 @@ export default async function PedidosPage() {
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle className="text-sm font-medium">Concluídos</CardTitle>
-						<CheckCircle className="h-4 w-4 text-green-600" />
+						<CheckCircle className="h-4 w-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">{stats.completedOrders}</div>
@@ -117,7 +117,7 @@ export default async function PedidosPage() {
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle className="text-sm font-medium">Faturamento</CardTitle>
-						<TrendingUp className="h-4 w-4 text-green-600" />
+						<TrendingUp className="h-4 w-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">

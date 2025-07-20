@@ -3,6 +3,9 @@
  * These components can be used in both the web app and email templates
  */
 
+"use client";
+
+import Image from "next/image";
 import type * as React from "react";
 
 // Brand configuration constants
@@ -32,7 +35,7 @@ export const BRAND_CONFIG = {
 	},
 } as const;
 
-// Logo component for web app
+// Logo component for web app with theme switching
 export function AppLogo({
 	size = "md",
 	showText = true,
@@ -42,41 +45,56 @@ export function AppLogo({
 	showText?: boolean;
 	className?: string;
 }) {
-	const sizeClasses = {
-		sm: "h-6 w-6",
-		md: "h-8 w-8",
-		lg: "h-12 w-12",
-		xl: "h-16 w-16",
+	const sizeConfig = {
+		sm: { height: 24, logoOnly: 24 },
+		md: { height: 32, logoOnly: 32 },
+		lg: { height: 48, logoOnly: 64 },
+		xl: { height: 64, logoOnly: 80 },
 	};
 
-	const textSizeClasses = {
-		sm: "text-lg",
-		md: "text-xl",
-		lg: "text-2xl",
-		xl: "text-3xl",
-	};
+	const config = sizeConfig[size];
 
-	return (
-		<div className={`flex items-center gap-2 ${className}`}>
-			<div
-				className={`${sizeClasses[size]} rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-bold`}
-				style={{ backgroundColor: BRAND_CONFIG.colors.primary }}
-			>
-				<span className="text-sm">Dr</span>
+	if (!showText) {
+		// Logo only - use the favicon SVG
+		return (
+			<div className={`flex items-center ${className}`}>
+				<Image
+					src="/drvista-favicon.svg"
+					alt="DrVista"
+					width={config.logoOnly}
+					height={config.logoOnly}
+					className="object-contain"
+				/>
 			</div>
-			{showText && (
-				<span
-					className={`font-bold ${textSizeClasses[size]}`}
-					style={{ color: BRAND_CONFIG.colors.text }}
-				>
-					{BRAND_CONFIG.name}
-				</span>
-			)}
+		);
+	}
+
+	// Full logo with text - use CSS to handle theme switching to avoid hydration mismatch
+	return (
+		<div className={`flex items-center ${className}`}>
+			{/* Light theme logo - hidden in dark mode */}
+			<Image
+				src="/drvista-logo-light.svg"
+				alt="DrVista"
+				width={config.height * 3} // Logo with text is wider
+				height={config.height}
+				className="object-contain dark:hidden"
+				priority
+			/>
+			{/* Dark theme logo - hidden in light mode */}
+			<Image
+				src="/drvista-logo-dark.svg"
+				alt="DrVista"
+				width={config.height * 3} // Logo with text is wider
+				height={config.height}
+				className="object-contain hidden dark:block"
+				priority
+			/>
 		</div>
 	);
 }
 
-// Logo for email templates (inline styles)
+// Logo for email templates (inline styles) - keeps using the old approach since emails don't support theme switching
 export function EmailLogo({
 	size = "md",
 	showText = true,

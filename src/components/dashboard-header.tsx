@@ -1,8 +1,9 @@
 "use client";
 
-import { LogOut, Search, Settings, Shield } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { AppLogo } from "@/components/shared/brand";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -12,7 +13,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { signOut } from "@/lib/auth-client";
 
@@ -68,14 +69,7 @@ export function DashboardHeader({
 							href="/dashboard"
 							className="flex items-center space-x-2 shrink-0"
 						>
-							<div
-								className={`w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-sm`}
-							>
-								<Shield className="w-3 h-3 sm:w-5 sm:h-5 text-white drop-shadow-sm" />
-							</div>
-							<span className="text-lg sm:text-xl font-bold truncate">
-								DrVista Admin
-							</span>
+							<AppLogo size="md" showText={true} />
 						</Link>
 						<nav className="hidden lg:flex items-center space-x-6">
 							{navigationItems.map((item) => {
@@ -123,6 +117,9 @@ export function DashboardHeader({
 						</nav>
 					</div>
 					<div className="flex items-center space-x-2 sm:space-x-4">
+						{/* Theme Toggle */}
+						<ThemeToggle />
+
 						{/* User Dropdown */}
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>

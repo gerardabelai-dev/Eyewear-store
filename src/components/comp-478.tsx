@@ -105,10 +105,10 @@ const columns: ColumnDef<Item>[] = [
 				<div className="flex gap-1">
 					{intents.map((intent) => {
 						const styles = {
-							Informational: "bg-indigo-400/20 text-indigo-500",
-							Navigational: "bg-emerald-400/20 text-emerald-500",
-							Commercial: "bg-amber-400/20 text-amber-500",
-							Transactional: "bg-rose-400/20 text-rose-500",
+							Informational: "bg-primary/20 text-primary",
+							Navigational: "bg-secondary/50 text-secondary-foreground",
+							Commercial: "bg-muted text-muted-foreground",
+							Transactional: "bg-destructive/20 text-destructive",
 						}[intent];
 
 						return (
@@ -263,7 +263,7 @@ const items: Item[] = [
 	},
 ];
 
-export default function Component() {
+export default function DataTable() {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 	const [sorting, setSorting] = useState<SortingState>([
 		{

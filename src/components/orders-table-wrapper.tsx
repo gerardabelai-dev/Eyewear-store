@@ -45,8 +45,7 @@ export function OrdersTableWrapper({
 	const handleEditSuccess = () => {
 		setIsEditDrawerOpen(false);
 		setEditingOrder(null);
-		// Refresh the page to show updated data
-		window.location.reload();
+		// Data will be automatically revalidated by server action
 	};
 
 	const handleEditCancel = () => {

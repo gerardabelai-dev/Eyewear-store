@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -53,6 +54,7 @@ interface PasswordFormProps {
 }
 
 export function PasswordForm({ hasPassword }: PasswordFormProps) {
+	const router = useRouter();
 	const [isPending, startTransition] = useTransition();
 
 	// Use different forms based on whether user has password
@@ -100,7 +102,7 @@ export function PasswordForm({ hasPassword }: PasswordFormProps) {
 				toast.success(result.success);
 				setPasswordForm.reset();
 				// Refresh the page to update the hasPassword status
-				window.location.reload();
+				router.refresh();
 			}
 		});
 	};

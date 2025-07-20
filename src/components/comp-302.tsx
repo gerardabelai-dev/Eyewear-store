@@ -1,6 +1,6 @@
 import { ArrowRightIcon } from "lucide-react";
 
-export default function Component() {
+export default function AnnouncementBanner() {
 	return (
 		<div className="dark bg-muted text-foreground px-4 py-3">
 			<p className="flex justify-center text-sm">

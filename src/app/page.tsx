@@ -1,5 +1,6 @@
 import { ArrowRight, Shield, Users, Zap } from "lucide-react";
 import Link from "next/link";
+import { AppLogo } from "@/components/shared/brand";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -8,23 +9,19 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
+// Fast Refresh Test - this comment should update immediately
 export default function Home() {
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+		<div className="min-h-screen bg-background">
 			{/* Header */}
-			<header className="border-b bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+			<header className="border-b bg-background/80 backdrop-blur-sm">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="flex justify-between items-center h-14 sm:h-16">
-						<div className="flex items-center space-x-2">
-							<div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-								<Shield className="w-3 h-3 sm:w-5 sm:h-5 text-white" />
-							</div>
-							<span className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 truncate">
-								DrVista Admin
-							</span>
-						</div>
+						<AppLogo size="md" showText={true} />
 						<nav className="flex items-center space-x-2 sm:space-x-4">
+							<ThemeToggle />
 							<Link href="/auth">
 								<Button
 									variant="ghost"
@@ -46,124 +43,139 @@ export default function Home() {
 
 			{/* Hero Section */}
 			<section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
-				<div className="max-w-7xl mx-auto text-center">
-					<div className="max-w-4xl mx-auto">
-						<h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6 leading-tight">
-							Autenticação Segura
-							<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 block sm:inline">
-								{" "}
-								Simplificada
-							</span>
-						</h1>
-						<p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400 mb-6 sm:mb-8 leading-relaxed px-4 sm:px-0">
-							Experimente uma plataforma moderna, segura e ultrarrápida para
-							autenticação. Desenvolvida para desenvolvedores, amada pelos
-							usuários.
-						</p>
-						<div className="flex flex-col sm:flex-row gap-4 justify-center px-4 sm:px-0">
-							<Link href="/auth" className="w-full sm:w-auto">
-								<Button
-									size="lg"
-									className="flex items-center justify-center space-x-2 w-full sm:w-auto"
-								>
-									<span>Começar Agora</span>
-									<ArrowRight className="w-4 h-4" />
-								</Button>
-							</Link>
-							<Link href="/dashboard" className="w-full sm:w-auto">
-								<Button
-									variant="outline"
-									size="lg"
-									className="w-full sm:w-auto"
-								>
-									Ver Dashboard
-								</Button>
-							</Link>
-						</div>
+				<div className="max-w-4xl mx-auto text-center">
+					<h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-foreground mb-4 sm:mb-6 px-4 sm:px-0">
+						Plataforma de{" "}
+						<span className="text-primary">Autenticação Segura</span>
+					</h1>
+					<p className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-3xl mx-auto px-4 sm:px-0">
+						Sistema administrativo moderno com autenticação robusta, interface
+						intuitiva e ferramentas avançadas para gestão completa de usuários e
+						permissões.
+					</p>
+					<div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4 sm:px-0">
+						<Link href="/auth" className="w-full sm:w-auto">
+							<Button
+								size="lg"
+								className="flex items-center justify-center space-x-2 w-full sm:w-auto"
+							>
+								<span>Começar Agora</span>
+								<ArrowRight className="w-4 h-4 text-primary-foreground" />
+							</Button>
+						</Link>
+						<Link href="/auth" className="w-full sm:w-auto">
+							<Button variant="outline" size="lg" className="w-full sm:w-auto">
+								Fazer Login
+							</Button>
+						</Link>
 					</div>
 				</div>
 			</section>
 
 			{/* Features Section */}
-			<section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-white/50 dark:bg-gray-800/50">
-				<div className="max-w-7xl mx-auto">
-					<div className="text-center mb-12 sm:mb-16">
-						<h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4 px-4 sm:px-0">
-							Por que escolher nossa plataforma?
+			<section className="py-12 sm:py-16 lg:py-20 bg-muted/30 px-4 sm:px-6 lg:px-8">
+				<div className="max-w-6xl mx-auto">
+					<div className="text-center mb-8 sm:mb-12">
+						<h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3 sm:mb-4 px-4 sm:px-0">
+							Recursos Avançados
 						</h2>
-						<p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto px-4 sm:px-0">
-							Construída com tecnologias modernas e melhores práticas para
-							garantir que seus dados permaneçam seguros, oferecendo uma
-							experiência excepcional ao usuário.
+						<p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4 sm:px-0">
+							Tudo que você precisa para gerenciar autenticação e usuários de
+							forma eficiente e segura.
 						</p>
 					</div>
-
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-						<Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow">
-							<CardHeader className="pb-4">
-								<div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center mb-4">
-									<Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 px-4 sm:px-0">
+						<Card className="text-center">
+							<CardHeader>
+								<div className="mx-auto w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+									<Shield className="w-6 h-6 text-primary" />
 								</div>
 								<CardTitle className="text-lg sm:text-xl">
-									Segurança Bancária
+									Segurança Avançada
 								</CardTitle>
-								<CardDescription className="text-sm sm:text-base">
-									Criptografia e protocolos de segurança empresariais para
-									proteger seus dados
-								</CardDescription>
 							</CardHeader>
 							<CardContent>
-								<ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-									<li>• Criptografia ponta a ponta</li>
-									<li>• Autenticação multifator</li>
-									<li>• Auditorias regulares de segurança</li>
-								</ul>
+								<CardDescription className="text-sm sm:text-base">
+									Autenticação multifator, criptografia de ponta e proteção
+									contra ataques modernos.
+								</CardDescription>
 							</CardContent>
 						</Card>
-
-						<Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow">
-							<CardHeader className="pb-4">
-								<div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center mb-4">
-									<Zap className="w-6 h-6 text-green-600 dark:text-green-400" />
+						<Card className="text-center">
+							<CardHeader>
+								<div className="mx-auto w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+									<Users className="w-6 h-6 text-primary" />
 								</div>
 								<CardTitle className="text-lg sm:text-xl">
-									Ultrarrápido
+									Gestão de Usuários
 								</CardTitle>
-								<CardDescription className="text-sm sm:text-base">
-									Performance otimizada com arquitetura moderna para respostas
-									instantâneas
-								</CardDescription>
 							</CardHeader>
 							<CardContent>
-								<ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-									<li>• Autenticação em menos de 1 segundo</li>
-									<li>• Distribuição global via CDN</li>
-									<li>• Garantia de 99,9% de uptime</li>
-								</ul>
+								<CardDescription className="text-sm sm:text-base">
+									Interface intuitiva para gerenciar usuários, permissões e
+									grupos de acesso.
+								</CardDescription>
 							</CardContent>
 						</Card>
-
-						<Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow sm:col-span-2 lg:col-span-1">
-							<CardHeader className="pb-4">
-								<div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center mb-4">
-									<Users className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+						<Card className="text-center md:col-span-2 lg:col-span-1">
+							<CardHeader>
+								<div className="mx-auto w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+									<Zap className="w-6 h-6 text-primary" />
 								</div>
 								<CardTitle className="text-lg sm:text-xl">
-									Fácil de Usar
+									Alta Performance
 								</CardTitle>
-								<CardDescription className="text-sm sm:text-base">
-									Interface intuitiva projetada para a melhor experiência do
-									usuário
-								</CardDescription>
 							</CardHeader>
 							<CardContent>
-								<ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-									<li>• Login social em um clique</li>
-									<li>• Design mobile-first</li>
-									<li>• Compatível com acessibilidade</li>
-								</ul>
+								<CardDescription className="text-sm sm:text-base">
+									Sistema otimizado com tempos de resposta rápidos e
+									escalabilidade enterprise.
+								</CardDescription>
 							</CardContent>
 						</Card>
+					</div>
+				</div>
+			</section>
+
+			{/* Stats Section */}
+			<section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
+				<div className="max-w-6xl mx-auto text-center">
+					<h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-8 sm:mb-12 px-4 sm:px-0">
+						Confiado por Desenvolvedores
+					</h2>
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+						<div className="text-center">
+							<div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary mb-2">
+								10K+
+							</div>
+							<div className="text-sm sm:text-base text-muted-foreground">
+								Usuários Ativos
+							</div>
+						</div>
+						<div className="text-center">
+							<div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary mb-2">
+								99.9%
+							</div>
+							<div className="text-sm sm:text-base text-muted-foreground">
+								Uptime Garantido
+							</div>
+						</div>
+						<div className="text-center">
+							<div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary mb-2">
+								500+
+							</div>
+							<div className="text-sm sm:text-base text-muted-foreground">
+								Aplicações Integradas
+							</div>
+						</div>
+						<div className="text-center">
+							<div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary mb-2">
+								24/7
+							</div>
+							<div className="text-sm sm:text-base text-muted-foreground">
+								Suporte Técnico
+							</div>
+						</div>
 					</div>
 				</div>
 			</section>
@@ -171,10 +183,10 @@ export default function Home() {
 			{/* CTA Section */}
 			<section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
 				<div className="max-w-4xl mx-auto text-center">
-					<h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6 px-4 sm:px-0">
+					<h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-4 sm:mb-6 px-4 sm:px-0">
 						Pronto para começar?
 					</h2>
-					<p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400 mb-6 sm:mb-8 px-4 sm:px-0">
+					<p className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 px-4 sm:px-0">
 						Junte-se a milhares de desenvolvedores que confiam em nossa
 						plataforma de autenticação.
 					</p>
@@ -185,7 +197,7 @@ export default function Home() {
 								className="flex items-center justify-center space-x-2 w-full sm:w-auto"
 							>
 								<span>Criar minha conta</span>
-								<ArrowRight className="w-4 h-4" />
+								<ArrowRight className="w-4 h-4 text-primary-foreground" />
 							</Button>
 						</Link>
 					</div>
@@ -193,18 +205,11 @@ export default function Home() {
 			</section>
 
 			{/* Footer */}
-			<footer className="border-t bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+			<footer className="border-t bg-background/80 backdrop-blur-sm">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
 					<div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
-						<div className="flex items-center space-x-2">
-							<div className="w-6 h-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-								<Shield className="w-4 h-4 text-white" />
-							</div>
-							<span className="font-semibold text-gray-900 dark:text-gray-100">
-								DrVista Admin
-							</span>
-						</div>
-						<p className="text-sm text-gray-600 dark:text-gray-400 text-center sm:text-right">
+						<AppLogo size="sm" showText={true} />
+						<p className="text-sm text-muted-foreground text-center sm:text-right">
 							© 2024 DrVista Admin. Construído com tecnologias modernas.
 						</p>
 					</div>

@@ -31,7 +31,7 @@ const organizations = [
 	},
 ];
 
-export default function Component() {
+export default function SelectWithSearch() {
 	const id = useId();
 	const [open, setOpen] = useState<boolean>(false);
 	const [value, setValue] = useState<string>("originui");
