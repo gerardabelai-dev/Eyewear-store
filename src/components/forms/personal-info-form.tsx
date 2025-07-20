@@ -76,7 +76,7 @@ export function PersonalInfoForm({
 				<div className="flex justify-between items-start mb-6">
 					<div>
 						<h3 className="text-lg font-semibold mb-2">Informações Pessoais</h3>
-						<p className="text-muted-foreground">
+						<p className="text-muted-foreground text-sm">
 							Atualize seus dados pessoais.
 						</p>
 					</div>
@@ -90,50 +90,44 @@ export function PersonalInfoForm({
 								"Por favor, verifique os campos destacados e tente novamente.",
 							);
 						})}
-						className="space-y-6"
+						className="space-y-4"
 					>
-						<div className="space-y-6">
-							<FormField
-								control={form.control}
-								name="firstName"
-								render={({ field }) => (
-									<FormItem className="space-y-2">
-										<FormLabel>Nome</FormLabel>
-										<FormControl>
-											<Input
-												placeholder="Digite seu primeiro nome"
-												className="w-full"
-												{...field}
-											/>
-										</FormControl>
-										<div className="min-h-[20px]">
-											<FormMessage />
-										</div>
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name="lastName"
-								render={({ field }) => (
-									<FormItem className="space-y-2">
-										<FormLabel>Sobrenome</FormLabel>
-										<FormControl>
-											<Input
-												placeholder="Digite seu sobrenome"
-												className="w-full"
-												{...field}
-											/>
-										</FormControl>
-										<div className="min-h-[20px]">
-											<FormMessage />
-										</div>
-									</FormItem>
-								)}
-							/>
-						</div>
+						<FormField
+							control={form.control}
+							name="firstName"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Nome</FormLabel>
+									<FormControl>
+										<Input
+											placeholder="Digite seu primeiro nome"
+											className="w-full"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="lastName"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Sobrenome</FormLabel>
+									<FormControl>
+										<Input
+											placeholder="Digite seu sobrenome"
+											className="w-full"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-						<div className="flex justify-end">
+						<div className="flex justify-end pt-2">
 							<Button type="submit" disabled={isPending}>
 								{isPending ? "Salvando..." : "Salvar Informações"}
 							</Button>

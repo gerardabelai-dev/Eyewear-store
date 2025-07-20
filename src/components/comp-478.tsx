@@ -263,7 +263,7 @@ const items: Item[] = [
 	},
 ];
 
-export default function DataTable() {
+function DataTable() {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 	const [sorting, setSorting] = useState<SortingState>([
 		{
@@ -532,3 +532,6 @@ function Filter({ column }: { column: Column<any, unknown> }) {
 		</div>
 	);
 }
+
+DataTable.displayName = "DataTable";
+export default DataTable;

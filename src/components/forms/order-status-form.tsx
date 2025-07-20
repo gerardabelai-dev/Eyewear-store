@@ -120,7 +120,7 @@ export function OrderStatusForm({
 						"Por favor, verifique os campos destacados e tente novamente.",
 					);
 				})}
-				className="space-y-6"
+				className="space-y-4"
 			>
 				<FormField
 					control={form.control}
@@ -155,51 +155,49 @@ export function OrderStatusForm({
 					)}
 				/>
 
-				<div className="space-y-6">
-					<FormField
-						control={form.control}
-						name="color"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Cor</FormLabel>
-								<FormControl>
-									<div className="flex items-center gap-2">
-										<Input
-											type="color"
-											{...field}
-											className="w-12 h-10 p-1 border rounded"
-										/>
-										<Input
-											type="text"
-											{...field}
-											placeholder="#6b7280"
-											className="flex-1"
-										/>
-									</div>
-								</FormControl>
-								<FormDescription>
-									Cor hexadecimal para exibição na interface
-								</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+				<FormField
+					control={form.control}
+					name="color"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Cor</FormLabel>
+							<FormControl>
+								<div className="flex items-center gap-2">
+									<Input
+										type="color"
+										{...field}
+										className="w-12 h-10 p-1 border rounded"
+									/>
+									<Input
+										type="text"
+										{...field}
+										placeholder="#6b7280"
+										className="flex-1"
+									/>
+								</div>
+							</FormControl>
+							<FormDescription>
+								Cor hexadecimal para exibição na interface
+							</FormDescription>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
 
-					<FormField
-						control={form.control}
-						name="icon"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Ícone</FormLabel>
-								<FormControl>
-									<Input placeholder="Package" className="w-full" {...field} />
-								</FormControl>
-								<FormDescription>Nome do ícone Lucide React</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
+				<FormField
+					control={form.control}
+					name="icon"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Ícone</FormLabel>
+							<FormControl>
+								<Input placeholder="Package" className="w-full" {...field} />
+							</FormControl>
+							<FormDescription>Nome do ícone Lucide React</FormDescription>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
 
 				<FormField
 					control={form.control}

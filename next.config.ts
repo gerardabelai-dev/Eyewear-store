@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+	// Ensure fast refresh is enabled in development
+	reactStrictMode: true,
+
 	images: {
 		remotePatterns: [
 			{

@@ -146,4 +146,5 @@ export function WelcomeEmail({
 	);
 }
 
+WelcomeEmail.displayName = "WelcomeEmail";
 export default WelcomeEmail;

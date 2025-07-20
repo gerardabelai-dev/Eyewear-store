@@ -31,7 +31,7 @@ const organizations = [
 	},
 ];
 
-export default function SelectWithSearch() {
+function SelectWithSearch() {
 	const id = useId();
 	const [open, setOpen] = useState<boolean>(false);
 	const [value, setValue] = useState<string>("originui");
@@ -108,3 +108,6 @@ export default function SelectWithSearch() {
 		</div>
 	);
 }
+
+SelectWithSearch.displayName = "SelectWithSearch";
+export default SelectWithSearch;

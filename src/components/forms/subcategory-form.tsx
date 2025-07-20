@@ -105,7 +105,7 @@ export function SubcategoryForm({
 						"Por favor, verifique os campos destacados e tente novamente.",
 					);
 				})}
-				className="space-y-6"
+				className="space-y-4"
 			>
 				<FormField
 					control={form.control}

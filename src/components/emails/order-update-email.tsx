@@ -329,4 +329,5 @@ export function OrderUpdateEmail({
 	);
 }
 
+OrderUpdateEmail.displayName = "OrderUpdateEmail";
 export default OrderUpdateEmail;

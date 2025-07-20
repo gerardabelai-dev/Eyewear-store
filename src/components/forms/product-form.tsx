@@ -384,164 +384,160 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 							"Por favor, verifique os campos destacados e tente novamente.",
 						);
 					})}
-					className="space-y-6"
+					className="space-y-4"
 				>
-					<div className="space-y-4">
+					<FormField
+						control={form.control}
+						name="name"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Nome do Produto</FormLabel>
+								<FormControl>
+									<Input placeholder="Ex: iPhone 15 Pro" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						control={form.control}
+						name="description"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Descrição (Opcional)</FormLabel>
+								<FormControl>
+									<Input placeholder="Descreva seu produto..." {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						control={form.control}
+						name="price"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Preço (R$)</FormLabel>
+								<FormControl>
+									<Input
+										type="number"
+										step="0.01"
+										min="0"
+										placeholder="99.99"
+										className="w-full"
+										{...field}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						control={form.control}
+						name="stock"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Estoque</FormLabel>
+								<FormControl>
+									<Input
+										type="number"
+										min="0"
+										placeholder="10"
+										className="w-full"
+										{...field}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						control={form.control}
+						name="categoryId"
+						render={({ field }) => (
+							<FormItem>
+								<SearchableSelect
+									options={categories.map((category) => ({
+										value: category.id,
+										label: category.name,
+									}))}
+									value={field.value}
+									onValueChange={(value) => {
+										field.onChange(value);
+										setSelectedCategoryId(value);
+										// Reset subcategory when category changes
+										form.setValue("subcategoryId", "");
+									}}
+									label="Categoria *"
+									placeholder="Selecione uma categoria"
+									searchPlaceholder="Buscar categorias..."
+									emptyText="Nenhuma categoria encontrada."
+									addNewText="Nova Categoria"
+									showAddNew={true}
+									onAddNew={() => setShowCategoryCreation(true)}
+								/>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					{selectedCategoryId && (
 						<FormField
 							control={form.control}
-							name="name"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Nome do Produto</FormLabel>
-									<FormControl>
-										<Input placeholder="Ex: iPhone 15 Pro" {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<FormField
-							control={form.control}
-							name="description"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Descrição (Opcional)</FormLabel>
-									<FormControl>
-										<Input placeholder="Descreva seu produto..." {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<div className="space-y-4">
-							<FormField
-								control={form.control}
-								name="price"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Preço (R$)</FormLabel>
-										<FormControl>
-											<Input
-												type="number"
-												step="0.01"
-												min="0"
-												placeholder="99.99"
-												className="w-full"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							<FormField
-								control={form.control}
-								name="stock"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Estoque</FormLabel>
-										<FormControl>
-											<Input
-												type="number"
-												min="0"
-												placeholder="10"
-												className="w-full"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
-
-						<FormField
-							control={form.control}
-							name="categoryId"
+							name="subcategoryId"
 							render={({ field }) => (
 								<FormItem>
 									<SearchableSelect
-										options={categories.map((category) => ({
-											value: category.id,
-											label: category.name,
-										}))}
-										value={field.value}
-										onValueChange={(value) => {
-											field.onChange(value);
-											setSelectedCategoryId(value);
-											// Reset subcategory when category changes
-											form.setValue("subcategoryId", "");
-										}}
-										label="Categoria *"
-										placeholder="Selecione uma categoria"
-										searchPlaceholder="Buscar categorias..."
-										emptyText="Nenhuma categoria encontrada."
-										addNewText="Nova Categoria"
+										options={[
+											{
+												value: "",
+												label: "Nenhuma subcategoria",
+											},
+											...subcategories.map((subcategory) => ({
+												value: subcategory.id,
+												label: subcategory.name,
+											})),
+										]}
+										value={field.value || ""}
+										onValueChange={field.onChange}
+										label="Subcategoria (Opcional)"
+										placeholder="Selecione uma subcategoria"
+										searchPlaceholder="Buscar subcategorias..."
+										emptyText="Nenhuma subcategoria encontrada."
+										addNewText="Nova Subcategoria"
 										showAddNew={true}
-										onAddNew={() => setShowCategoryCreation(true)}
+										onAddNew={() => setShowSubcategoryCreation(true)}
 									/>
 									<FormMessage />
 								</FormItem>
 							)}
 						/>
+					)}
 
-						{selectedCategoryId && (
-							<FormField
-								control={form.control}
-								name="subcategoryId"
-								render={({ field }) => (
-									<FormItem>
-										<SearchableSelect
-											options={[
-												{
-													value: "",
-													label: "Nenhuma subcategoria",
-												},
-												...subcategories.map((subcategory) => ({
-													value: subcategory.id,
-													label: subcategory.name,
-												})),
-											]}
-											value={field.value || ""}
-											onValueChange={field.onChange}
-											label="Subcategoria (Opcional)"
-											placeholder="Selecione uma subcategoria"
-											searchPlaceholder="Buscar subcategorias..."
-											emptyText="Nenhuma subcategoria encontrada."
-											addNewText="Nova Subcategoria"
-											showAddNew={true}
-											onAddNew={() => setShowSubcategoryCreation(true)}
-										/>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
+					<Separator />
+
+					<FormField
+						control={form.control}
+						name="images"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Imagens do Produto</FormLabel>
+								<FormControl>
+									<ImageUpload
+										value={field.value || []}
+										onChange={field.onChange}
+										maxFiles={5}
+										onUploadingChange={setIsImageUploading}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
 						)}
-
-						<Separator />
-
-						<FormField
-							control={form.control}
-							name="images"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Imagens do Produto</FormLabel>
-									<FormControl>
-										<ImageUpload
-											value={field.value || []}
-											onChange={field.onChange}
-											maxFiles={5}
-											onUploadingChange={setIsImageUploading}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					</div>
+					/>
 
 					<Button
 						type="submit"

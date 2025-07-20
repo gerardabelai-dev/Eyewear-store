@@ -62,7 +62,7 @@ const signUpSchema = z
 
 type SignUpValues = z.infer<typeof signUpSchema>;
 
-export default function SignUp() {
+function SignUp() {
 	const router = useRouter();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [image, setImage] = useState<File | null>(null);
@@ -395,6 +395,9 @@ export default function SignUp() {
 		</div>
 	);
 }
+
+SignUp.displayName = "SignUp";
+export default SignUp;
 
 async function convertImageToBase64(file: File): Promise<string> {
 	return new Promise((resolve, reject) => {

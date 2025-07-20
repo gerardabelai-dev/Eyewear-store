@@ -222,4 +222,5 @@ export function OrderConfirmationEmail({
 	);
 }
 
+OrderConfirmationEmail.displayName = "OrderConfirmationEmail";
 export default OrderConfirmationEmail;

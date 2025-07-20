@@ -37,7 +37,7 @@ const initialFiles = [
 	},
 ];
 
-export default function ImageUploader() {
+function ImageUploader() {
 	const maxSizeMB = 5;
 	const maxSize = maxSizeMB * 1024 * 1024; // 5MB default
 	const maxFiles = 6;
@@ -169,3 +169,6 @@ export default function ImageUploader() {
 		</div>
 	);
 }
+
+ImageUploader.displayName = "ImageUploader";
+export default ImageUploader;

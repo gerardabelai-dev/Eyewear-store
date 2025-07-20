@@ -61,7 +61,7 @@ export function EmailForm({ email: initialEmail }: EmailFormProps) {
 				<div className="flex justify-between items-start mb-6">
 					<div>
 						<h3 className="text-lg font-semibold mb-2">Endereço de Email</h3>
-						<p className="text-muted-foreground">
+						<p className="text-sm text-muted-foreground">
 							Atualize seu endereço de email principal para receber notificações
 							e acessar sua conta.
 						</p>
@@ -76,31 +76,27 @@ export function EmailForm({ email: initialEmail }: EmailFormProps) {
 								"Por favor, verifique os campos destacados e tente novamente.",
 							);
 						})}
-						className="space-y-6"
+						className="space-y-4"
 					>
-						<div className="max-w-md">
-							<FormField
-								control={form.control}
-								name="email"
-								render={({ field }) => (
-									<FormItem className="space-y-2">
-										<FormLabel>Email</FormLabel>
-										<FormControl>
-											<Input
-												type="email"
-												placeholder="Digite seu email"
-												{...field}
-											/>
-										</FormControl>
-										<div className="min-h-[20px]">
-											<FormMessage />
-										</div>
-									</FormItem>
-								)}
-							/>
-						</div>
+						<FormField
+							control={form.control}
+							name="email"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Email</FormLabel>
+									<FormControl>
+										<Input
+											type="email"
+											placeholder="Digite seu email"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-						<div className="flex justify-end">
+						<div className="flex justify-end pt-2">
 							<Button type="submit" disabled={isPending}>
 								{isPending ? "Atualizando..." : "Atualizar Email"}
 							</Button>

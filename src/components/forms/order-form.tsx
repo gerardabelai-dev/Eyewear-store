@@ -475,7 +475,7 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 							"Por favor, verifique os campos destacados e tente novamente.",
 						);
 					})}
-					className="space-y-6"
+					className="space-y-4"
 				>
 					{/* Customer Information */}
 					<Card>
@@ -485,7 +485,7 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 								Dados do Cliente
 							</CardTitle>
 						</CardHeader>
-						<CardContent className="space-y-6">
+						<CardContent className="space-y-4">
 							<FormField
 								control={form.control}
 								name="customerName"
@@ -588,7 +588,7 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 								{isEditing ? "Adicionar Mais Produtos" : "Adicionar Produtos"}
 							</CardTitle>
 						</CardHeader>
-						<CardContent className="space-y-6">
+						<CardContent className="space-y-4">
 							<FormField
 								control={form.control}
 								name="selectedProduct"

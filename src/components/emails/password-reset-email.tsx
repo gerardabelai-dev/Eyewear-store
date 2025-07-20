@@ -160,4 +160,5 @@ export function PasswordResetEmail({
 	);
 }
 
+PasswordResetEmail.displayName = "PasswordResetEmail";
 export default PasswordResetEmail;

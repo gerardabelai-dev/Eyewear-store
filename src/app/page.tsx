@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
-// Fast Refresh Test - this comment should update immediately
+// Fast Refresh Test - updated comment to test refresh functionality
 export default function Home() {
 	return (
 		<div className="min-h-screen bg-background">

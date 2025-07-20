@@ -115,7 +115,7 @@ export function PasswordForm({ hasPassword }: PasswordFormProps) {
 					<div className="flex justify-between items-start mb-6">
 						<div>
 							<h3 className="text-lg font-semibold mb-2">Alterar Senha</h3>
-							<p className="text-muted-foreground">
+							<p className="text-muted-foreground text-sm">
 								Altere sua senha atual por uma nova.
 							</p>
 						</div>
@@ -132,61 +132,51 @@ export function PasswordForm({ hasPassword }: PasswordFormProps) {
 									);
 								},
 							)}
-							className="space-y-6 "
+							className="space-y-4"
 						>
-							<div className="max-w-md">
-								<FormField
-									control={changePasswordForm.control}
-									name="currentPassword"
-									render={({ field }) => (
-										<FormItem className="space-y-2">
-											<FormLabel>Senha Atual</FormLabel>
-											<FormControl>
-												<Input type="password" {...field} />
-											</FormControl>
-											<div className="min-h-[20px]">
-												<FormMessage />
-											</div>
-										</FormItem>
-									)}
-								/>
-							</div>
+							<FormField
+								control={changePasswordForm.control}
+								name="currentPassword"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Senha Atual</FormLabel>
+										<FormControl>
+											<Input type="password" {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 
-							<div className="space-y-6">
-								<FormField
-									control={changePasswordForm.control}
-									name="newPassword"
-									render={({ field }) => (
-										<FormItem className="space-y-2">
-											<FormLabel>Nova Senha</FormLabel>
-											<FormControl>
-												<Input type="password" className="w-full" {...field} />
-											</FormControl>
-											<div className="min-h-[20px]">
-												<FormMessage />
-											</div>
-										</FormItem>
-									)}
-								/>
+							<FormField
+								control={changePasswordForm.control}
+								name="newPassword"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Nova Senha</FormLabel>
+										<FormControl>
+											<Input type="password" {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 
-								<FormField
-									control={changePasswordForm.control}
-									name="confirmPassword"
-									render={({ field }) => (
-										<FormItem className="space-y-2">
-											<FormLabel>Confirmar Nova Senha</FormLabel>
-											<FormControl>
-												<Input type="password" className="w-full" {...field} />
-											</FormControl>
-											<div className="min-h-[20px]">
-												<FormMessage />
-											</div>
-										</FormItem>
-									)}
-								/>
-							</div>
+							<FormField
+								control={changePasswordForm.control}
+								name="confirmPassword"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Confirmar Nova Senha</FormLabel>
+										<FormControl>
+											<Input type="password" {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 
-							<div className="flex justify-end">
+							<div className="flex justify-end pt-2">
 								<Button type="submit" disabled={isPending}>
 									{isPending ? "Alterando..." : "Alterar Senha"}
 								</Button>
@@ -223,43 +213,37 @@ export function PasswordForm({ hasPassword }: PasswordFormProps) {
 								);
 							},
 						)}
-						className="space-y-6"
+						className="space-y-4"
 					>
-						<div className="max-w-md space-y-6">
-							<FormField
-								control={setPasswordForm.control}
-								name="newPassword"
-								render={({ field }) => (
-									<FormItem className="space-y-2">
-										<FormLabel>Nova Senha</FormLabel>
-										<FormControl>
-											<Input type="password" {...field} />
-										</FormControl>
-										<div className="min-h-[20px]">
-											<FormMessage />
-										</div>
-									</FormItem>
-								)}
-							/>
+						<FormField
+							control={setPasswordForm.control}
+							name="newPassword"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Nova Senha</FormLabel>
+									<FormControl>
+										<Input type="password" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-							<FormField
-								control={setPasswordForm.control}
-								name="confirmPassword"
-								render={({ field }) => (
-									<FormItem className="space-y-2">
-										<FormLabel>Confirmar Senha</FormLabel>
-										<FormControl>
-											<Input type="password" {...field} />
-										</FormControl>
-										<div className="min-h-[20px]">
-											<FormMessage />
-										</div>
-									</FormItem>
-								)}
-							/>
-						</div>
+						<FormField
+							control={setPasswordForm.control}
+							name="confirmPassword"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Confirmar Senha</FormLabel>
+									<FormControl>
+										<Input type="password" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-						<div className="flex justify-end">
+						<div className="flex justify-end pt-2">
 							<Button type="submit" disabled={isPending}>
 								{isPending ? "Definindo..." : "Definir Senha"}
 							</Button>

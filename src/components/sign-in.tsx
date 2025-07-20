@@ -55,7 +55,7 @@ const signInSchema = z.object({
 
 type SignInValues = z.infer<typeof signInSchema>;
 
-export default function SignIn() {
+function SignIn() {
 	const router = useRouter();
 	const form = useForm<SignInValues>({
 		resolver: zodResolver(signInSchema),
@@ -209,7 +209,7 @@ export default function SignIn() {
 										<FormControl>
 											<Checkbox
 												checked={field.value}
-												onChange={(e) => field.onChange(e.target.checked)}
+												onCheckedChange={field.onChange}
 											/>
 										</FormControl>
 										<div className="space-y-1 leading-none">
@@ -285,3 +285,6 @@ export default function SignIn() {
 		</div>
 	);
 }
+
+SignIn.displayName = "SignIn";
+export default SignIn;
