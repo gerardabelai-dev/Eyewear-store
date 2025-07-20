@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 		const [orderRecord] = await db
 			.select({
 				id: order.id,
-				status: order.status,
+				statusId: order.statusId,
 				total: order.totalAmount,
 				user: {
 					id: user.id,
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
 		await db
 			.update(order)
 			.set({
-				status: "processing",
+				statusId: "processing",
 				updatedAt: new Date(),
 			})
 			.where(eq(order.id, payload.orderId));
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
 				await db
 					.update(order)
 					.set({
-						status: "failed",
+						statusId: "failed",
 						updatedAt: new Date(),
 					})
 					.where(eq(order.id, payload.orderId));

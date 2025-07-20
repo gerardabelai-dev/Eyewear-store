@@ -29,7 +29,7 @@ import { useId, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
+import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -75,7 +75,7 @@ type ProductWithCategory = Product & {
 interface ProductsAdvancedTableProps {
 	products: ProductWithCategory[];
 	onEditProduct?: (product: ProductWithCategory) => void;
-	onDeleteProduct?: (productId: string) => void;
+	onDeleteProduct?: (product: ProductWithCategory) => void;
 }
 
 // Product Images Component
@@ -223,10 +223,17 @@ const columns: ColumnDef<ProductWithCategory>[] = [
 							<Edit className="mr-2 h-4 w-4" />
 							Editar
 						</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => onDeleteProduct?.(product.id)}>
-							<Trash2 className="mr-2 h-4 w-4" />
-							Excluir
-						</DropdownMenuItem>
+						<DeleteConfirmationDialog
+							productId={product.id}
+							productName={product.name}
+							onConfirm={() => onDeleteProduct?.(product)}
+							trigger={
+								<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+									<Trash2 className="mr-2 h-4 w-4" />
+									Excluir
+								</DropdownMenuItem>
+							}
+						/>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			);

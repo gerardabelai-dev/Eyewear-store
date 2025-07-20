@@ -25,21 +25,15 @@ export function ProductsTableWrapper({ products }: ProductsTableWrapperProps) {
 	const [editingProduct, setEditingProduct] =
 		useState<ProductWithCategory | null>(null);
 	const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
-	const [isDeleting, setIsDeleting] = useState(false);
 
 	const handleEditProduct = (product: ProductWithCategory) => {
 		setEditingProduct(product);
 		setIsEditDrawerOpen(true);
 	};
 
-	const handleDeleteProduct = async (productId: string) => {
-		if (!confirm("Tem certeza que deseja excluir este produto?")) {
-			return;
-		}
-
-		setIsDeleting(true);
+	const handleDeleteProduct = async (product: ProductWithCategory) => {
 		try {
-			const result = await deleteProduct(productId);
+			const result = await deleteProduct(product.id);
 			if (result.error) {
 				toast.error(result.error);
 			} else {
@@ -50,8 +44,6 @@ export function ProductsTableWrapper({ products }: ProductsTableWrapperProps) {
 		} catch (error) {
 			console.error("Error deleting product:", error);
 			toast.error("Erro ao excluir produto");
-		} finally {
-			setIsDeleting(false);
 		}
 	};
 

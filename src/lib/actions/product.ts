@@ -192,6 +192,18 @@ export async function deleteProduct(productId: string) {
 		return { success: "Produto deletado com sucesso" };
 	} catch (error) {
 		console.error("Erro ao deletar produto:", error);
+
+		// Extract meaningful error message from database error
+		if (
+			error &&
+			typeof error === "object" &&
+			"detail" in error &&
+			typeof error.detail === "string"
+		) {
+			return { error: error.detail };
+		}
+
+		// Fallback to generic error
 		return { error: "Erro interno do servidor" };
 	}
 }
