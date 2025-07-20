@@ -68,6 +68,11 @@ if (typeof window === "undefined") {
 			// Resend Configuration
 			RESEND_API_KEY: z.string().min(1, "RESEND_API_KEY is required"),
 
+			// Vercel Blob Configuration
+			BLOB_READ_WRITE_TOKEN: z
+				.string()
+				.min(1, "BLOB_READ_WRITE_TOKEN is required"),
+
 			// Admin Configuration
 			BACKOFFICE_TOKEN: z.string().min(1, "BACKOFFICE_TOKEN is required"),
 

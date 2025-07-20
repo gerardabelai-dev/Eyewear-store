@@ -1,12 +1,22 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertCircleIcon, ImageIcon, UploadIcon, XIcon } from "lucide-react";
+import {
+	AlertCircleIcon,
+	ImageIcon,
+	Package,
+	UploadIcon,
+	XIcon,
+} from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
+import { CategoryForm } from "@/components/forms/category-form";
+import { SubcategoryForm } from "@/components/forms/subcategory-form";
 import { Button } from "@/components/ui/button";
+import { Drawer } from "@/components/ui/drawer";
 import {
 	Form,
 	FormControl,
@@ -15,7 +25,9 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { Input } from "@/components/ui/input";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import {
 	Select,
 	SelectContent,
@@ -24,7 +36,6 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { useFileUpload } from "@/hooks/use-file-upload";
 import {
 	getCategories,
 	getSubcategoriesByCategory,
@@ -49,6 +60,11 @@ const productFormSchema = z.object({
 		const num = parseInt(val);
 		return !Number.isNaN(num) && num >= 0;
 	}, "Estoque deve ser um número válido maior ou igual a 0"),
+	status: z
+		.enum(["active", "inactive", "draft", "discontinued"], {
+			errorMap: () => ({ message: "Status inválido" }),
+		})
+		.default("active"),
 	categoryId: z.string().min(1, "Categoria é obrigatória"),
 	subcategoryId: z.string().optional(),
 	images: z
@@ -258,9 +274,12 @@ function ProductImageUpload({
 
 export function ProductForm({ onSuccess, product }: ProductFormProps) {
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [isImageUploading, setIsImageUploading] = useState(false);
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
 	const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
+	const [showCategoryCreation, setShowCategoryCreation] = useState(false);
+	const [showSubcategoryCreation, setShowSubcategoryCreation] = useState(false);
 	const isEditing = !!product;
 
 	const form = useForm<ProductFormData>({
@@ -270,6 +289,7 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 			description: product?.description || "",
 			price: product?.price || "",
 			stock: product?.stock?.toString() || "",
+			status: (product as any)?.status || "active",
 			categoryId: product?.categoryId || "",
 			subcategoryId: product?.subcategoryId || "",
 			images: product?.images || [],
@@ -309,6 +329,24 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 		}
 	}, [product?.categoryId]);
 
+	// Function to reload categories after creation
+	const reloadCategories = async () => {
+		const result = await getCategories();
+		if (result.data) {
+			setCategories(result.data);
+		}
+	};
+
+	// Function to reload subcategories after creation
+	const reloadSubcategories = async () => {
+		if (selectedCategoryId) {
+			const result = await getSubcategoriesByCategory(selectedCategoryId);
+			if (result.data) {
+				setSubcategories(result.data);
+			}
+		}
+	};
+
 	async function onSubmit(data: ProductFormData) {
 		setIsSubmitting(true);
 		try {
@@ -335,52 +373,26 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 	}
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-				<div className="space-y-4">
-					<FormField
-						control={form.control}
-						name="name"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Nome do Produto</FormLabel>
-								<FormControl>
-									<Input placeholder="Ex: iPhone 15 Pro" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name="description"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Descrição (Opcional)</FormLabel>
-								<FormControl>
-									<Input placeholder="Descreva seu produto..." {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<div className="grid grid-cols-2 gap-4">
+		<>
+			<Form {...form}>
+				<form
+					onSubmit={form.handleSubmit(onSubmit, (errors) => {
+						console.error("Form validation errors:", errors);
+						toast.error(
+							"Por favor, verifique os campos destacados e tente novamente.",
+						);
+					})}
+					className="space-y-6"
+				>
+					<div className="space-y-4">
 						<FormField
 							control={form.control}
-							name="price"
+							name="name"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Preço (R$)</FormLabel>
+									<FormLabel>Nome do Produto</FormLabel>
 									<FormControl>
-										<Input
-											type="number"
-											step="0.01"
-											min="0"
-											placeholder="99.99"
-											{...field}
-										/>
+										<Input placeholder="Ex: iPhone 15 Pro" {...field} />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -389,12 +401,137 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 
 						<FormField
 							control={form.control}
-							name="stock"
+							name="description"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Estoque</FormLabel>
+									<FormLabel>Descrição (Opcional)</FormLabel>
 									<FormControl>
-										<Input type="number" min="0" placeholder="10" {...field} />
+										<Input placeholder="Descreva seu produto..." {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<div className="grid grid-cols-2 gap-4">
+							<FormField
+								control={form.control}
+								name="price"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Preço (R$)</FormLabel>
+										<FormControl>
+											<Input
+												type="number"
+												step="0.01"
+												min="0"
+												placeholder="99.99"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<FormField
+								control={form.control}
+								name="stock"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Estoque</FormLabel>
+										<FormControl>
+											<Input
+												type="number"
+												min="0"
+												placeholder="10"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+
+						<FormField
+							control={form.control}
+							name="categoryId"
+							render={({ field }) => (
+								<FormItem>
+									<SearchableSelect
+										options={categories.map((category) => ({
+											value: category.id,
+											label: category.name,
+										}))}
+										value={field.value}
+										onValueChange={(value) => {
+											field.onChange(value);
+											setSelectedCategoryId(value);
+											// Reset subcategory when category changes
+											form.setValue("subcategoryId", "");
+										}}
+										label="Categoria *"
+										placeholder="Selecione uma categoria"
+										searchPlaceholder="Buscar categorias..."
+										emptyText="Nenhuma categoria encontrada."
+										addNewText="Nova Categoria"
+										showAddNew={true}
+										onAddNew={() => setShowCategoryCreation(true)}
+									/>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						{selectedCategoryId && (
+							<FormField
+								control={form.control}
+								name="subcategoryId"
+								render={({ field }) => (
+									<FormItem>
+										<SearchableSelect
+											options={[
+												{
+													value: "",
+													label: "Nenhuma subcategoria",
+												},
+												...subcategories.map((subcategory) => ({
+													value: subcategory.id,
+													label: subcategory.name,
+												})),
+											]}
+											value={field.value || ""}
+											onValueChange={field.onChange}
+											label="Subcategoria (Opcional)"
+											placeholder="Selecione uma subcategoria"
+											searchPlaceholder="Buscar subcategorias..."
+											emptyText="Nenhuma subcategoria encontrada."
+											addNewText="Nova Subcategoria"
+											showAddNew={true}
+											onAddNew={() => setShowSubcategoryCreation(true)}
+										/>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						)}
+
+						<Separator />
+
+						<FormField
+							control={form.control}
+							name="images"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Imagens do Produto</FormLabel>
+									<FormControl>
+										<ImageUpload
+											value={field.value || []}
+											onChange={field.onChange}
+											maxFiles={5}
+											onUploadingChange={setIsImageUploading}
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -402,103 +539,58 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 						/>
 					</div>
 
-					<FormField
-						control={form.control}
-						name="categoryId"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Categoria</FormLabel>
-								<Select
-									onValueChange={(value) => {
-										field.onChange(value);
-										setSelectedCategoryId(value);
-										// Reset subcategory when category changes
-										form.setValue("subcategoryId", "");
-									}}
-									defaultValue={field.value}
-								>
-									<FormControl>
-										<SelectTrigger>
-											<SelectValue placeholder="Selecione uma categoria" />
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{categories.map((category) => (
-											<SelectItem key={category.id} value={category.id}>
-												{category.name}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						)}
+					<Button
+						type="submit"
+						disabled={isSubmitting || isImageUploading}
+						className="w-full"
+					>
+						{isSubmitting
+							? isEditing
+								? "Atualizando produto..."
+								: "Criando produto..."
+							: isEditing
+								? "Atualizar Produto"
+								: "Criar Produto"}
+					</Button>
+				</form>
+			</Form>
+			{showCategoryCreation && (
+				<Drawer
+					trigger={<button type="button" style={{ display: "none" }}></button>}
+					title="Nova Categoria"
+					description="Preencha as informações para criar uma nova categoria."
+					icon={<Package className="h-5 w-5" />}
+					open={showCategoryCreation}
+					onOpenChange={(open) => !open && setShowCategoryCreation(false)}
+				>
+					<CategoryForm
+						onSuccess={() => {
+							setShowCategoryCreation(false);
+							reloadCategories();
+						}}
 					/>
+				</Drawer>
+			)}
 
-					{selectedCategoryId && subcategories.length > 0 && (
-						<FormField
-							control={form.control}
-							name="subcategoryId"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Subcategoria (Opcional)</FormLabel>
-									<Select
-										onValueChange={(value) => {
-											// Convert "none" back to empty string for the form
-											field.onChange(value === "none" ? "" : value);
-										}}
-										defaultValue={field.value || "none"}
-									>
-										<FormControl>
-											<SelectTrigger>
-												<SelectValue placeholder="Selecione uma subcategoria" />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent>
-											<SelectItem value="none">Nenhuma subcategoria</SelectItem>
-											{subcategories.map((subcategory) => (
-												<SelectItem key={subcategory.id} value={subcategory.id}>
-													{subcategory.name}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					)}
-
-					<Separator />
-
-					<FormField
-						control={form.control}
-						name="images"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Imagens do Produto</FormLabel>
-								<FormControl>
-									<ProductImageUpload
-										onImagesChange={field.onChange}
-										initialImages={field.value}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+			{/* Subcategory Creation Drawer */}
+			{showSubcategoryCreation && selectedCategoryId && (
+				<Drawer
+					trigger={<button type="button" style={{ display: "none" }}></button>}
+					title="Nova Subcategoria"
+					description="Preencha as informações para criar uma nova subcategoria."
+					icon={<Package className="h-5 w-5" />}
+					open={showSubcategoryCreation}
+					onOpenChange={(open) => !open && setShowSubcategoryCreation(false)}
+				>
+					<SubcategoryForm
+						categoryId={selectedCategoryId}
+						onSuccess={() => {
+							setShowSubcategoryCreation(false);
+							reloadSubcategories();
+						}}
 					/>
-				</div>
-
-				<Button type="submit" disabled={isSubmitting} className="w-full">
-					{isSubmitting
-						? isEditing
-							? "Atualizando produto..."
-							: "Criando produto..."
-						: isEditing
-							? "Atualizar Produto"
-							: "Criar Produto"}
-				</Button>
-			</form>
-		</Form>
+				</Drawer>
+			)}
+		</>
 	);
 }

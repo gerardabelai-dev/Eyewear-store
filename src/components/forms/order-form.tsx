@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+// import { OrderStatusForm } from "@/components/forms/order-status-form";
 import { ProductForm } from "@/components/forms/product-form";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,17 +31,12 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Textarea } from "@/components/ui/textarea";
 import { createOrder, updateOrder } from "@/lib/actions/order";
+import { getOrderStatuses } from "@/lib/actions/order-status";
 import { getProducts } from "@/lib/actions/product";
-import type { Order, Product } from "@/lib/db/schema";
+import type { Order, OrderStatus, Product } from "@/lib/db/schema";
 
 const orderItemSchema = z.object({
 	productId: z.string().min(1, "Produto é obrigatório"),
@@ -51,36 +47,50 @@ const orderItemSchema = z.object({
 	}, "Preço deve ser um valor válido maior que 0"),
 });
 
-const orderFormSchema = z.object({
-	customerName: z
-		.string()
-		.min(1, "Nome do cliente é obrigatório")
-		.max(100, "Nome deve ter no máximo 100 caracteres"),
-	customerEmail: z
-		.string()
-		.email("E-mail inválido")
-		.max(100, "E-mail deve ter no máximo 100 caracteres"),
-	customerPhone: z
-		.string()
-		.max(20, "Telefone deve ter no máximo 20 caracteres")
-		.optional(),
-	notes: z
-		.string()
-		.max(500, "Observações devem ter no máximo 500 caracteres")
-		.optional(),
-	items: z.array(orderItemSchema),
-	status: z
-		.enum(["pending", "processing", "completed", "cancelled"], {
-			errorMap: () => ({ message: "Status inválido" }),
-		})
-		.optional(),
-	// Temporary fields for product selection validation
-	selectedProduct: z.string().optional(),
-	selectedQuantity: z
-		.number()
-		.min(1, "Quantidade deve ser maior que 0")
-		.optional(),
-});
+const orderFormSchema = z
+	.object({
+		customerName: z
+			.string()
+			.min(1, "Nome do cliente é obrigatório")
+			.max(100, "Nome deve ter no máximo 100 caracteres"),
+		customerEmail: z
+			.string()
+			.email("E-mail inválido")
+			.max(100, "E-mail deve ter no máximo 100 caracteres"),
+		customerPhone: z
+			.string()
+			.max(20, "Telefone deve ter no máximo 20 caracteres")
+			.optional(),
+		notes: z
+			.string()
+			.max(500, "Observações devem ter no máximo 500 caracteres")
+			.optional(),
+		items: z
+			.array(orderItemSchema)
+			.min(1, "Adicione pelo menos um produto ao pedido"),
+		statusId: z
+			.union([z.string().min(1), z.literal(""), z.undefined()])
+			.optional(),
+		// Temporary fields for product selection validation
+		selectedProduct: z.string().optional(),
+		selectedQuantity: z
+			.number()
+			.min(1, "Quantidade deve ser maior que 0")
+			.optional(),
+	})
+	.refine(
+		(data) => {
+			// For new orders (when statusId is not provided), items are required
+			if (!data.statusId && data.items.length === 0) {
+				return false;
+			}
+			return true;
+		},
+		{
+			message: "Adicione pelo menos um produto ao pedido",
+			path: ["items"],
+		},
+	);
 
 type OrderFormData = z.infer<typeof orderFormSchema>;
 
@@ -134,8 +144,13 @@ function ProductImageDisplay({ images }: { images: string[] | undefined }) {
 export function OrderForm({ onSuccess, order }: OrderFormProps) {
 	const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
 	const [products, setProducts] = useState<Product[]>([]);
+	const [orderStatuses, setOrderStatuses] = useState<OrderStatus[]>([]);
 	const [loadingProducts, setLoadingProducts] = useState(false);
+	const [loadingStatuses, setLoadingStatuses] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+	const [showProductCreation, setShowProductCreation] = useState(false);
+	const [showStatusCreation, setShowStatusCreation] = useState(false);
 
 	const isEditing = !!order;
 
@@ -146,19 +161,14 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 			customerEmail: order?.customerEmail || "",
 			customerPhone: order?.customerPhone || "",
 			notes: order?.notes || "",
-			status:
-				(order?.status as
-					| "pending"
-					| "processing"
-					| "completed"
-					| "cancelled") || "pending",
+			statusId: order?.statusId,
 			items: [],
 			selectedProduct: "",
 			selectedQuantity: 1,
 		},
 	});
 
-	// Load products and set up order items
+	// Load products
 	useEffect(() => {
 		const loadProducts = async () => {
 			setLoadingProducts(true);
@@ -167,7 +177,7 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 				if (result.error) {
 					toast.error("Erro ao carregar produtos");
 				} else {
-					setProducts((result.data as Product[]) || []);
+					setProducts((result.data as any[]) || []);
 				}
 			} catch (error) {
 				console.error("Error loading products:", error);
@@ -179,6 +189,39 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 
 		loadProducts();
 	}, []);
+
+	// Load order statuses
+	useEffect(() => {
+		const loadOrderStatuses = async () => {
+			setLoadingStatuses(true);
+			try {
+				const result = await getOrderStatuses();
+				if (result.error) {
+					toast.error("Erro ao carregar status");
+				} else {
+					setOrderStatuses(result.data || []);
+				}
+			} catch (error) {
+				console.error("Error loading order statuses:", error);
+				toast.error("Erro ao carregar status");
+			} finally {
+				setLoadingStatuses(false);
+			}
+		};
+
+		loadOrderStatuses();
+	}, []);
+
+	// Set default status for new orders when statuses are loaded
+	useEffect(() => {
+		if (!isEditing && orderStatuses.length > 0 && !form.getValues("statusId")) {
+			const defaultStatus =
+				orderStatuses.find((status) => status.isDefault) || orderStatuses[0];
+			if (defaultStatus) {
+				form.setValue("statusId", defaultStatus.id);
+			}
+		}
+	}, [orderStatuses, isEditing, form]);
 
 	// Set up order items when products are loaded or order changes
 	useEffect(() => {
@@ -197,6 +240,8 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 	// Update form items when orderItems change
 	useEffect(() => {
 		form.setValue("items", orderItems);
+		// Trigger validation for items field
+		form.trigger("items");
 	}, [orderItems, form]);
 
 	// Clear items error when user selects a product (only for new orders)
@@ -315,50 +360,78 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 	};
 
 	const onSubmit = async (data: OrderFormData) => {
+		console.log("=== ORDER FORM SUBMISSION START ===");
+		console.log("Form data:", data);
+		console.log("Order items:", orderItems);
+		console.log("Is editing:", isEditing);
+
+		setIsSubmitting(true);
 		try {
-			// For new orders, ensure we have products added
-			if (!isEditing && orderItems.length === 0) {
-				// Set form error on product selection
-				form.setError("selectedProduct", {
+			// For editing orders, statusId is required
+			if (isEditing && (!data.statusId || data.statusId.trim() === "")) {
+				form.setError("statusId", {
 					type: "manual",
-					message: "Selecione um produto",
+					message: "Status é obrigatório",
 				});
-				// Show toast error message
-				toast.error("Adicione pelo menos um produto para criar o pedido");
+				toast.error("Por favor, selecione um status para o pedido.");
+				setIsSubmitting(false);
 				return;
 			}
 
 			// Exclude temporary fields from the data
 			const { selectedProduct, selectedQuantity, ...orderData } = data;
 
+			// Use orderItems from state instead of form data for items
+			const finalOrderData = {
+				...orderData,
+				items: orderItems.map((item) => ({
+					productId: item.productId,
+					quantity: item.quantity,
+					unitPrice: item.unitPrice,
+				})),
+			};
+
+			console.log("Final order data to submit:", finalOrderData);
+
 			let result: { error?: string; success?: string };
 			if (order) {
-				// Update existing order - include status if provided
+				console.log("Updating existing order...");
+				// Update existing order - include statusId if provided
 				result = await updateOrder({
 					id: order.id,
-					...orderData,
-					status: data.status,
+					...finalOrderData,
+					statusId: data.statusId,
 				});
 			} else {
-				// Create new order - exclude status for new orders
-				const { status, ...createData } = orderData;
-				result = await createOrder(createData);
+				console.log("Creating new order...");
+				// Create new order - include statusId if provided, otherwise use default
+				console.log("Data being sent to createOrder:", finalOrderData);
+				result = await createOrder(finalOrderData);
 			}
 
+			console.log("Order creation result:", result);
+
 			if (result.error) {
+				console.error("Order creation failed:", result.error);
 				toast.error(result.error);
 			} else {
+				console.log("Order creation successful!");
 				toast.success(
 					order
 						? "Pedido atualizado com sucesso!"
 						: "Pedido criado com sucesso!",
 				);
+				console.log("Calling onSuccess callback...");
 				onSuccess?.();
 			}
 		} catch (error) {
 			console.error("Error saving order:", error);
 			toast.error("Erro ao salvar pedido");
+		} finally {
+			setIsSubmitting(false);
 		}
+
+		console.log("=== ORDER FORM SUBMISSION END ===");
 	};
 
 	const availableProducts = products.filter((p) => p.stock > 0);
@@ -370,10 +443,40 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 		}
 	};
 
+	const reloadProducts = async () => {
+		try {
+			const result = await getProducts();
+			if (result.data) {
+				setProducts(result.data as any[]);
+			}
+		} catch (error) {
+			console.error("Error reloading products:", error);
+		}
+	};
+
+	const reloadOrderStatuses = async () => {
+		try {
+			const result = await getOrderStatuses();
+			if (result.data) {
+				setOrderStatuses(result.data);
+			}
+		} catch (error) {
+			console.error("Error reloading order statuses:", error);
+		}
+	};
+
 	return (
 		<>
 			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+				<form
+					onSubmit={form.handleSubmit(onSubmit, (errors) => {
+						console.error("Form validation errors:", errors);
+						toast.error(
+							"Por favor, verifique os campos destacados e tente novamente.",
+						);
+					})}
+					className="space-y-6"
+				>
 					{/* Customer Information */}
 					<Card>
 						<CardHeader>
@@ -438,65 +541,43 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 						</CardContent>
 					</Card>
 
-					{/* Order Status - Only show for editing orders */}
-					{isEditing && (
-						<Card>
-							<CardHeader>
-								<CardTitle className="text-lg flex items-center gap-2">
-									<Package className="h-5 w-5" />
-									Status do Pedido
-								</CardTitle>
-							</CardHeader>
-							<CardContent>
-								<FormField
-									control={form.control}
-									name="status"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Status *</FormLabel>
-											<Select
-												onValueChange={field.onChange}
-												value={field.value}
-											>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue placeholder="Selecione o status" />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													<SelectItem value="pending">
-														<div className="flex items-center gap-2">
-															<div className="w-2 h-2 rounded-full bg-gray-500" />
-															Pendente
-														</div>
-													</SelectItem>
-													<SelectItem value="processing">
-														<div className="flex items-center gap-2">
-															<div className="w-2 h-2 rounded-full bg-blue-500" />
-															Em Processamento
-														</div>
-													</SelectItem>
-													<SelectItem value="completed">
-														<div className="flex items-center gap-2">
-															<div className="w-2 h-2 rounded-full bg-green-500" />
-															Concluído
-														</div>
-													</SelectItem>
-													<SelectItem value="cancelled">
-														<div className="flex items-center gap-2">
-															<div className="w-2 h-2 rounded-full bg-red-500" />
-															Cancelado
-														</div>
-													</SelectItem>
-												</SelectContent>
-											</Select>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</CardContent>
-						</Card>
-					)}
+					{/* Order Status */}
+					<Card>
+						<CardHeader>
+							<CardTitle className="text-lg flex items-center gap-2">
+								<Package className="h-5 w-5" />
+								Status do Pedido
+							</CardTitle>
+						</CardHeader>
+						<CardContent>
+							<FormField
+								control={form.control}
+								name="statusId"
+								render={({ field }) => (
+									<FormItem>
+										<SearchableSelect
+											options={orderStatuses.map((status) => ({
+												value: status.id,
+												label: status.name,
+											}))}
+											value={field.value || ""}
+											onValueChange={field.onChange}
+											label={isEditing ? "Status *" : "Status"}
+											placeholder="Selecione o status"
+											searchPlaceholder="Buscar status..."
+											emptyText="Nenhum status encontrado."
+											addNewText="Novo Status"
+											showAddNew={true}
+											onAddNew={() => setShowStatusCreation(true)}
+											loading={loadingStatuses}
+											loadingText="Carregando status..."
+										/>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</CardContent>
+					</Card>
 
 					{/* Product Selection - Show for new orders AND editing orders */}
 					<Card>
@@ -514,36 +595,23 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 										name="selectedProduct"
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel>Produto</FormLabel>
-												<Select
-													onValueChange={field.onChange}
+												<SearchableSelect
+													options={availableProducts.map((product) => ({
+														value: product.id,
+														label: `${product.name} - R$ ${parseFloat(product.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })} (Est: ${product.stock})`,
+													}))}
 													value={field.value}
-												>
-													<FormControl>
-														<SelectTrigger>
-															<SelectValue placeholder="Selecione um produto" />
-														</SelectTrigger>
-													</FormControl>
-													<SelectContent>
-														{loadingProducts && (
-															<SelectItem value="loading" disabled>
-																Carregando produtos...
-															</SelectItem>
-														)}
-														{availableProducts.map((product) => (
-															<SelectItem key={product.id} value={product.id}>
-																{product.name} - R${" "}
-																{parseFloat(product.price).toLocaleString(
-																	"pt-BR",
-																	{
-																		minimumFractionDigits: 2,
-																	},
-																)}{" "}
-																(Est: {product.stock})
-															</SelectItem>
-														))}
-													</SelectContent>
-												</Select>
+													onValueChange={field.onChange}
+													label="Produto"
+													placeholder="Selecione um produto"
+													searchPlaceholder="Buscar produtos..."
+													emptyText="Nenhum produto encontrado."
+													addNewText="Novo Produto"
+													showAddNew={true}
+													onAddNew={() => setShowProductCreation(true)}
+													loading={loadingProducts}
+													loadingText="Carregando produtos..."
+												/>
 												<FormMessage />
 											</FormItem>
 										)}
@@ -778,8 +846,19 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 					</Card>
 
 					{/* Submit Button */}
-					<Button type="submit" className="w-full" size="lg">
-						{order ? "Atualizar Pedido" : "Criar Pedido"}
+					<Button
+						type="submit"
+						disabled={isSubmitting}
+						className="w-full"
+						size="lg"
+					>
+						{isSubmitting
+							? order
+								? "Atualizando pedido..."
+								: "Criando pedido..."
+							: order
+								? "Atualizar Pedido"
+								: "Criar Pedido"}
 					</Button>
 				</form>
 			</Form>
@@ -798,20 +877,45 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 						product={editingProduct}
 						onSuccess={() => {
 							setEditingProduct(null);
-							// Reload products to get updated information
-							const loadProducts = async () => {
-								try {
-									const result = await getProducts();
-									if (result.data) {
-										setProducts(result.data as Product[]);
-									}
-								} catch (error) {
-									console.error("Error reloading products:", error);
-								}
-							};
-							loadProducts();
+							reloadProducts();
 						}}
 					/>
+				</Drawer>
+			)}
+
+			{/* Product Creation Drawer */}
+			{showProductCreation && (
+				<Drawer
+					trigger={<button type="button" style={{ display: "none" }}></button>}
+					title="Novo Produto"
+					description="Preencha as informações para criar um novo produto."
+					icon={<Package className="h-5 w-5" />}
+					open={showProductCreation}
+					onOpenChange={(open) => !open && setShowProductCreation(false)}
+				>
+					<ProductForm
+						onSuccess={() => {
+							setShowProductCreation(false);
+							reloadProducts();
+						}}
+					/>
+				</Drawer>
+			)}
+
+			{/* Order Status Creation Drawer */}
+			{showStatusCreation && (
+				<Drawer
+					trigger={<button type="button" style={{ display: "none" }}></button>}
+					title="Novo Status"
+					description="Preencha as informações para criar um novo status de pedido."
+					icon={<Package className="h-5 w-5" />}
+					open={showStatusCreation}
+					onOpenChange={(open) => !open && setShowStatusCreation(false)}
+				>
+					{/* TODO: Re-enable OrderStatusForm when import issue is resolved */}
+					<div className="p-4 text-center text-muted-foreground">
+						Order status creation temporarily disabled
+					</div>
 				</Drawer>
 			)}
 		</>

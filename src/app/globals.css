@@ -120,3 +120,28 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+/* Toast responsive positioning - simplified */
+@media (max-width: 767px) {
+	[data-sonner-toaster] {
+		top: 1rem;
+		left: 50%;
+		right: auto;
+		bottom: auto;
+		transform: translateX(-50%);
+		width: calc(100vw - 2rem);
+		max-width: 400px;
+	}
+}
+
+@media (min-width: 768px) {
+	[data-sonner-toaster] {
+		top: auto;
+		right: 1rem;
+		left: auto;
+		bottom: 1rem;
+		transform: none;
+		width: auto;
+		max-width: 400px;
+	}
+}

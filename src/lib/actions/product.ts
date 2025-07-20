@@ -68,6 +68,7 @@ export async function getProducts() {
 				description: product.description,
 				price: product.price,
 				stock: product.stock,
+				status: product.status,
 				categoryId: product.categoryId,
 				subcategoryId: product.subcategoryId,
 				images: product.images,
@@ -195,39 +196,48 @@ export async function deleteProduct(productId: string) {
 	}
 }
 
-// Seed sample products for testing
+// Helper function to get real glasses images from Unsplash
+function getGlassesImages(productIndex: number): string[] {
+	const availableImages = [
+		"https://images.unsplash.com/photo-1649303922416-75f631e6ac8e?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+		"https://images.unsplash.com/photo-1652837345706-6a0f9c0148c0?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+		"https://images.unsplash.com/photo-1648688135643-2716ec8f4b24?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+		"https://images.unsplash.com/photo-1701252374715-b5d8ab0b5f2c?q=80&w=764&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+		"https://images.unsplash.com/photo-1653268986450-838b2f07e835?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+		"https://images.unsplash.com/photo-1619089661769-3101dbac9257?q=80&w=1128&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+		"https://images.unsplash.com/photo-1475312775467-159e03aaa7cd?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+	];
+
+	// Return 1-3 images based on product index
+	const numImages = (productIndex % 3) + 1; // 1, 2, or 3 images
+	const startIndex = (productIndex * 2) % availableImages.length;
+
+	const selectedImages = [];
+	for (let i = 0; i < numImages; i++) {
+		const imageIndex = (startIndex + i) % availableImages.length;
+		selectedImages.push(availableImages[imageIndex]);
+	}
+
+	return selectedImages;
+}
+
+// Seed sample products for testing - only glasses products (1 per subcategory)
 export async function seedProducts() {
 	try {
+		console.log("🌱 Seeding glasses products with placeholder images...");
+
 		const sampleProducts = [
-			// Óculos de Grau - Masculino - Various characteristics
+			// Óculos de Grau - Masculino
 			{
 				id: crypto.randomUUID(),
 				name: "Ray-Ban RB5154 Clubmaster",
 				description:
-					"Óculos de grau clássico masculino com armação em acetato premium. Design atemporal que combina sofisticação e durabilidade. Hastes flexíveis para maior conforto durante todo o dia. Ideal para rostos ovais e quadrados. Acompanha estojo rígido e flanela para limpeza.",
+					"Óculos de grau clássico masculino com armação em acetato premium. Design atemporal que combina sofisticação e durabilidade. Hastes flexíveis para maior conforto durante todo o dia. Ideal para rostos ovais e quadrados.",
 				price: "450.00",
 				stock: 25,
 				categoryId: "oculos-grau",
 				subcategoryId: "grau-masculino",
-				images: [
-					"https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=400",
-					"https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400",
-					"https://images.unsplash.com/photo-1508296695146-257a814070b4?w=400",
-				],
-				createdAt: new Date(),
-				updatedAt: new Date(),
-			},
-			{
-				id: crypto.randomUUID(),
-				name: "Oakley OX8156",
-				description: "Esportivo e resistente.",
-				price: "680.00",
-				stock: 3, // Low stock
-				categoryId: "oculos-grau",
-				subcategoryId: "grau-masculino",
-				images: [
-					"https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=400",
-				],
+				images: getGlassesImages(0),
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			},
@@ -237,195 +247,72 @@ export async function seedProducts() {
 				id: crypto.randomUUID(),
 				name: "Dior Stellaire O2",
 				description:
-					"Elegante armação feminina em metal dourado com detalhes exclusivos da marca. Lentes de qualidade superior com tratamento anti-reflexo. Design sofisticado que realça a feminilidade. Perfeito para ocasiões especiais e uso profissional.",
-				price: "1250.00", // High price
+					"Elegante armação feminina em metal dourado com detalhes exclusivos da marca. Lentes de qualidade superior com tratamento anti-reflexo. Design sofisticado que realça a feminilidade.",
+				price: "1250.00",
 				stock: 8,
 				categoryId: "oculos-grau",
 				subcategoryId: "grau-feminino",
-				images: [
-					"https://images.unsplash.com/photo-1577803645773-f96470509666?w=400",
-					"https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=400",
-					"https://images.unsplash.com/photo-1544924187-6d27097d6bf4?w=400",
-					"https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=400",
-				],
-				createdAt: new Date(),
-				updatedAt: new Date(),
-			},
-			{
-				id: crypto.randomUUID(),
-				name: "Armação Delicada Rosa",
-				description: "Leve e confortável para uso diário. Cor rosa suave.",
-				price: "180.00", // Low price
-				stock: 45, // High stock
-				categoryId: "oculos-grau",
-				subcategoryId: "grau-feminino",
-				images: [
-					"https://images.unsplash.com/photo-1564131071-de4f7fb3e2ef?w=400",
-					"https://images.unsplash.com/photo-1591076482161-42ce6da69f67?w=400",
-				],
+				images: getGlassesImages(1),
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			},
 
-			// Óculos de Grau - Progressivo (same category, different subcategory)
+			// Óculos de Grau - Progressivo
 			{
 				id: crypto.randomUUID(),
-				name: "Varilux Comfort Max Multifocal Premium Progressive Lens Technology Advanced",
+				name: "Varilux Comfort Max",
 				description:
-					"Lentes progressivas de última geração com tecnologia avançada de transição suave entre os campos de visão. Ideal para presbiopia, oferecendo visão nítida para longe, intermediária e perto sem linhas visíveis. Armação em titânio ultraleve com design ergonômico. Tratamento anti-reflexo, anti-risco e hidrofóbico incluso. Garantia de adaptação de 30 dias.",
-				price: "1850.00", // Very high price
-				stock: 2, // Very low stock
+					"Lentes progressivas de última geração com tecnologia avançada de transição suave entre os campos de visão. Ideal para presbiopia, oferecendo visão nítida para longe, intermediária e perto sem linhas visíveis.",
+				price: "1850.00",
+				stock: 2,
 				categoryId: "oculos-grau",
 				subcategoryId: "grau-progressivo",
-				images: [
-					"https://images.unsplash.com/photo-1503328427499-d92d1ac3d174?w=400",
-					"https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400",
-					"https://images.unsplash.com/photo-1508296695146-257a814070b4?w=400",
-					"https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=400",
-					"https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=400",
-					"https://images.unsplash.com/photo-1544924187-6d27097d6bf4?w=400",
-				], // 6 images
+				images: getGlassesImages(2),
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			},
 
-			// Óculos de Sol - Masculino (different category)
+			// Óculos de Sol - Aviador
 			{
 				id: crypto.randomUUID(),
 				name: "Ray-Ban Aviator Classic",
 				description:
-					"O clássico aviador que nunca sai de moda. Proteção UV400 e qualidade premium.",
+					"O clássico aviador que nunca sai de moda. Proteção UV400 e qualidade premium para máxima proteção solar.",
 				price: "520.00",
 				stock: 15,
 				categoryId: "oculos-sol",
 				subcategoryId: "sol-aviador",
-				images: [
-					"https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400",
-					"https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400",
-					"https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=400",
-				],
+				images: getGlassesImages(3),
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			},
+
+			// Óculos de Sol - Esportivo
 			{
 				id: crypto.randomUUID(),
 				name: "Oakley Holbrook",
 				description:
-					"Óculos de sol esportivo com design contemporâneo e lentes polarizadas para máxima proteção solar. Armação em O Matter resistente a impactos. Ideal para atividades ao ar livre e esportes. Tecnologia HDO para visão cristalina.",
+					"Óculos de sol esportivo com design contemporâneo e lentes polarizadas para máxima proteção solar. Armação em O Matter resistente a impactos. Ideal para atividades ao ar livre e esportes.",
 				price: "720.00",
 				stock: 22,
 				categoryId: "oculos-sol",
 				subcategoryId: "sol-esportivo",
-				images: [
-					"https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400",
-				], // Only 1 image
+				images: getGlassesImages(4),
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			},
 
-			// Óculos de Sol - Feminino (same category, different subcategory)
+			// Óculos de Sol - Feminino
 			{
 				id: crypto.randomUUID(),
 				name: "Chanel CH5450",
 				description:
-					"Luxo e elegância em cada detalhe. Proteção solar premium com style.",
-				price: "2100.00", // Very high price
+					"Luxo e elegância em cada detalhe. Proteção solar premium com style. Design sofisticado para mulheres que valorizam qualidade e exclusividade.",
+				price: "2100.00",
 				stock: 5,
 				categoryId: "oculos-sol",
 				subcategoryId: "sol-feminino",
-				images: [
-					"https://images.unsplash.com/photo-1502767089025-6572583495b9?w=400",
-					"https://images.unsplash.com/photo-1535491969645-8d6d2c6b7156?w=400",
-				],
-				createdAt: new Date(),
-				updatedAt: new Date(),
-			},
-
-			// Lentes de Contato - Different category entirely
-			{
-				id: crypto.randomUUID(),
-				name: "Acuvue Oasys Diárias",
-				description:
-					"Lentes de contato diárias com tecnologia HydraLuxe para hidratação duradoura.",
-				price: "85.00", // Low price
-				stock: 100, // Very high stock
-				categoryId: "lentes-contato",
-				subcategoryId: "lentes-diarias",
-				images: [
-					"https://images.unsplash.com/photo-1551029506-0807df4e2031?w=400",
-					"https://images.unsplash.com/photo-1590172038866-0ec84b167bad?w=400",
-					"https://images.unsplash.com/photo-1617016254851-c6ee82dd19c8?w=400",
-					"https://images.unsplash.com/photo-1622013452703-9cd89bd4b3ee?w=400",
-					"https://images.unsplash.com/photo-1612033299208-ad1ef8e7fb6e?w=400",
-				], // 5 images
-				createdAt: new Date(),
-				updatedAt: new Date(),
-			},
-			{
-				id: crypto.randomUUID(),
-				name: "Biofinity Mensais Astigmatismo",
-				description:
-					"Lentes de contato mensais especialmente desenvolvidas para correção de astigmatismo. Tecnologia Aquaform que retém a umidade natural dos olhos. Material silicone hidrogel para maior permeabilidade ao oxigênio. Caixa com 6 unidades.",
-				price: "145.00",
-				stock: 0, // Out of stock
-				categoryId: "lentes-contato",
-				subcategoryId: "lentes-astigmatismo",
-				images: [
-					"https://images.unsplash.com/photo-1551029506-0807df4e2031?w=400",
-				],
-				createdAt: new Date(),
-				updatedAt: new Date(),
-			},
-
-			// Armações
-			{
-				id: crypto.randomUUID(),
-				name: "Armação Titânio Ultralight",
-				description: "Extremamente leve e resistente.",
-				price: "320.00",
-				stock: 12,
-				categoryId: "armacoes",
-				subcategoryId: "armacao-titanio",
-				images: [
-					"https://images.unsplash.com/photo-1517639418742-0d6a8b6fcf9f?w=400",
-					"https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400",
-				],
-				createdAt: new Date(),
-				updatedAt: new Date(),
-			},
-
-			// Acessórios
-			{
-				id: crypto.randomUUID(),
-				name: "Estojo Rígido Premium Couro Legítimo Proteção Máxima",
-				description:
-					"Estojo de proteção em couro legítimo com forro em veludo para máxima proteção dos seus óculos. Interior acolchoado e fecho magnético seguro. Design elegante e durável. Dimensões compatíveis com a maioria dos modelos de óculos.",
-				price: "89.00",
-				stock: 35,
-				categoryId: "acessorios",
-				subcategoryId: "estojos",
-				images: [
-					"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400",
-				],
-				createdAt: new Date(),
-				updatedAt: new Date(),
-			},
-
-			// Infantil
-			{
-				id: crypto.randomUUID(),
-				name: "Kids Safety Blue",
-				description:
-					"Óculos de grau infantil com armação flexível e proteção anti-impacto. Cores divertidas e design ergonômico adaptado para crianças de 6 a 12 anos. Material hipoalergênico e cordão de segurança incluso.",
-				price: "250.00",
-				stock: 18,
-				categoryId: "infantil",
-				subcategoryId: "infantil-grau",
-				images: [
-					"https://images.unsplash.com/photo-1554466615-9d2eb9e88e20?w=400",
-					"https://images.unsplash.com/photo-1504178451683-27f33d13dae5?w=400",
-					"https://images.unsplash.com/photo-1617016254851-c6ee82dd19c8?w=400",
-				],
+				images: getGlassesImages(5),
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			},

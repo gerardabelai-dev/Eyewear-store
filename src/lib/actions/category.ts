@@ -1,8 +1,36 @@
 "use server";
 
 import { eq } from "drizzle-orm";
+import { z } from "zod";
 import { db } from "@/lib/db";
 import { category, subcategory } from "@/lib/db/schema";
+
+// Validation schemas
+const categorySchema = z.object({
+	name: z
+		.string()
+		.min(1, "Nome é obrigatório")
+		.max(100, "Nome deve ter no máximo 100 caracteres"),
+	description: z
+		.string()
+		.max(500, "Descrição deve ter no máximo 500 caracteres")
+		.optional(),
+});
+
+const subcategorySchema = z.object({
+	name: z
+		.string()
+		.min(1, "Nome é obrigatório")
+		.max(100, "Nome deve ter no máximo 100 caracteres"),
+	categoryId: z.string().min(1, "Categoria é obrigatória"),
+	description: z
+		.string()
+		.max(500, "Descrição deve ter no máximo 500 caracteres")
+		.optional(),
+});
+
+type CategoryFormData = z.infer<typeof categorySchema>;
+type SubcategoryFormData = z.infer<typeof subcategorySchema>;
 
 // Get all categories with their subcategories
 export async function getCategories() {
@@ -51,6 +79,211 @@ export async function getAllSubcategoriesWithCategory() {
 		return { data: subcategoriesWithCategory };
 	} catch (error) {
 		console.error("Erro ao buscar subcategorias com categorias:", error);
+		return { error: "Erro interno do servidor" };
+	}
+}
+
+// Create a new category
+export async function createCategory(data: CategoryFormData) {
+	try {
+		const validatedData = categorySchema.parse(data);
+
+		// Generate slug from name
+		const slug = validatedData.name
+			.toLowerCase()
+			.normalize("NFD")
+			.replace(/[\u0300-\u036f]/g, "")
+			.replace(/[^a-z0-9\s-]/g, "")
+			.replace(/\s+/g, "-")
+			.trim();
+
+		const newCategory = await db
+			.insert(category)
+			.values({
+				id: crypto.randomUUID(),
+				...validatedData,
+				slug,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			})
+			.returning();
+
+		return { data: newCategory[0], success: "Categoria criada com sucesso!" };
+	} catch (error: unknown) {
+		if (error instanceof z.ZodError) {
+			return { error: error.errors[0].message };
+		}
+		console.error("Erro ao criar categoria:", error);
+		return { error: "Erro interno do servidor" };
+	}
+}
+
+// Update a category
+export async function updateCategory(data: CategoryFormData & { id: string }) {
+	try {
+		const { id, ...updateData } = data;
+		const validatedData = categorySchema.parse(updateData);
+
+		// Generate slug from name
+		const slug = validatedData.name
+			.toLowerCase()
+			.normalize("NFD")
+			.replace(/[\u0300-\u036f]/g, "")
+			.replace(/[^a-z0-9\s-]/g, "")
+			.replace(/\s+/g, "-")
+			.trim();
+
+		const updatedCategory = await db
+			.update(category)
+			.set({
+				...validatedData,
+				slug,
+			})
+			.where(eq(category.id, id))
+			.returning();
+
+		if (updatedCategory.length === 0) {
+			return { error: "Categoria não encontrada" };
+		}
+
+		return {
+			data: updatedCategory[0],
+			success: "Categoria atualizada com sucesso!",
+		};
+	} catch (error: unknown) {
+		if (error instanceof z.ZodError) {
+			return { error: error.errors[0].message };
+		}
+		console.error("Erro ao atualizar categoria:", error);
+		return { error: "Erro interno do servidor" };
+	}
+}
+
+// Delete a category
+export async function deleteCategory(id: string) {
+	try {
+		// Check if category has subcategories
+		const subcategoriesCount = await db
+			.select()
+			.from(subcategory)
+			.where(eq(subcategory.categoryId, id));
+
+		if (subcategoriesCount.length > 0) {
+			return {
+				error: "Não é possível excluir categoria que possui subcategorias",
+			};
+		}
+
+		const deletedCategory = await db
+			.delete(category)
+			.where(eq(category.id, id))
+			.returning();
+
+		if (deletedCategory.length === 0) {
+			return { error: "Categoria não encontrada" };
+		}
+
+		return { success: "Categoria excluída com sucesso!" };
+	} catch (error: unknown) {
+		console.error("Erro ao excluir categoria:", error);
+		return { error: "Erro interno do servidor" };
+	}
+}
+
+// Create a new subcategory
+export async function createSubcategory(data: SubcategoryFormData) {
+	try {
+		const validatedData = subcategorySchema.parse(data);
+
+		// Generate slug from name
+		const slug = validatedData.name
+			.toLowerCase()
+			.normalize("NFD")
+			.replace(/[\u0300-\u036f]/g, "")
+			.replace(/[^a-z0-9\s-]/g, "")
+			.replace(/\s+/g, "-")
+			.trim();
+
+		const newSubcategory = await db
+			.insert(subcategory)
+			.values({
+				id: crypto.randomUUID(),
+				...validatedData,
+				slug,
+			})
+			.returning();
+
+		return {
+			data: newSubcategory[0],
+			success: "Subcategoria criada com sucesso!",
+		};
+	} catch (error: unknown) {
+		if (error instanceof z.ZodError) {
+			return { error: error.errors[0].message };
+		}
+		console.error("Erro ao criar subcategoria:", error);
+		return { error: "Erro interno do servidor" };
+	}
+}
+
+// Update a subcategory
+export async function updateSubcategory(
+	data: SubcategoryFormData & { id: string },
+) {
+	try {
+		const { id, ...updateData } = data;
+		const validatedData = subcategorySchema.parse(updateData);
+
+		// Generate slug from name
+		const slug = validatedData.name
+			.toLowerCase()
+			.normalize("NFD")
+			.replace(/[\u0300-\u036f]/g, "")
+			.replace(/[^a-z0-9\s-]/g, "")
+			.replace(/\s+/g, "-")
+			.trim();
+
+		const updatedSubcategory = await db
+			.update(subcategory)
+			.set({
+				...validatedData,
+				slug,
+			})
+			.where(eq(subcategory.id, id))
+			.returning();
+
+		if (updatedSubcategory.length === 0) {
+			return { error: "Subcategoria não encontrada" };
+		}
+
+		return {
+			data: updatedSubcategory[0],
+			success: "Subcategoria atualizada com sucesso!",
+		};
+	} catch (error: unknown) {
+		if (error instanceof z.ZodError) {
+			return { error: error.errors[0].message };
+		}
+		console.error("Erro ao atualizar subcategoria:", error);
+		return { error: "Erro interno do servidor" };
+	}
+}
+
+// Delete a subcategory
+export async function deleteSubcategory(id: string) {
+	try {
+		const deletedSubcategory = await db
+			.delete(subcategory)
+			.where(eq(subcategory.id, id))
+			.returning();
+
+		if (deletedSubcategory.length === 0) {
+			return { error: "Subcategoria não encontrada" };
+		}
+
+		return { success: "Subcategoria excluída com sucesso!" };
+	} catch (error: unknown) {
+		console.error("Erro ao excluir subcategoria:", error);
 		return { error: "Erro interno do servidor" };
 	}
 }

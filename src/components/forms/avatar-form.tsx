@@ -162,7 +162,14 @@ export function AvatarForm({ userImage, userInitials }: AvatarFormProps) {
 
 							{image && (
 								<Form {...form}>
-									<form onSubmit={form.handleSubmit(onSubmit)}>
+									<form
+										onSubmit={form.handleSubmit(onSubmit, (errors) => {
+											console.error("Form validation errors:", errors);
+											toast.error(
+												"Por favor, verifique os campos destacados e tente novamente.",
+											);
+										})}
+									>
 										<FormField
 											control={form.control}
 											name="ready"

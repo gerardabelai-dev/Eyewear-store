@@ -21,6 +21,26 @@ import {
 import { Input } from "@/components/ui/input";
 import { signIn, signUp } from "@/lib/auth-client";
 
+// Create a global toast tracker to prevent duplicates across all sign-up attempts
+const globalToastTracker = {
+	lastToast: "",
+	lastToastTime: 0,
+
+	canShowToast(message: string): boolean {
+		const now = Date.now();
+		const timeDiff = now - this.lastToastTime;
+
+		// Prevent same message within 2 seconds
+		if (this.lastToast === message && timeDiff < 2000) {
+			return false;
+		}
+
+		this.lastToast = message;
+		this.lastToastTime = now;
+		return true;
+	},
+};
+
 const signUpSchema = z
 	.object({
 		firstName: z.string().min(1, "Nome é obrigatório"),
@@ -93,16 +113,25 @@ export default function SignUp() {
 				} as any,
 				{
 					onSuccess: () => {
-						toast.success("Conta criada com sucesso!");
-						router.push("/dashboard");
+						const message = "Conta criada com sucesso!";
+						if (globalToastTracker.canShowToast(message)) {
+							toast.success(message);
+							router.push("/dashboard");
+						}
 					},
 					onError: (ctx) => {
-						toast.error(ctx.error.message || "Falha ao criar conta");
+						const message = ctx.error.message || "Falha ao criar conta";
+						if (globalToastTracker.canShowToast(message)) {
+							toast.error(message);
+						}
 					},
 				},
 			);
 		} catch (_errorrr) {
-			toast.error("Ocorreu um erro inesperado");
+			const message = "Ocorreu um erro inesperado";
+			if (globalToastTracker.canShowToast(message)) {
+				toast.error(message);
+			}
 		}
 	};
 
@@ -115,15 +144,25 @@ export default function SignUp() {
 				},
 				{
 					onSuccess: () => {
-						toast.success("Conta criada com sucesso!");
+						const message = "Conta criada com sucesso!";
+						if (globalToastTracker.canShowToast(message)) {
+							toast.success(message);
+						}
 					},
 					onError: (ctx) => {
-						toast.error(ctx.error.message || "Falha ao criar conta com Google");
+						const message =
+							ctx.error.message || "Falha ao criar conta com Google";
+						if (globalToastTracker.canShowToast(message)) {
+							toast.error(message);
+						}
 					},
 				},
 			);
 		} catch (_errorrr) {
-			toast.error("Ocorreu um erro inesperado");
+			const message = "Ocorreu um erro inesperado";
+			if (globalToastTracker.canShowToast(message)) {
+				toast.error(message);
+			}
 		}
 	};
 
@@ -141,7 +180,15 @@ export default function SignUp() {
 			<Card>
 				<CardContent className="pt-6">
 					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+						<form
+							onSubmit={form.handleSubmit(onSubmit, (errors) => {
+								console.error("Form validation errors:", errors);
+								toast.error(
+									"Por favor, verifique os campos destacados e tente novamente.",
+								);
+							})}
+							className="space-y-4"
+						>
 							{/* Profile Picture Upload */}
 							<div className="flex flex-col items-center space-y-4">
 								<div className="relative">

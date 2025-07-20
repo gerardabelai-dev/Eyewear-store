@@ -4,7 +4,7 @@ import { Shield } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import SignIn from "@/components/sign-in";
 import SignUp from "@/components/sign-up";
 import { Button } from "@/components/ui/button";
@@ -89,7 +89,6 @@ export default function AuthPage() {
 					</h2>
 					<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
 				</div>
-				<Toaster />
 			</div>
 		);
 	}
@@ -131,8 +130,6 @@ export default function AuthPage() {
 				{/* Auth Components */}
 				<div className="w-full">{showSignUp ? <SignUp /> : <SignIn />}</div>
 			</div>
-
-			<Toaster />
 		</div>
 	);
 }

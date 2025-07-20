@@ -1,13 +1,7 @@
-import {
-	AlertTriangle,
-	Package,
-	Package2,
-	Search,
-	TrendingUp,
-} from "lucide-react";
+import { AlertTriangle, Package, Package2, TrendingUp } from "lucide-react";
 import { redirect } from "next/navigation";
 import { ProductCreationSheet } from "@/components/product-creation-sheet";
-import { ProductsTable } from "@/components/products-table";
+import { ProductsTableWrapper } from "@/components/products-table-wrapper";
 import { Badge } from "@/components/ui/badge";
 import {
 	Card,
@@ -16,7 +10,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { getProducts } from "@/lib/actions/product";
 
 export default async function ProdutosPage() {
@@ -112,7 +105,7 @@ export default async function ProdutosPage() {
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<ProductsTable products={products} />
+					<ProductsTableWrapper products={products} />
 				</CardContent>
 			</Card>
 		</>

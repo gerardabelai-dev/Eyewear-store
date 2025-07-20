@@ -69,7 +69,15 @@ export function EmailForm({ email: initialEmail }: EmailFormProps) {
 				</div>
 
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+					<form
+						onSubmit={form.handleSubmit(onSubmit, (errors) => {
+							console.error("Form validation errors:", errors);
+							toast.error(
+								"Por favor, verifique os campos destacados e tente novamente.",
+							);
+						})}
+						className="space-y-6"
+					>
 						<div className="max-w-md">
 							<FormField
 								control={form.control}

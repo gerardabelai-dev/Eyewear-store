@@ -22,6 +22,7 @@ export function OrderCreationSheet() {
 				<OrderForm
 					onSuccess={() => {
 						// Close the sheet after successful creation
+						console.log("Order form success, closing drawer");
 						onClose();
 					}}
 				/>

@@ -87,6 +87,7 @@ export const product = pgTable("product", {
 	description: text("description"),
 	price: decimal("price", { precision: 10, scale: 2 }).notNull(),
 	stock: integer("stock").notNull().default(0),
+	status: text("status").notNull().default("active"), // active, inactive, draft, discontinued
 	categoryId: text("categoryId")
 		.notNull()
 		.references(() => category.id, { onDelete: "restrict" }),
@@ -94,6 +95,20 @@ export const product = pgTable("product", {
 		onDelete: "restrict",
 	}),
 	images: json("images").$type<string[]>().default([]),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
+
+export const orderStatus = pgTable("order_status", {
+	id: text("id").primaryKey(),
+	name: text("name").notNull().unique(),
+	slug: text("slug").notNull().unique(),
+	description: text("description"),
+	color: text("color").notNull().default("#6b7280"), // hex color for UI display
+	icon: text("icon").default("Package"), // lucide icon name
+	isDefault: boolean("is_default").notNull().default(false), // for new orders
+	isActive: boolean("is_active").notNull().default(true),
+	sortOrder: integer("sort_order").notNull().default(0),
 	createdAt: timestamp("createdAt").notNull().defaultNow(),
 	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
@@ -107,7 +122,9 @@ export const order = pgTable("order", {
 	customerName: text("customerName").notNull(),
 	customerEmail: text("customerEmail").notNull(),
 	customerPhone: text("customerPhone"),
-	status: text("status").notNull().default("pending"), // pending, processing, completed, cancelled
+	statusId: text("statusId")
+		.notNull()
+		.references(() => orderStatus.id, { onDelete: "restrict" }),
 	totalAmount: decimal("totalAmount", { precision: 10, scale: 2 }).notNull(),
 	notes: text("notes"),
 	createdAt: timestamp("createdAt").notNull().defaultNow(),
@@ -196,6 +213,8 @@ export type Subcategory = typeof subcategory.$inferSelect;
 export type NewSubcategory = typeof subcategory.$inferInsert;
 export type Product = typeof product.$inferSelect;
 export type NewProduct = typeof product.$inferInsert;
+export type OrderStatus = typeof orderStatus.$inferSelect;
+export type NewOrderStatus = typeof orderStatus.$inferInsert;
 export type Order = typeof order.$inferSelect;
 export type NewOrder = typeof order.$inferInsert;
 export type OrderItem = typeof orderItem.$inferSelect;

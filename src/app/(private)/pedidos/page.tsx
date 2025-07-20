@@ -9,7 +9,7 @@ import {
 import { redirect } from "next/navigation";
 import { DashboardHeader } from "@/components/dashboard-header";
 import { OrderCreationSheet } from "@/components/order-creation-sheet";
-import { OrdersTable } from "@/components/orders-table";
+import { OrdersTableWrapper } from "@/components/orders-table-wrapper";
 import { Badge } from "@/components/ui/badge";
 import {
 	Card,
@@ -19,24 +19,27 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { getOrderStats, getOrders } from "@/lib/actions/order";
+import { getOrderStatuses } from "@/lib/actions/order-status";
 import { getUserProfile } from "@/lib/actions/user";
 import { getCurrentUser } from "@/lib/auth-server";
 
 export default async function PedidosPage() {
-	const [ordersResult, statsResult] = await Promise.all([
+	const [ordersResult, statsResult, statusesResult] = await Promise.all([
 		getOrders(),
 		getOrderStats(),
+		getOrderStatuses(),
 	]);
 
-	if (ordersResult.error || statsResult.error) {
+	if (ordersResult.error || statsResult.error || statusesResult.error) {
 		console.error(
-			"Error loading orders or stats:",
-			ordersResult.error || statsResult.error,
+			"Error loading orders, stats, or statuses:",
+			ordersResult.error || statsResult.error || statusesResult.error,
 		);
 		// Don't redirect, show empty state instead
 	}
 
 	const orders = ordersResult.data || [];
+	const orderStatuses = statusesResult.data || [];
 	const stats = statsResult.data || {
 		totalOrders: 0,
 		pendingOrders: 0,
@@ -141,7 +144,7 @@ export default async function PedidosPage() {
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<OrdersTable orders={orders} />
+					<OrdersTableWrapper orders={orders} orderStatuses={orderStatuses} />
 				</CardContent>
 			</Card>
 		</>

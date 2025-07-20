@@ -3,12 +3,14 @@
 import { and, desc, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { getDefaultOrderStatus } from "@/lib/actions/order-status";
 import { getCurrentUser } from "@/lib/auth-server";
 import { db } from "@/lib/db";
 import {
 	category,
 	order,
 	orderItem,
+	orderStatus,
 	product,
 	subcategory,
 	user,
@@ -31,13 +33,12 @@ const createOrderSchema = z.object({
 	customerPhone: z.string().optional(),
 	notes: z.string().optional(),
 	items: z.array(orderItemSchema).min(1, "Pelo menos um item é obrigatório"),
+	statusId: z.string().optional(),
 });
 
 const updateOrderStatusSchema = z.object({
 	id: z.string().min(1, "ID do pedido é obrigatório"),
-	status: z.enum(["pending", "processing", "completed", "cancelled"], {
-		errorMap: () => ({ message: "Status inválido" }),
-	}),
+	statusId: z.string().min(1, "Status é obrigatório"),
 });
 
 const updateOrderSchema = z.object({
@@ -47,11 +48,7 @@ const updateOrderSchema = z.object({
 	customerPhone: z.string().optional(),
 	notes: z.string().optional(),
 	items: z.array(orderItemSchema).min(1, "Pelo menos um item é obrigatório"),
-	status: z
-		.enum(["pending", "processing", "completed", "cancelled"], {
-			errorMap: () => ({ message: "Status inválido" }),
-		})
-		.optional(),
+	statusId: z.string().min(1, "Status é obrigatório").optional(),
 });
 
 // Generate order number
@@ -77,13 +74,16 @@ export async function getOrders() {
 				customerName: order.customerName,
 				customerEmail: order.customerEmail,
 				customerPhone: order.customerPhone,
-				status: order.status,
+				statusId: order.statusId,
+				statusName: orderStatus.name,
+				statusColor: orderStatus.color,
 				totalAmount: order.totalAmount,
 				notes: order.notes,
 				createdAt: order.createdAt,
 				updatedAt: order.updatedAt,
 			})
 			.from(order)
+			.leftJoin(orderStatus, eq(order.statusId, orderStatus.id))
 			.where(eq(order.userId, currentUser.id))
 			.orderBy(desc(order.createdAt));
 
@@ -110,13 +110,16 @@ export async function getOrderById(orderId: string) {
 				customerName: order.customerName,
 				customerEmail: order.customerEmail,
 				customerPhone: order.customerPhone,
-				status: order.status,
+				statusId: order.statusId,
+				statusName: orderStatus.name,
+				statusColor: orderStatus.color,
 				totalAmount: order.totalAmount,
 				notes: order.notes,
 				createdAt: order.createdAt,
 				updatedAt: order.updatedAt,
 			})
 			.from(order)
+			.leftJoin(orderStatus, eq(order.statusId, orderStatus.id))
 			.where(and(eq(order.id, orderId), eq(order.userId, currentUser.id)))
 			.limit(1);
 
@@ -166,13 +169,19 @@ export async function createOrder(data: z.infer<typeof createOrderSchema>) {
 
 		const validatedData = createOrderSchema.parse(data);
 
+		// Use provided status or get default
+		let statusId = validatedData.statusId;
+
+		if (!statusId) {
+			const defaultStatusResult = await getDefaultOrderStatus();
+			if (defaultStatusResult.error || !defaultStatusResult.data) {
+				return { error: "Erro ao buscar status padrão" };
+			}
+			statusId = defaultStatusResult.data.id;
+		}
+
 		// Validate products exist and have sufficient stock
 		const productIds = validatedData.items.map((item) => item.productId);
-		const products = await db
-			.select()
-			.from(product)
-			.where(eq(product.id, productIds[0])); // We'll validate all products
-
 		const allProducts = await db.select().from(product);
 
 		const productsMap = new Map(allProducts.map((p) => [p.id, p]));
@@ -205,7 +214,7 @@ export async function createOrder(data: z.infer<typeof createOrderSchema>) {
 				customerName: validatedData.customerName,
 				customerEmail: validatedData.customerEmail,
 				customerPhone: validatedData.customerPhone || null,
-				status: "pending",
+				statusId: statusId,
 				totalAmount: totalAmount.toString(),
 				notes: validatedData.notes || null,
 				createdAt: new Date(),
@@ -248,36 +257,36 @@ export async function createOrder(data: z.infer<typeof createOrderSchema>) {
 					orderNumber: newOrder[0].orderNumber,
 					customerName: validatedData.customerName,
 					totalAmount: totalAmount,
-					items: validatedData.items.map((item) => ({
-						name: productsMap.get(item.productId)?.name || "Produto",
-						quantity: item.quantity,
-						price: parseFloat(item.unitPrice),
-					})),
+					items: validatedData.items.map((item) => {
+						const productData = productsMap.get(item.productId);
+						return {
+							productName: productData?.name || "Produto",
+							quantity: item.quantity,
+							unitPrice: item.unitPrice,
+							totalPrice: (
+								parseFloat(item.unitPrice) * item.quantity
+							).toString(),
+						};
+					}),
 				},
 			});
 		} catch (emailError) {
-			console.error("Failed to queue order confirmation email:", emailError);
+			console.error("Erro ao enviar email de confirmação:", emailError);
 			// Don't fail the order creation if email fails
 		}
 
-		revalidatePath("/pedidos");
-		revalidatePath("/produtos");
-		return {
-			success: "Pedido criado com sucesso!",
-			data: newOrder[0],
-		};
-	} catch (error) {
-		console.error("Erro ao criar pedido:", error);
+		revalidatePath("/orders");
+		return { success: "Pedido criado com sucesso!" };
+	} catch (error: unknown) {
 		if (error instanceof z.ZodError) {
-			return {
-				error: error.errors[0]?.message || "Dados inválidos fornecidos",
-			};
+			return { error: error.errors[0].message };
 		}
+		console.error("Erro ao criar pedido:", error);
 		return { error: "Erro interno do servidor" };
 	}
 }
 
-// Update an existing order
+// Update order
 export async function updateOrder(data: z.infer<typeof updateOrderSchema>) {
 	try {
 		const currentUser = await getCurrentUser();
@@ -287,7 +296,7 @@ export async function updateOrder(data: z.infer<typeof updateOrderSchema>) {
 
 		const validatedData = updateOrderSchema.parse(data);
 
-		// Check if order exists and belongs to current user
+		// Get existing order
 		const existingOrder = await db
 			.select()
 			.from(order)
@@ -300,15 +309,10 @@ export async function updateOrder(data: z.infer<typeof updateOrderSchema>) {
 			return { error: "Pedido não encontrado" };
 		}
 
-		// Don't allow updating completed or cancelled orders
-		if (
-			existingOrder[0].status === "completed" ||
-			existingOrder[0].status === "cancelled"
-		) {
-			return {
-				error: "Não é possível editar pedidos concluídos ou cancelados",
-			};
-		}
+		// Validate products exist and have sufficient stock
+		const productIds = validatedData.items.map((item) => item.productId);
+		const allProducts = await db.select().from(product);
+		const productsMap = new Map(allProducts.map((p) => [p.id, p]));
 
 		// Get existing order items to restore stock
 		const existingItems = await db
@@ -316,80 +320,62 @@ export async function updateOrder(data: z.infer<typeof updateOrderSchema>) {
 			.from(orderItem)
 			.where(eq(orderItem.orderId, validatedData.id));
 
-		// Restore stock for existing items
-		for (const item of existingItems) {
-			const productData = await db
-				.select()
-				.from(product)
-				.where(eq(product.id, item.productId))
-				.limit(1);
+		// Calculate stock changes
+		const stockChanges = new Map<string, number>();
 
-			if (productData.length > 0) {
-				await db
-					.update(product)
-					.set({
-						stock: productData[0].stock + item.quantity,
-						updatedAt: new Date(),
-					})
-					.where(eq(product.id, item.productId));
-			}
+		// Restore stock from existing items
+		for (const item of existingItems) {
+			stockChanges.set(
+				item.productId,
+				(stockChanges.get(item.productId) || 0) + item.quantity,
+			);
 		}
 
-		// Validate new products and stock
-		const allProducts = await db.select().from(product);
-		const productsMap = new Map(allProducts.map((p) => [p.id, p]));
-
+		// Subtract stock for new items
 		for (const item of validatedData.items) {
-			const productData = productsMap.get(item.productId);
+			stockChanges.set(
+				item.productId,
+				(stockChanges.get(item.productId) || 0) - item.quantity,
+			);
+		}
+
+		// Validate stock availability
+		for (const [productId, stockChange] of stockChanges) {
+			const productData = productsMap.get(productId);
 			if (!productData) {
-				return { error: `Produto ${item.productId} não encontrado` };
+				return { error: `Produto ${productId} não encontrado` };
 			}
-			if (productData.stock < item.quantity) {
+			if (productData.stock + stockChange < 0) {
 				return {
 					error: `Estoque insuficiente para o produto ${productData.name}`,
 				};
 			}
 		}
 
-		// Calculate new total amount
+		// Calculate total amount
 		const totalAmount = validatedData.items.reduce((sum, item) => {
 			return sum + parseFloat(item.unitPrice) * item.quantity;
 		}, 0);
 
+		// Update order
+		await db
+			.update(order)
+			.set({
+				customerName: validatedData.customerName,
+				customerEmail: validatedData.customerEmail,
+				customerPhone: validatedData.customerPhone || null,
+				statusId: validatedData.statusId || existingOrder[0].statusId,
+				totalAmount: totalAmount.toString(),
+				notes: validatedData.notes || null,
+				updatedAt: new Date(),
+			})
+			.where(eq(order.id, validatedData.id));
+
 		// Delete existing order items
 		await db.delete(orderItem).where(eq(orderItem.orderId, validatedData.id));
 
-		// Update order
-		const updateData: any = {
-			customerName: validatedData.customerName,
-			customerEmail: validatedData.customerEmail,
-			customerPhone: validatedData.customerPhone || null,
-			notes: validatedData.notes || null,
-			totalAmount: totalAmount.toString(),
-			updatedAt: new Date(),
-		};
-
-		// Handle status change if provided
-		if (validatedData.status) {
-			// If cancelling order, restore product stock
-			if (
-				validatedData.status === "cancelled" &&
-				existingOrder[0].status !== "cancelled"
-			) {
-				// Stock was already restored when we deleted existing items above
-				// No additional stock restoration needed
-			}
-			updateData.status = validatedData.status;
-		}
-
-		const updatedOrder = await db
-			.update(order)
-			.set(updateData)
-			.where(eq(order.id, validatedData.id))
-			.returning();
-
 		// Create new order items
-		const orderItems = validatedData.items.map((item) => ({
+		const newOrderItems = validatedData.items.map((item) => ({
 			id: crypto.randomUUID(),
 			orderId: validatedData.id,
 			productId: item.productId,
@@ -400,37 +386,64 @@ export async function updateOrder(data: z.infer<typeof updateOrderSchema>) {
 			updatedAt: new Date(),
 		}));
 
-		await db.insert(orderItem).values(orderItems);
+		await db.insert(orderItem).values(newOrderItems);
 
-		// Update product stock for new items
-		for (const item of validatedData.items) {
-			const productData = productsMap.get(item.productId);
-			if (productData) {
+		// Update stock for all affected products
+		for (const [productId, stockChange] of stockChanges) {
+			if (stockChange !== 0) {
 				await db
 					.update(product)
 					.set({
-						stock: productData.stock - item.quantity,
+						stock: sql`${product.stock} + ${stockChange}`,
 						updatedAt: new Date(),
 					})
-					.where(eq(product.id, item.productId));
+					.where(eq(product.id, productId));
 			}
 		}
 
-		revalidatePath("/pedidos");
-		revalidatePath("/produtos");
-		return { data: updatedOrder[0], success: "Pedido atualizado com sucesso" };
-	} catch (error) {
-		console.error("Erro ao atualizar pedido:", error);
-		if (error instanceof z.ZodError) {
-			return {
-				error: error.errors[0]?.message || "Dados inválidos fornecidos",
-			};
+		// Queue order update email if status changed
+		if (
+			validatedData.statusId &&
+			validatedData.statusId !== existingOrder[0].statusId
+		) {
+			try {
+				const statusData = await db
+					.select()
+					.from(orderStatus)
+					.where(eq(orderStatus.id, validatedData.statusId))
+					.limit(1);
+
+				if (statusData.length > 0) {
+					await enqueueEmailJob({
+						type: "order-update",
+						userId: currentUser.id,
+						email: validatedData.customerEmail,
+						data: {
+							orderNumber: existingOrder[0].orderNumber,
+							customerName: validatedData.customerName,
+							newStatus: statusData[0].name,
+							totalAmount: totalAmount,
+						},
+					});
+				}
+			} catch (emailError) {
+				console.error("Erro ao enviar email de atualização:", emailError);
+				// Don't fail the order update if email fails
+			}
 		}
+
+		revalidatePath("/orders");
+		return { success: "Pedido atualizado com sucesso!" };
+	} catch (error: unknown) {
+		if (error instanceof z.ZodError) {
+			return { error: error.errors[0].message };
+		}
+		console.error("Erro ao atualizar pedido:", error);
 		return { error: "Erro interno do servidor" };
 	}
 }
 
-// Update order status
+// Update order status only
 export async function updateOrderStatus(
 	data: z.infer<typeof updateOrderStatusSchema>,
 ) {
@@ -442,9 +455,16 @@ export async function updateOrderStatus(
 
 		const validatedData = updateOrderStatusSchema.parse(data);
 
-		// Check if order exists and belongs to current user
+		// Get existing order
 		const existingOrder = await db
-			.select()
+			.select({
+				id: order.id,
+				orderNumber: order.orderNumber,
+				customerName: order.customerName,
+				customerEmail: order.customerEmail,
+				statusId: order.statusId,
+				totalAmount: order.totalAmount,
+			})
 			.from(order)
 			.where(
 				and(eq(order.id, validatedData.id), eq(order.userId, currentUser.id)),
@@ -455,56 +475,98 @@ export async function updateOrderStatus(
 			return { error: "Pedido não encontrado" };
 		}
 
-		// If cancelling order, restore product stock
-		if (
-			validatedData.status === "cancelled" &&
-			existingOrder[0].status !== "cancelled"
-		) {
-			const items = await db
-				.select()
-				.from(orderItem)
-				.where(eq(orderItem.orderId, validatedData.id));
+		const currentOrder = existingOrder[0];
 
-			for (const item of items) {
-				const productData = await db
+		// Update order status
+		await db
+			.update(order)
+			.set({
+				statusId: validatedData.statusId,
+				updatedAt: new Date(),
+			})
+			.where(eq(order.id, validatedData.id));
+
+		// Queue order update email if status changed
+		if (validatedData.statusId !== currentOrder.statusId) {
+			try {
+				const statusData = await db
 					.select()
-					.from(product)
-					.where(eq(product.id, item.productId))
+					.from(orderStatus)
+					.where(eq(orderStatus.id, validatedData.statusId))
 					.limit(1);
 
-				if (productData.length > 0) {
-					await db
-						.update(product)
-						.set({
-							stock: productData[0].stock + item.quantity,
-							updatedAt: new Date(),
-						})
-						.where(eq(product.id, item.productId));
+				if (statusData.length > 0) {
+					await enqueueEmailJob({
+						type: "order-update",
+						userId: currentUser.id,
+						email: currentOrder.customerEmail,
+						data: {
+							orderNumber: currentOrder.orderNumber,
+							customerName: currentOrder.customerName,
+							newStatus: statusData[0].name,
+							totalAmount: parseFloat(currentOrder.totalAmount),
+						},
+					});
 				}
+			} catch (emailError) {
+				console.error("Erro ao enviar email de atualização:", emailError);
+				// Don't fail the status update if email fails
 			}
 		}
 
-		const updatedOrder = await db
-			.update(order)
-			.set({
-				status: validatedData.status,
-				updatedAt: new Date(),
-			})
-			.where(eq(order.id, validatedData.id))
+		revalidatePath("/orders");
+		return { success: "Status do pedido atualizado com sucesso!" };
+	} catch (error: unknown) {
+		if (error instanceof z.ZodError) {
+			return { error: error.errors[0].message };
+		}
+		console.error("Erro ao atualizar status do pedido:", error);
+		return { error: "Erro interno do servidor" };
+	}
+}
+
+// Delete order
+export async function deleteOrder(orderId: string) {
+	try {
+		const currentUser = await getCurrentUser();
+		if (!currentUser) {
+			return { error: "Usuário não autenticado" };
+		}
+
+		// Get order items to restore stock
+		const orderItems = await db
+			.select()
+			.from(orderItem)
+			.where(eq(orderItem.orderId, orderId));
+
+		// Delete order items first
+		await db.delete(orderItem).where(eq(orderItem.orderId, orderId));
+
+		// Delete order
+		const result = await db
+			.delete(order)
+			.where(and(eq(order.id, orderId), eq(order.userId, currentUser.id)))
 			.returning();
 
-		revalidatePath("/pedidos");
-		return {
-			data: updatedOrder[0],
-			success: "Status do pedido atualizado com sucesso",
-		};
-	} catch (error) {
-		console.error("Erro ao atualizar status do pedido:", error);
-		if (error instanceof z.ZodError) {
-			return {
-				error: error.errors[0]?.message || "Dados inválidos fornecidos",
-			};
+		if (!result.length) {
+			return { error: "Pedido não encontrado" };
 		}
+
+		// Restore stock for all items
+		for (const item of orderItems) {
+			await db
+				.update(product)
+				.set({
+					stock: sql`${product.stock} + ${item.quantity}`,
+					updatedAt: new Date(),
+				})
+				.where(eq(product.id, item.productId));
+		}
+
+		revalidatePath("/orders");
+		return { success: "Pedido deletado com sucesso!" };
+	} catch (error) {
+		console.error("Erro ao deletar pedido:", error);
 		return { error: "Erro interno do servidor" };
 	}
 }
@@ -519,7 +581,7 @@ export async function getOrderStats() {
 
 		const orders = await db
 			.select({
-				status: order.status,
+				statusId: order.statusId,
 				totalAmount: order.totalAmount,
 				createdAt: order.createdAt,
 			})
@@ -528,12 +590,13 @@ export async function getOrderStats() {
 
 		const stats = {
 			totalOrders: orders.length,
-			pendingOrders: orders.filter((o) => o.status === "pending").length,
-			processingOrders: orders.filter((o) => o.status === "processing").length,
-			completedOrders: orders.filter((o) => o.status === "completed").length,
-			cancelledOrders: orders.filter((o) => o.status === "cancelled").length,
+			pendingOrders: orders.filter((o) => o.statusId === "pending").length,
+			processingOrders: orders.filter((o) => o.statusId === "processing")
+				.length,
+			completedOrders: orders.filter((o) => o.statusId === "completed").length,
+			cancelledOrders: orders.filter((o) => o.statusId === "cancelled").length,
 			totalRevenue: orders
-				.filter((o) => o.status === "completed")
+				.filter((o) => o.statusId === "completed")
 				.reduce((sum, o) => sum + parseFloat(o.totalAmount), 0),
 		};
 

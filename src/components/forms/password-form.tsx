@@ -121,7 +121,15 @@ export function PasswordForm({ hasPassword }: PasswordFormProps) {
 
 					<Form {...changePasswordForm}>
 						<form
-							onSubmit={changePasswordForm.handleSubmit(onChangePasswordSubmit)}
+							onSubmit={changePasswordForm.handleSubmit(
+								onChangePasswordSubmit,
+								(errors) => {
+									console.error("Form validation errors:", errors);
+									toast.error(
+										"Por favor, verifique os campos destacados e tente novamente.",
+									);
+								},
+							)}
 							className="space-y-6 "
 						>
 							<div className="max-w-md">
@@ -204,7 +212,15 @@ export function PasswordForm({ hasPassword }: PasswordFormProps) {
 
 				<Form {...setPasswordForm}>
 					<form
-						onSubmit={setPasswordForm.handleSubmit(onSetPasswordSubmit)}
+						onSubmit={setPasswordForm.handleSubmit(
+							onSetPasswordSubmit,
+							(errors) => {
+								console.error("Form validation errors:", errors);
+								toast.error(
+									"Por favor, verifique os campos destacados e tente novamente.",
+								);
+							},
+						)}
 						className="space-y-6"
 					>
 						<div className="max-w-md space-y-6">

@@ -198,7 +198,7 @@ export function ProductsTable({ products }: ProductsTableProps) {
 													<Edit className="mr-2 h-4 w-4" />
 													Editar
 												</DropdownMenuItem>
-												<DropdownMenuItem className="text-destructive">
+												<DropdownMenuItem>
 													<Trash2 className="mr-2 h-4 w-4" />
 													Deletar
 												</DropdownMenuItem>
