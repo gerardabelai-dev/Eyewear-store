@@ -88,11 +88,11 @@ export const product = pgTable("product", {
 	price: decimal("price", { precision: 10, scale: 2 }).notNull(),
 	stock: integer("stock").notNull().default(0),
 	status: text("status").notNull().default("active"), // active, inactive, draft, discontinued
-	categoryId: text("categoryId")
-		.notNull()
-		.references(() => category.id, { onDelete: "restrict" }),
+	categoryId: text("categoryId").references(() => category.id, {
+		onDelete: "set null",
+	}),
 	subcategoryId: text("subcategoryId").references(() => subcategory.id, {
-		onDelete: "restrict",
+		onDelete: "set null",
 	}),
 	images: json("images").$type<string[]>().default([]),
 	createdAt: timestamp("createdAt").notNull().defaultNow(),

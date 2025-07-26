@@ -1,5 +1,7 @@
+import "server-only";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { admin, bearer, openAPI } from "better-auth/plugins";
 import { db } from "./db";
 import * as schema from "./db/schema";
 import { serverEnv } from "./env";
@@ -8,25 +10,17 @@ import { enqueueEmailJob } from "./qstash";
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
 		provider: "pg",
-		schema: schema,
 	}),
 	emailAndPassword: {
 		enabled: true,
 		requireEmailVerification: false,
-		async sendResetPassword(data: any, _request: any) {
-			// Queue password reset email job
-			try {
-				await enqueueEmailJob({
-					type: "password-reset",
-					email: data.email,
-					data: {
-						resetUrl: data.url,
-					},
-				});
-				console.log("Password reset email queued for:", data.email);
-			} catch (error) {
-				console.error("Failed to queue password reset email:", error);
-			}
+	},
+	session: {
+		expiresIn: 60 * 60 * 24 * 7, // 7 days
+		updateAge: 60 * 60 * 24, // 1 day
+		cookieCache: {
+			enabled: true,
+			maxAge: 5 * 60 * 1000, // 5 minutes
 		},
 	},
 	socialProviders: {
@@ -37,6 +31,16 @@ export const auth = betterAuth({
 	},
 	baseURL: serverEnv.NEXT_PUBLIC_APP_URL,
 	trustedOrigins: [serverEnv.NEXT_PUBLIC_APP_URL],
+	plugins: [
+		admin(),
+		bearer(),
+		openAPI({
+			path: "/api/auth/reference",
+			output: {
+				file: "./auth-schema.json",
+			},
+		}),
+	],
 	user: {
 		additionalFields: {
 			firstName: {

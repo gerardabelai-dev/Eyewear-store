@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -78,7 +79,7 @@ function SignIn() {
 						const message = "Bem-vindo de volta!";
 						if (globalToastTracker.canShowToast(message)) {
 							toast.success(message);
-							router.push("/account");
+							router.push("/produtos");
 						}
 					},
 					onError: (ctx) => {
@@ -282,6 +283,15 @@ function SignIn() {
 					</Button>
 				</CardContent>
 			</Card>
+
+			<div className="text-center mt-4">
+				<p className="text-sm text-muted-foreground">
+					Não tem uma conta?{" "}
+					<Link href="/auth/sign-up" className="text-primary hover:underline">
+						Criar conta
+					</Link>
+				</p>
+			</div>
 		</div>
 	);
 }

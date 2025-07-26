@@ -18,6 +18,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import type { NotificationPreferences } from "@/lib/notifications/types";
 
@@ -183,11 +184,14 @@ function UnsubscribePageContent() {
 	if (isLoading) {
 		return (
 			<div className="min-h-screen bg-background flex items-center justify-center">
-				<div className="text-center">
-					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-					<p className="text-muted-foreground">
-						Carregando suas preferências...
-					</p>
+				<div className="text-center space-y-4">
+					<div className="flex justify-center mb-6">
+						<Skeleton className="h-12 w-48" />
+					</div>
+					<div className="space-y-2">
+						<Skeleton className="h-6 w-64 mx-auto" />
+						<Skeleton className="h-4 w-48 mx-auto" />
+					</div>
 				</div>
 			</div>
 		);
@@ -198,7 +202,7 @@ function UnsubscribePageContent() {
 			<div className="min-h-screen bg-background flex items-center justify-center p-4">
 				<Card className="max-w-md w-full">
 					<CardHeader className="text-center">
-						<AppLogo size="lg" />
+						<AppLogo size="md" />
 						<CardTitle className="text-destructive">Erro</CardTitle>
 					</CardHeader>
 					<CardContent className="text-center">
@@ -222,7 +226,7 @@ function UnsubscribePageContent() {
 			<div className="max-w-2xl mx-auto p-4">
 				{/* Header */}
 				<div className="text-center mb-8">
-					<AppLogo size="xl" className="justify-center mb-4" />
+					<AppLogo size="md" className="justify-center mb-4" />
 					<h1 className="text-3xl font-bold text-foreground mb-2">
 						Preferências de Notificação
 					</h1>
@@ -230,7 +234,7 @@ function UnsubscribePageContent() {
 						Gerencie como e quando você deseja receber nossas comunicações
 					</p>
 					{tokenData?.email && (
-						<Badge variant="outline" className="mt-2">
+						<Badge variant="vibrant" className="mt-2">
 							{tokenData.email}
 						</Badge>
 					)}
@@ -238,13 +242,13 @@ function UnsubscribePageContent() {
 
 				{/* Success message */}
 				{success && (
-					<div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
+					<div className="bg-vibrant/10 border border-vibrant/20 rounded-lg p-4 mb-6">
 						<div className="flex items-center">
 							<div className="flex-shrink-0">
-								<span className="text-primary text-xl">✓</span>
+								<span className="text-vibrant text-xl">✓</span>
 							</div>
 							<div className="ml-3">
-								<p className="text-primary">
+								<p className="text-vibrant font-medium">
 									Suas preferências foram atualizadas com sucesso!
 								</p>
 							</div>
@@ -498,12 +502,12 @@ export default function UnsubscribePage() {
 					<Card className="w-full max-w-2xl">
 						<CardHeader className="text-center">
 							<div className="flex justify-center mb-4">
-								<AppLogo />
+								<Skeleton className="h-12 w-48" />
 							</div>
-							<CardTitle>Carregando...</CardTitle>
-							<CardDescription>
-								Processando sua solicitação de cancelamento de inscrição.
-							</CardDescription>
+							<div className="space-y-2">
+								<Skeleton className="h-6 w-32 mx-auto" />
+								<Skeleton className="h-4 w-80 mx-auto" />
+							</div>
 						</CardHeader>
 					</Card>
 				</div>

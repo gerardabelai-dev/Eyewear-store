@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Mail } from "lucide-react";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -98,7 +99,14 @@ export function EmailForm({ email: initialEmail }: EmailFormProps) {
 
 						<div className="flex justify-end pt-2">
 							<Button type="submit" disabled={isPending}>
-								{isPending ? "Atualizando..." : "Atualizar Email"}
+								{isPending ? (
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										Atualizando
+									</>
+								) : (
+									"Atualizar Email"
+								)}
 							</Button>
 						</div>
 					</form>

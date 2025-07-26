@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
 	AlertCircleIcon,
 	ImageIcon,
+	Loader2,
 	Package,
 	UploadIcon,
 	XIcon,
@@ -25,6 +26,7 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
+import { GenericDeleteDialog } from "@/components/ui/generic-delete-dialog";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { Input } from "@/components/ui/input";
 import { SearchableSelect } from "@/components/ui/searchable-select";
@@ -41,7 +43,11 @@ import {
 	getCategories,
 	getSubcategoriesByCategory,
 } from "@/lib/actions/category";
-import { createProduct, updateProduct } from "@/lib/actions/product";
+import {
+	createProduct,
+	deleteProduct,
+	updateProduct,
+} from "@/lib/actions/product";
 import type { Category, Product, Subcategory } from "@/lib/db/schema";
 
 const productFormSchema = z.object({
@@ -282,6 +288,8 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 	const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
 	const [showCategoryCreation, setShowCategoryCreation] = useState(false);
 	const [showSubcategoryCreation, setShowSubcategoryCreation] = useState(false);
+	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+	const [isDeleting, setIsDeleting] = useState(false);
 	const isEditing = !!product;
 
 	const form = useForm({
@@ -373,6 +381,27 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 			setIsSubmitting(false);
 		}
 	}
+
+	const handleDelete = async () => {
+		if (!product) return;
+
+		setIsDeleting(true);
+		try {
+			const result = await deleteProduct(product.id);
+			if (result.error) {
+				toast.error(result.error);
+			} else {
+				toast.success("Produto excluído com sucesso!");
+				onSuccess?.();
+			}
+		} catch (error) {
+			console.error("Error deleting product:", error);
+			toast.error("Erro ao excluir produto");
+		} finally {
+			setIsDeleting(false);
+			setShowDeleteDialog(false);
+		}
+	};
 
 	return (
 		<>
@@ -544,16 +573,51 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 						disabled={isSubmitting || isImageUploading}
 						className="w-full"
 					>
-						{isSubmitting
-							? isEditing
-								? "Atualizando produto..."
-								: "Criando produto..."
-							: isEditing
-								? "Atualizar Produto"
-								: "Criar Produto"}
+						{isSubmitting ? (
+							<>
+								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+								{isEditing ? "Atualizando produto" : "Criando produto"}
+							</>
+						) : isEditing ? (
+							"Atualizar Produto"
+						) : (
+							"Criar Produto"
+						)}
 					</Button>
+
+					{/* Delete button for editing mode */}
+					{isEditing && product && (
+						<>
+							<Separator />
+							<div className="pt-2">
+								<Button
+									type="button"
+									variant="destructive"
+									className="w-full"
+									onClick={() => setShowDeleteDialog(true)}
+									disabled={isSubmitting || isImageUploading || isDeleting}
+								>
+									Deletar Produto
+								</Button>
+							</div>
+						</>
+					)}
 				</form>
 			</Form>
+
+			{/* Delete Confirmation Dialog */}
+			{isEditing && product && (
+				<GenericDeleteDialog
+					open={showDeleteDialog}
+					onOpenChange={setShowDeleteDialog}
+					itemId={product.id}
+					itemName={product.name}
+					itemType="produto"
+					onConfirm={handleDelete}
+					isLoading={isDeleting}
+				/>
+			)}
+
 			{showCategoryCreation && (
 				<Drawer
 					trigger={<button type="button" style={{ display: "none" }}></button>}

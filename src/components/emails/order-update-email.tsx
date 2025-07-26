@@ -66,8 +66,8 @@ export function OrderUpdateEmail({
 
 	return (
 		<EmailLayout
-			preview={`Pedido #${orderNumber} - Status: ${config.title}. ${message || config.description}`}
-			title={`Atualização do Pedido - DrVista`}
+			preview={`Pedido #${orderNumber} - ${config.title}`}
+			title={`Atualização do Pedido - Dr. Vista`}
 			unsubscribeUrl={unsubscribeUrl}
 			footerVariant="full"
 		>

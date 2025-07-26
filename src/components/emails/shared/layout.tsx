@@ -19,7 +19,7 @@ interface EmailLayoutProps {
 export function EmailLayout({
 	children,
 	preview,
-	title = "DrVista",
+	title = "Dr. Vista",
 	lang = "pt-BR",
 	unsubscribeUrl,
 	userEmail,

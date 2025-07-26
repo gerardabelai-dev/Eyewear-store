@@ -2,6 +2,7 @@ import { AlertTriangle, Package, Package2, TrendingUp } from "lucide-react";
 import { redirect } from "next/navigation";
 import { ProductCreationSheet } from "@/components/product-creation-sheet";
 import { ProductsTableWrapper } from "@/components/products-table-wrapper";
+import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import {
 	Card,
@@ -29,15 +30,11 @@ export default async function ProdutosPage() {
 	return (
 		<>
 			{/* Page Header */}
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-				<div>
-					<h1 className="text-2xl font-bold tracking-tight">Produtos</h1>
-					<p className="text-muted-foreground">
-						Gerencie seus produtos e estoque
-					</p>
-				</div>
-				<ProductCreationSheet />
-			</div>
+			<PageHeader
+				title="Produtos"
+				description="Gerencie seus produtos e estoque"
+				action={<ProductCreationSheet />}
+			/>
 
 			{/* Statistics Cards */}
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

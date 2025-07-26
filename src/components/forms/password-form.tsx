@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff, Loader2, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
@@ -178,7 +179,14 @@ export function PasswordForm({ hasPassword }: PasswordFormProps) {
 
 							<div className="flex justify-end pt-2">
 								<Button type="submit" disabled={isPending}>
-									{isPending ? "Alterando..." : "Alterar Senha"}
+									{isPending ? (
+										<>
+											<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+											Alterando
+										</>
+									) : (
+										"Alterar Senha"
+									)}
 								</Button>
 							</div>
 						</form>
@@ -245,7 +253,14 @@ export function PasswordForm({ hasPassword }: PasswordFormProps) {
 
 						<div className="flex justify-end pt-2">
 							<Button type="submit" disabled={isPending}>
-								{isPending ? "Definindo..." : "Definir Senha"}
+								{isPending ? (
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										Definindo
+									</>
+								) : (
+									"Definir Senha"
+								)}
 							</Button>
 						</div>
 					</form>

@@ -1,4 +1,4 @@
-# DrVista Admin - Sistema de Gestão com Pedidos
+# Dr. Vista - Sistema de Gestão com Pedidos
 
 Sistema administrativo moderno com autenticação segura, gestão de produtos e **sistema completo de pedidos** usando Next.js, TypeScript, Drizzle ORM e Better Auth.
 

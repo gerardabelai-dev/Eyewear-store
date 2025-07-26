@@ -1,3 +1,4 @@
+import "server-only";
 import { Client } from "@upstash/qstash";
 import { serverEnv } from "./env";
 

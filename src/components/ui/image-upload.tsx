@@ -38,7 +38,7 @@ export function ImageUpload({
 			setUploading(true);
 			onUploadingChange?.(true);
 			const uploadPromises = acceptedFiles.map(async (file) => {
-				const result = await uploadFileToBlob(file);
+				const result = await uploadFileToBlob(file, "products");
 				if (result.success && result.data) {
 					return result.data.url;
 				} else {

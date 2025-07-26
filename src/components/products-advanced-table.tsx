@@ -19,12 +19,10 @@ import {
 	ChevronDownIcon,
 	ChevronUpIcon,
 	Edit,
-	ImageOff,
 	MoreHorizontal,
 	SearchIcon,
 	Trash2,
 } from "lucide-react";
-import Image from "next/image";
 import { useId, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +36,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ImagePreviewGroup } from "@/components/ui/image-preview-group";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -78,34 +77,6 @@ interface ProductsAdvancedTableProps {
 	onDeleteProduct?: (product: ProductWithCategory) => void;
 }
 
-// Product Images Component
-function ProductImages({ images }: { images: string[] }) {
-	if (!images || images.length === 0) {
-		return (
-			<div className="flex h-12 w-12 items-center justify-center rounded-md bg-muted">
-				<ImageOff className="h-6 w-6 text-muted-foreground" />
-			</div>
-		);
-	}
-
-	return (
-		<div className="relative h-12 w-12 overflow-hidden rounded-md">
-			<Image
-				src={images[0]}
-				alt="Produto"
-				className="h-full w-full object-cover"
-				width={48}
-				height={48}
-			/>
-			{images.length > 1 && (
-				<div className="absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium">
-					{images.length}
-				</div>
-			)}
-		</div>
-	);
-}
-
 // Helper functions
 function getStockStatus(stock: number) {
 	if (stock === 0) {
@@ -136,7 +107,9 @@ const columns: ColumnDef<ProductWithCategory>[] = [
 	{
 		header: "Imagem",
 		accessorKey: "images",
-		cell: ({ row }) => <ProductImages images={row.getValue("images") || []} />,
+		cell: ({ row }) => (
+			<ImagePreviewGroup images={row.getValue("images") || []} />
+		),
 		enableSorting: false,
 	},
 	{
@@ -198,7 +171,11 @@ const columns: ColumnDef<ProductWithCategory>[] = [
 			return (
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" className="h-8 w-8 p-0">
+						<Button
+							variant="ghost"
+							className="h-8 w-8 p-0"
+							onClick={(e) => e.stopPropagation()}
+						>
 							<span className="sr-only">Abrir menu</span>
 							<MoreHorizontal className="h-4 w-4" />
 						</Button>
@@ -206,7 +183,8 @@ const columns: ColumnDef<ProductWithCategory>[] = [
 					<DropdownMenuContent align="end">
 						<DropdownMenuLabel>Ações</DropdownMenuLabel>
 						<DropdownMenuItem
-							onClick={async () => {
+							onClick={async (e) => {
+								e.stopPropagation();
 								try {
 									await navigator.clipboard.writeText(product.id);
 									toast.success("ID do produto copiado!");
@@ -219,7 +197,12 @@ const columns: ColumnDef<ProductWithCategory>[] = [
 							Copiar ID do produto
 						</DropdownMenuItem>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={() => onEditProduct?.(product)}>
+						<DropdownMenuItem
+							onClick={(e) => {
+								e.stopPropagation();
+								onEditProduct?.(product);
+							}}
+						>
 							<Edit className="mr-2 h-4 w-4" />
 							Editar
 						</DropdownMenuItem>
@@ -372,7 +355,8 @@ export function ProductsAdvancedTable({
 								<TableRow
 									key={row.id}
 									data-state={row.getIsSelected() && "selected"}
-									className="hover:bg-muted/50"
+									className="cursor-pointer hover:bg-muted/50"
+									onClick={() => onEditProduct?.(row.original)}
 								>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>

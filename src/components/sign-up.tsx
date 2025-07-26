@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Upload, X } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -392,6 +393,15 @@ function SignUp() {
 					</Button>
 				</CardContent>
 			</Card>
+
+			<div className="text-center mt-4">
+				<p className="text-sm text-muted-foreground">
+					Já tem uma conta?{" "}
+					<Link href="/auth/sign-in" className="text-primary hover:underline">
+						Fazer login
+					</Link>
+				</p>
+			</div>
 		</div>
 	);
 }

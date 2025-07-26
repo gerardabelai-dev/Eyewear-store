@@ -73,10 +73,14 @@ const columns: ColumnDef<Item>[] = [
 					checked={isAllSelected}
 					ref={(el) => {
 						if (el) {
-							el.indeterminate = isSomeSelected && !isAllSelected;
+							(el as any).indeterminate = isSomeSelected && !isAllSelected;
 						}
 					}}
-					onChange={(e) => table.toggleAllPageRowsSelected(!!e.target.checked)}
+					onChange={(e) =>
+						table.toggleAllPageRowsSelected(
+							!!(e.target as HTMLInputElement).checked,
+						)
+					}
 					aria-label="Select all"
 				/>
 			);
@@ -84,7 +88,9 @@ const columns: ColumnDef<Item>[] = [
 		cell: ({ row }) => (
 			<Checkbox
 				checked={row.getIsSelected()}
-				onChange={(e) => row.toggleSelected(!!e.target.checked)}
+				onChange={(e) =>
+					row.toggleSelected(!!(e.target as HTMLInputElement).checked)
+				}
 				aria-label="Select row"
 			/>
 		),

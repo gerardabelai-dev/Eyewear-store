@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
 	Edit,
 	ImageOff,
+	Loader2,
 	MessageSquare,
 	Package,
 	Plus,
@@ -30,10 +31,12 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
+import { GenericDeleteDialog } from "@/components/ui/generic-delete-dialog";
 import { Input } from "@/components/ui/input";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { createOrder, updateOrder } from "@/lib/actions/order";
+import { createOrder, deleteOrder, updateOrder } from "@/lib/actions/order";
 import { getOrderStatuses } from "@/lib/actions/order-status";
 import { getProducts } from "@/lib/actions/product";
 import type { Order, OrderStatus, Product } from "@/lib/db/schema";
@@ -151,6 +154,8 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 	const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 	const [showProductCreation, setShowProductCreation] = useState(false);
 	const [showStatusCreation, setShowStatusCreation] = useState(false);
+	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+	const [isDeleting, setIsDeleting] = useState(false);
 
 	const isEditing = !!order;
 
@@ -432,6 +437,27 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 		}
 
 		console.log("=== ORDER FORM SUBMISSION END ===");
+	};
+
+	const handleDelete = async () => {
+		if (!order) return;
+
+		setIsDeleting(true);
+		try {
+			const result = await deleteOrder(order.id);
+			if (result.error) {
+				toast.error(result.error);
+			} else {
+				toast.success("Pedido excluído com sucesso!");
+				onSuccess?.();
+			}
+		} catch (error) {
+			console.error("Error deleting order:", error);
+			toast.error("Erro ao excluir pedido");
+		} finally {
+			setIsDeleting(false);
+			setShowDeleteDialog(false);
+		}
 	};
 
 	const availableProducts = products.filter((p) => p.stock > 0);
@@ -852,16 +878,51 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 						className="w-full"
 						size="lg"
 					>
-						{isSubmitting
-							? order
-								? "Atualizando pedido..."
-								: "Criando pedido..."
-							: order
-								? "Atualizar Pedido"
-								: "Criar Pedido"}
+						{isSubmitting ? (
+							<>
+								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+								{order ? "Atualizando pedido" : "Criando pedido"}
+							</>
+						) : order ? (
+							"Atualizar Pedido"
+						) : (
+							"Criar Pedido"
+						)}
 					</Button>
+
+					{/* Delete button for editing mode */}
+					{isEditing && order && (
+						<>
+							<Separator />
+							<div className="pt-2">
+								<Button
+									type="button"
+									variant="destructive"
+									className="w-full"
+									onClick={() => setShowDeleteDialog(true)}
+									disabled={isSubmitting || isDeleting}
+								>
+									Deletar Pedido
+								</Button>
+							</div>
+						</>
+					)}
 				</form>
 			</Form>
+
+			{/* Delete Confirmation Dialog */}
+			{isEditing && order && (
+				<GenericDeleteDialog
+					open={showDeleteDialog}
+					onOpenChange={setShowDeleteDialog}
+					itemId={order.id}
+					itemName={`Pedido #${order.id.slice(-8)}`}
+					itemType="pedido"
+					onConfirm={handleDelete}
+					isLoading={isDeleting}
+					warningText="Atenção: Esta ação irá restaurar o estoque dos produtos incluídos no pedido."
+				/>
+			)}
 
 			{/* Product Edit Drawer */}
 			{editingProduct && (

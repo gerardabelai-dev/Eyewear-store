@@ -231,13 +231,17 @@ const columns: ColumnDef<Order>[] = [
 							variant="ghost"
 							className="h-8 w-8 p-0"
 							aria-label="Abrir menu de ações"
+							onClick={(e) => e.stopPropagation()}
 						>
 							<MoreHorizontal className="h-4 w-4" />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end" className="w-40">
 						<DropdownMenuItem
-							onClick={handleEditOrder}
+							onClick={(e) => {
+								e.stopPropagation();
+								handleEditOrder();
+							}}
 							className="cursor-pointer"
 						>
 							<Edit className="mr-2 h-4 w-4" />
@@ -245,7 +249,10 @@ const columns: ColumnDef<Order>[] = [
 						</DropdownMenuItem>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem
-							onClick={handleCopyOrderId}
+							onClick={(e) => {
+								e.stopPropagation();
+								handleCopyOrderId();
+							}}
 							className="cursor-pointer"
 						>
 							<Copy className="mr-2 h-4 w-4" />
@@ -416,7 +423,8 @@ export function OrdersAdvancedTable({
 								<TableRow
 									key={row.id}
 									data-state={row.getIsSelected() && "selected"}
-									className="hover:bg-muted/50"
+									className="cursor-pointer hover:bg-muted/50"
+									onClick={() => onEditOrder?.(row.original)}
 								>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>

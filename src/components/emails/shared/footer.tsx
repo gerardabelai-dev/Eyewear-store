@@ -40,7 +40,7 @@ export function EmailFooter({
 				<div className="border-t border-gray-300 pt-4 mt-4">
 					{/* Unsubscribe link */}
 					<Text className="text-xs text-gray-500 mb-2">
-						Você está recebendo este email porque possui uma conta no DrVista.
+						Você está recebendo este email porque possui uma conta no Dr. Vista.
 						{userEmail && (
 							<>
 								{" "}

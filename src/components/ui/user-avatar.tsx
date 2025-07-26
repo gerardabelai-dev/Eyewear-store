@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
 interface UserAvatarProps {
@@ -9,7 +9,7 @@ interface UserAvatarProps {
 }
 
 const sizeClasses = {
-	sm: "w-8 h-8 text-sm",
+	sm: "w-8 h-8 text-xs",
 	md: "w-10 h-10 text-sm",
 	lg: "w-16 h-16 text-lg",
 	xl: "w-20 h-20 text-lg",
@@ -24,36 +24,11 @@ export function UserAvatar({
 	const sizeClass = sizeClasses[size];
 
 	return (
-		<div
-			className={cn(
-				"rounded-full overflow-hidden flex items-center justify-center",
-				sizeClass,
-				"bg-primary",
-				className,
-			)}
-		>
-			{userImage ? (
-				<Image
-					src={userImage}
-					alt="Avatar"
-					width={
-						size === "sm" ? 32 : size === "md" ? 40 : size === "lg" ? 64 : 80
-					}
-					height={
-						size === "sm" ? 32 : size === "md" ? 40 : size === "lg" ? 64 : 80
-					}
-					className="w-full h-full object-cover"
-				/>
-			) : (
-				<span
-					className={cn(
-						"font-semibold text-primary-foreground drop-shadow-sm",
-						size === "sm" ? "text-xs" : size === "md" ? "text-sm" : "text-lg",
-					)}
-				>
-					{userInitials}
-				</span>
-			)}
-		</div>
+		<Avatar className={cn(sizeClass, className)}>
+			{userImage && <AvatarImage src={userImage} alt="Avatar" />}
+			<AvatarFallback className="bg-primary text-primary-foreground font-semibold drop-shadow-sm">
+				{userInitials}
+			</AvatarFallback>
+		</Avatar>
 	);
 }

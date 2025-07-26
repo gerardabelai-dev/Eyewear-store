@@ -3,29 +3,34 @@
  * These components can be used in both the web app and email templates
  */
 
-"use client";
-
 import Image from "next/image";
 import type * as React from "react";
 
-// Brand configuration constants
+// Brand configuration - centralized brand information
 export const BRAND_CONFIG = {
-	name: "DrVista",
-	tagline: "Sistema de Gestão",
+	name: "Dr. Vista",
+	tagline: "Plataforma de Autenticação Segura",
 	email: "contato@drvista.com.br",
 	website: "https://www.drvista.com.br",
-	phone: "+55 (11) 99999-9999",
+	phone: "+55 (11) 1234-5678",
 	address: "São Paulo, SP - Brasil",
 	colors: {
-		primary: "#2563eb",
-		primaryDark: "#1e40af",
-		secondary: "#059669",
-		accent: "#f59e0b",
-		gray: "#6b7280",
-		lightGray: "#f9fafb",
-		border: "#e5e7eb",
-		text: "#374151",
-		background: "#ffffff",
+		primary: "#0066CC", // Blue
+		secondary: "#00A859", // Green
+		accent: "#FFB800", // Yellow/Gold
+		gray: {
+			50: "#F9FAFB",
+			100: "#F3F4F6",
+			200: "#E5E7EB",
+			300: "#D1D5DB",
+			400: "#9CA3AF",
+			500: "#6B7280",
+			600: "#4B5563",
+			700: "#374151",
+			800: "#1F2937",
+			900: "#111827",
+		},
+		text: "#1F2937",
 	},
 	social: {
 		twitter: "https://twitter.com/drvista",
@@ -33,7 +38,7 @@ export const BRAND_CONFIG = {
 		instagram: "https://instagram.com/drvista",
 		facebook: "https://facebook.com/drvista",
 	},
-} as const;
+};
 
 // Logo component for web app with theme switching
 export function AppLogo({
@@ -46,10 +51,10 @@ export function AppLogo({
 	className?: string;
 }) {
 	const sizeConfig = {
-		sm: { height: 24, logoOnly: 24 },
-		md: { height: 32, logoOnly: 32 },
-		lg: { height: 48, logoOnly: 64 },
-		xl: { height: 64, logoOnly: 80 },
+		sm: { width: 100, height: 24, logoOnly: 20 },
+		md: { width: 120, height: 28, logoOnly: 24 },
+		lg: { width: 140, height: 32, logoOnly: 32 },
+		xl: { width: 160, height: 36, logoOnly: 40 },
 	};
 
 	const config = sizeConfig[size];
@@ -60,10 +65,14 @@ export function AppLogo({
 			<div className={`flex items-center ${className}`}>
 				<Image
 					src="/drvista-favicon.svg"
-					alt="DrVista"
+					alt="Dr. Vista"
 					width={config.logoOnly}
 					height={config.logoOnly}
 					className="object-contain"
+					style={{
+						width: config.logoOnly,
+						height: config.logoOnly,
+					}}
 				/>
 			</div>
 		);
@@ -75,19 +84,27 @@ export function AppLogo({
 			{/* Light theme logo - hidden in dark mode */}
 			<Image
 				src="/drvista-logo-light.svg"
-				alt="DrVista"
-				width={config.height * 3} // Logo with text is wider
+				alt="Dr. Vista"
+				width={config.width}
 				height={config.height}
 				className="object-contain dark:hidden"
+				style={{
+					width: config.width,
+					height: config.height,
+				}}
 				priority
 			/>
 			{/* Dark theme logo - hidden in light mode */}
 			<Image
 				src="/drvista-logo-dark.svg"
-				alt="DrVista"
-				width={config.height * 3} // Logo with text is wider
+				alt="Dr. Vista"
+				width={config.width}
 				height={config.height}
 				className="object-contain hidden dark:block"
+				style={{
+					width: config.width,
+					height: config.height,
+				}}
 				priority
 			/>
 		</div>
@@ -117,7 +134,7 @@ export function EmailLogo({
 					width: currentSize.width,
 					height: currentSize.height,
 					borderRadius: "8px",
-					background: `linear-gradient(135deg, ${BRAND_CONFIG.colors.primary} 0%, ${BRAND_CONFIG.colors.primaryDark} 100%)`,
+					background: `linear-gradient(135deg, ${BRAND_CONFIG.colors.primary} 0%, ${BRAND_CONFIG.colors.secondary} 100%)`,
 					display: "flex",
 					alignItems: "center",
 					justifyContent: "center",
@@ -193,7 +210,7 @@ export function EmailCompanyInfo({
 }) {
 	const baseStyle: React.CSSProperties = {
 		fontFamily: "Arial, sans-serif",
-		color: BRAND_CONFIG.colors.gray,
+		color: BRAND_CONFIG.colors.gray[600],
 		fontSize: "14px",
 		lineHeight: "1.6",
 		...style,
@@ -293,7 +310,7 @@ export function EmailSocialLinks({
 						display: "inline-block",
 						width: iconSize,
 						height: iconSize,
-						backgroundColor: BRAND_CONFIG.colors.lightGray,
+						backgroundColor: BRAND_CONFIG.colors.gray[100],
 						borderRadius: "4px",
 						textDecoration: "none",
 					}}
@@ -303,7 +320,7 @@ export function EmailSocialLinks({
 						style={{
 							width: "100%",
 							height: "100%",
-							backgroundColor: BRAND_CONFIG.colors.gray,
+							backgroundColor: BRAND_CONFIG.colors.gray[300],
 							borderRadius: "4px",
 						}}
 					/>

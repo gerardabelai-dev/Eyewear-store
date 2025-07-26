@@ -8,8 +8,13 @@ export interface UploadResult {
 
 /**
  * Upload a file to Vercel Blob storage
+ * @param file - The file to upload
+ * @param type - The type of upload (products, avatars, etc.)
  */
-export async function uploadFileToBlob(file: File): Promise<UploadResult> {
+export async function uploadFileToBlob(
+	file: File,
+	type: "products" | "avatars" = "products",
+): Promise<UploadResult> {
 	try {
 		// Validate file type
 		const allowedTypes = [
@@ -38,7 +43,7 @@ export async function uploadFileToBlob(file: File): Promise<UploadResult> {
 
 		// Upload to our API endpoint
 		const response = await fetch(
-			`/api/upload/product-images?filename=${encodeURIComponent(file.name)}`,
+			`/api/upload/images?filename=${encodeURIComponent(file.name)}&type=${type}`,
 			{
 				method: "POST",
 				body: file,

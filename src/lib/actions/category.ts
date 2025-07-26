@@ -1,9 +1,9 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { category, subcategory } from "@/lib/db/schema";
+import { category, product, subcategory } from "@/lib/db/schema";
 
 // Validation schemas
 const categorySchema = z.object({
@@ -162,18 +162,6 @@ export async function updateCategory(data: CategoryFormData & { id: string }) {
 // Delete a category
 export async function deleteCategory(id: string) {
 	try {
-		// Check if category has subcategories
-		const subcategoriesCount = await db
-			.select()
-			.from(subcategory)
-			.where(eq(subcategory.categoryId, id));
-
-		if (subcategoriesCount.length > 0) {
-			return {
-				error: "Não é possível excluir categoria que possui subcategorias",
-			};
-		}
-
 		const deletedCategory = await db
 			.delete(category)
 			.where(eq(category.id, id))
@@ -553,5 +541,174 @@ export async function seedCategories() {
 	} catch (error) {
 		console.error("Erro ao criar categorias:", error);
 		return { error: "Erro interno do servidor" };
+	}
+}
+
+// Get all categories with counts
+export async function getCategoriesWithCounts() {
+	try {
+		const categoriesData = await db
+			.select({
+				id: category.id,
+				name: category.name,
+				slug: category.slug,
+				description: category.description,
+				createdAt: category.createdAt,
+				updatedAt: category.updatedAt,
+			})
+			.from(category)
+			.orderBy(category.name);
+
+		// Get counts for each category
+		const categoriesWithCounts = await Promise.all(
+			categoriesData.map(async (cat) => {
+				// Count products using this category
+				const productsCount = await db
+					.select({ count: sql<number>`count(*)` })
+					.from(product)
+					.where(eq(product.categoryId, cat.id));
+
+				// Count subcategories
+				const subcategoriesCount = await db
+					.select({ count: sql<number>`count(*)` })
+					.from(subcategory)
+					.where(eq(subcategory.categoryId, cat.id));
+
+				return {
+					...cat,
+					productsCount: Number(productsCount[0]?.count || 0),
+					subcategoriesCount: Number(subcategoriesCount[0]?.count || 0),
+				};
+			}),
+		);
+
+		return { data: categoriesWithCounts };
+	} catch (error: unknown) {
+		console.error("Erro ao buscar categorias:", error);
+		return { error: "Erro ao buscar categorias" };
+	}
+}
+
+// Get category details with subcategories and products
+export async function getCategoryDetails(categoryId: string) {
+	try {
+		// Get category
+		const categoryData = await db
+			.select()
+			.from(category)
+			.where(eq(category.id, categoryId))
+			.limit(1);
+
+		if (categoryData.length === 0) {
+			return { error: "Categoria não encontrada" };
+		}
+
+		// Get subcategories
+		const subcategoriesData = await db
+			.select()
+			.from(subcategory)
+			.where(eq(subcategory.categoryId, categoryId))
+			.orderBy(subcategory.name);
+
+		// Get products count for each subcategory
+		const subcategoriesWithCounts = await Promise.all(
+			subcategoriesData.map(async (sub) => {
+				const productsCount = await db
+					.select({ count: sql<number>`count(*)` })
+					.from(product)
+					.where(eq(product.subcategoryId, sub.id));
+
+				return {
+					...sub,
+					productsCount: Number(productsCount[0]?.count || 0),
+				};
+			}),
+		);
+
+		// Get products using this category
+		const productsData = await db
+			.select({
+				id: product.id,
+				name: product.name,
+				price: product.price,
+				stock: product.stock,
+				status: product.status,
+				images: product.images,
+				subcategoryId: product.subcategoryId,
+				subcategoryName: subcategory.name,
+			})
+			.from(product)
+			.leftJoin(subcategory, eq(product.subcategoryId, subcategory.id))
+			.where(eq(product.categoryId, categoryId))
+			.orderBy(product.name);
+
+		return {
+			data: {
+				category: categoryData[0],
+				subcategories: subcategoriesWithCounts,
+				products: productsData,
+			},
+		};
+	} catch (error: unknown) {
+		console.error("Erro ao buscar detalhes da categoria:", error);
+		return { error: "Erro ao buscar detalhes da categoria" };
+	}
+}
+
+// Get products count for category/subcategory before deletion
+export async function getProductsCountForDeletion(
+	categoryId?: string,
+	subcategoryId?: string,
+) {
+	try {
+		let count = 0;
+
+		if (categoryId) {
+			const result = await db
+				.select({ count: sql<number>`count(*)` })
+				.from(product)
+				.where(eq(product.categoryId, categoryId));
+			count = Number(result[0]?.count || 0);
+		} else if (subcategoryId) {
+			const result = await db
+				.select({ count: sql<number>`count(*)` })
+				.from(product)
+				.where(eq(product.subcategoryId, subcategoryId));
+			count = Number(result[0]?.count || 0);
+		}
+
+		return { data: count };
+	} catch (error: unknown) {
+		console.error("Erro ao contar produtos:", error);
+		return { error: "Erro ao contar produtos" };
+	}
+}
+
+// Get detailed count for category deletion (products and subcategories)
+export async function getCategoryDeletionInfo(categoryId: string) {
+	try {
+		const [productsResult, subcategoriesResult] = await Promise.all([
+			db
+				.select({ count: sql<number>`count(*)` })
+				.from(product)
+				.where(eq(product.categoryId, categoryId)),
+			db
+				.select({ count: sql<number>`count(*)` })
+				.from(subcategory)
+				.where(eq(subcategory.categoryId, categoryId)),
+		]);
+
+		const productsCount = Number(productsResult[0]?.count || 0);
+		const subcategoriesCount = Number(subcategoriesResult[0]?.count || 0);
+
+		return {
+			data: {
+				productsCount,
+				subcategoriesCount,
+			},
+		};
+	} catch (error: unknown) {
+		console.error("Erro ao buscar informações de exclusão:", error);
+		return { error: "Erro ao buscar informações de exclusão" };
 	}
 }

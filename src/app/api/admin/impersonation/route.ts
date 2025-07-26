@@ -1,15 +1,18 @@
+import "server-only";
 import { eq } from "drizzle-orm";
-import type { NextRequest } from "next/server";
+import { nanoid } from "nanoid";
+import { cookies } from "next/headers";
+import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import {
-	createAuthErrorResponse,
-	createNotFoundResponse,
+	createErrorResponse,
 	createSuccessResponse,
 	withErrorHandling,
 } from "@/lib/api-response";
 import { auth } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth-server";
 import { db } from "@/lib/db";
-import { user } from "@/lib/db/schema";
+import { account, session, user, verification } from "@/lib/db/schema";
 import { serverEnv } from "@/lib/env";
 import { storeImpersonationToken } from "@/lib/impersonation";
 
@@ -38,7 +41,7 @@ async function handleImpersonation(request: NextRequest) {
 		.limit(1);
 
 	if (!targetUser.length) {
-		return createNotFoundResponse("Usuário");
+		return createErrorResponse("Usuário");
 	}
 
 	// Type assertion to work around drizzle version conflicts

@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleAlertIcon } from "lucide-react";
+import { CircleAlertIcon, Loader2 } from "lucide-react";
 import { useId, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -52,12 +52,7 @@ export function DeleteConfirmationDialog({
 			<DialogTrigger asChild>{trigger}</DialogTrigger>
 			<DialogContent>
 				<div className="flex flex-col items-center gap-2">
-					<div
-						className="flex size-9 shrink-0 items-center justify-center rounded-full border"
-						aria-hidden="true"
-					>
-						<CircleAlertIcon className="opacity-80" size={16} />
-					</div>
+					<CircleAlertIcon className="opacity-80" size={16} />
 					<DialogHeader>
 						<DialogTitle className="sm:text-center">
 							Confirmação final
@@ -100,7 +95,14 @@ export function DeleteConfirmationDialog({
 							disabled={inputValue !== productId || isLoading}
 							onClick={handleConfirm}
 						>
-							{isLoading ? "Excluindo..." : "Excluir"}
+							{isLoading ? (
+								<>
+									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									Excluindo
+								</>
+							) : (
+								"Excluir"
+							)}
 						</Button>
 					</DialogFooter>
 				</form>

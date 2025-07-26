@@ -14,11 +14,10 @@ export function PasswordResetEmail({
 }: PasswordResetEmailProps) {
 	return (
 		<EmailLayout
-			preview={`${name ? `${name}, r` : "R"}edefinir sua senha no DrVista - Link válido por ${expiresIn}`}
-			title="Redefinir Senha - DrVista"
+			preview={`${name ? `${name}, r` : "R"}edefinir sua senha no Dr. Vista - Link válido por ${expiresIn}`}
+			title="Redefinir Senha - Dr. Vista"
 			unsubscribeUrl={unsubscribeUrl}
 			footerVariant="minimal"
-			showSocialLinks={false}
 		>
 			{/* Warning Header */}
 			<Section className="px-6 py-8">
@@ -43,9 +42,9 @@ export function PasswordResetEmail({
 					<Heading className="text-xl font-semibold text-brand-text mb-3">
 						{name ? `Olá, ${name}!` : "Olá!"}
 					</Heading>
-					<Text className="text-brand-text leading-relaxed mb-4">
+					<Text className="text-gray-700 mb-4">
 						Recebemos uma solicitação para redefinir a senha da sua conta no{" "}
-						<strong>DrVista</strong>. Se você não fez esta solicitação, pode
+						<strong>Dr. Vista</strong>. Se você não fez esta solicitação, pode
 						ignorar este email com segurança.
 					</Text>
 					<Text className="text-brand-text leading-relaxed">

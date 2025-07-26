@@ -70,11 +70,25 @@ export function EmailHeader({
 	);
 }
 
+interface EmailBodyHeaderProps {
+	title?: string;
+	subtitle?: string;
+	showLogo?: boolean;
+}
+
 // Simple header for use inside email body (without Html wrapper)
-export function EmailBodyHeader() {
+export function EmailBodyHeader({
+	title = "Dr. Vista",
+	subtitle,
+	showLogo = true,
+}: EmailBodyHeaderProps) {
 	return (
 		<Section className="bg-white px-6 py-8 border-b border-gray-200">
-			<EmailLogo size="lg" showText={true} />
+			{showLogo && <EmailLogo size="lg" showText={true} />}
+			<Text className="text-lg font-bold mt-2">{title}</Text>
+			{subtitle && (
+				<Text className="text-sm text-gray-600 mt-1">{subtitle}</Text>
+			)}
 		</Section>
 	);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Settings } from "lucide-react";
+import { LogOut, Menu, Settings, User, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AppLogo } from "@/components/shared/brand";
@@ -13,9 +13,10 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { UserAvatar } from "@/components/ui/user-avatar";
-import { signOut } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
 
 interface DashboardHeaderProps {
 	userImage?: string | null;
@@ -26,6 +27,7 @@ interface DashboardHeaderProps {
 
 const navigationItems = [
 	{ name: "Produtos", href: "/produtos" },
+	{ name: "Categorias", href: "/categorias" },
 	{ name: "Pedidos", href: "/pedidos" },
 	{ name: "Clientes", href: "#" },
 ];
@@ -36,96 +38,89 @@ export function DashboardHeader({
 	userName,
 	userEmail,
 }: DashboardHeaderProps) {
-	const router = useRouter();
 	const pathname = usePathname();
+	const router = useRouter();
 
 	const handleSignOut = async () => {
 		try {
-			await signOut({
-				fetchOptions: {
-					onSuccess: () => {
-						router.push("/auth");
-					},
-				},
-			});
+			await authClient.signOut();
+			router.push("/auth/sign-in");
 		} catch (error) {
-			console.error("Sign out error:", error);
+			console.error("Error signing out:", error);
 		}
-	};
-
-	const isActivePath = (href: string) => {
-		if (href === "/account") {
-			return pathname === "/account";
-		}
-		return pathname.startsWith(href) && href !== "#";
 	};
 
 	return (
-		<header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+		<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-				<div className="flex justify-between items-center h-14 sm:h-16">
-					<div className="flex items-center space-x-4 sm:space-x-8 min-w-0">
-						<Link
-							href="/account"
-							className="flex items-center space-x-2 shrink-0"
-						>
+				<div className="flex h-14 items-center justify-between">
+					{/* Logo and Navigation */}
+					<div className="flex items-center space-x-4 sm:space-x-8">
+						<Link href="/" className="flex items-center space-x-2">
 							<AppLogo size="md" showText={true} />
 						</Link>
-						<nav className="hidden lg:flex items-center space-x-6">
-							{navigationItems.map((item) => {
-								const isActive = isActivePath(item.href);
-								const isDisabled = item.href === "#";
 
-								if (isDisabled) {
-									return (
-										<Button
-											key={item.name}
-											variant="ghost"
-											className="text-muted-foreground cursor-not-allowed opacity-50"
-											disabled
-										>
-											{item.name}
-										</Button>
-									);
-								}
-
-								return (
-									<Link key={item.name} href={item.href}>
-										<Button
-											variant="ghost"
-											className={
-												isActive ? "text-foreground" : "text-muted-foreground"
-											}
-										>
-											{item.name}
-										</Button>
-									</Link>
-								);
-							})}
-							<Link href="/account">
-								<Button
-									variant="ghost"
-									className={
-										isActivePath("/account")
+						{/* Desktop Navigation */}
+						<nav className="hidden md:flex items-center space-x-6">
+							{navigationItems.map((item) => (
+								<Link
+									key={item.name}
+									href={item.href}
+									className={cn(
+										"text-sm font-medium transition-colors hover:text-primary",
+										pathname === item.href
 											? "text-foreground"
-											: "text-muted-foreground"
-									}
+											: "text-muted-foreground",
+									)}
 								>
-									Configurações
-								</Button>
-							</Link>
+									{item.name}
+								</Link>
+							))}
 						</nav>
 					</div>
-					<div className="flex items-center space-x-2 sm:space-x-4">
-						{/* Theme Toggle */}
-						<ThemeToggle />
+
+					{/* Right side - Mobile menu and User dropdown */}
+					<div className="flex items-center space-x-4">
+						{/* Mobile Navigation */}
+						<Sheet>
+							<SheetTrigger asChild className="md:hidden">
+								<Button variant="ghost" size="icon">
+									<Menu className="h-5 w-5" />
+									<span className="sr-only">Toggle menu</span>
+								</Button>
+							</SheetTrigger>
+							<SheetContent side="left" className="w-[240px] sm:w-[280px]">
+								<div className="mb-6">
+									<Link href="/" onClick={() => document.body.click()}>
+										<AppLogo size="md" showText={true} />
+									</Link>
+								</div>
+								<nav className="flex flex-col space-y-3">
+									{navigationItems.map((item) => (
+										<Link
+											key={item.name}
+											href={item.href}
+											onClick={() => document.body.click()}
+											className={cn(
+												"text-sm font-medium transition-colors hover:text-primary",
+												pathname === item.href
+													? "text-foreground"
+													: "text-muted-foreground",
+											)}
+										>
+											{item.name}
+										</Link>
+									))}
+								</nav>
+							</SheetContent>
+						</Sheet>
 
 						{/* User Dropdown */}
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<Button
 									variant="ghost"
-									className="flex items-center space-x-2 sm:space-x-3 p-1 sm:p-2 rounded-lg hover:bg-muted/50"
+									className="relative h-8 w-8 rounded-full"
 								>
 									<UserAvatar
 										userImage={userImage}
@@ -134,46 +129,31 @@ export function DashboardHeader({
 									/>
 								</Button>
 							</DropdownMenuTrigger>
-							<DropdownMenuContent className="w-56" align="end">
-								<DropdownMenuLabel>
+							<DropdownMenuContent align="end" className="w-56">
+								<DropdownMenuLabel className="font-normal">
 									<div className="flex flex-col space-y-1">
-										<p className="text-sm font-medium truncate">{userName}</p>
-										<p className="text-xs text-muted-foreground truncate">
+										<p className="text-sm font-medium leading-none">
+											{userName}
+										</p>
+										<p className="text-xs leading-none text-muted-foreground">
 											{userEmail}
 										</p>
 									</div>
 								</DropdownMenuLabel>
 								<DropdownMenuSeparator />
-
-								{/* Mobile navigation items */}
-								<div className="lg:hidden">
-									{navigationItems.map((item) => {
-										if (item.href === "#") {
-											return (
-												<DropdownMenuItem key={item.name} disabled>
-													{item.name}
-												</DropdownMenuItem>
-											);
-										}
-										return (
-											<Link key={item.name} href={item.href}>
-												<DropdownMenuItem>{item.name}</DropdownMenuItem>
-											</Link>
-										);
-									})}
-									<DropdownMenuSeparator />
-								</div>
-
-								<Link href="/account">
-									<DropdownMenuItem>
-										<Settings className="mr-2 h-4 w-4" />
-										Configurações
-									</DropdownMenuItem>
-								</Link>
+								<DropdownMenuItem asChild>
+									<Link href="/account" className="cursor-pointer">
+										<User className="mr-2 h-4 w-4" />
+										<span>Perfil</span>
+									</Link>
+								</DropdownMenuItem>
 								<DropdownMenuSeparator />
-								<DropdownMenuItem onClick={handleSignOut}>
+								<DropdownMenuItem
+									onClick={handleSignOut}
+									className="cursor-pointer"
+								>
 									<LogOut className="mr-2 h-4 w-4" />
-									Sair
+									<span>Sair</span>
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>

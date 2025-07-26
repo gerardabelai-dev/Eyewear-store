@@ -23,8 +23,8 @@ export function OrderConfirmationEmail({
 }: OrderConfirmationEmailProps) {
 	return (
 		<EmailLayout
-			preview={`Pedido #${orderNumber} confirmado! Obrigado pela sua compra, ${customerName}.`}
-			title="Pedido Confirmado - DrVista"
+			preview={`Pedido #${orderNumber} confirmado - ${customerName}`}
+			title="Pedido Confirmado - Dr. Vista"
 			unsubscribeUrl={unsubscribeUrl}
 			footerVariant="full"
 		>

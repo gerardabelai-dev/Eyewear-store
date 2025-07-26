@@ -36,6 +36,8 @@
 	--color-popover: var(--popover);
 	--color-card-foreground: var(--card-foreground);
 	--color-card: var(--card);
+	--color-vibrant: var(--vibrant);
+	--color-vibrant-foreground: var(--vibrant-foreground);
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
@@ -84,6 +86,8 @@
 	--accent-foreground: oklch(0.376 0.0225 64.3434);
 	--destructive: oklch(0.5471 0.1438 32.9149);
 	--destructive-foreground: oklch(1 0 0);
+	--vibrant: oklch(0.7 0.18 50); /* #F3841B converted to OKLCH */
+	--vibrant-foreground: oklch(1 0 0);
 	--border: oklch(0.8606 0.0321 84.5881);
 	--input: oklch(0.8606 0.0321 84.5881);
 	--ring: oklch(0.618 0.0778 65.5444);
@@ -144,6 +148,8 @@
 	--accent-foreground: oklch(0.9239 0.019 83.0636);
 	--destructive: oklch(0.5471 0.1438 32.9149);
 	--destructive-foreground: oklch(1 0 0);
+	--vibrant: oklch(0.7 0.18 50); /* #F3841B converted to OKLCH */
+	--vibrant-foreground: oklch(1 0 0);
 	--border: oklch(0.3795 0.0181 57.128);
 	--input: oklch(0.3795 0.0181 57.128);
 	--ring: oklch(0.7264 0.0581 66.6967);
@@ -218,6 +224,8 @@
 	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
+	--color-vibrant: var(--vibrant);
+	--color-vibrant-foreground: var(--vibrant-foreground);
 
 	--font-sans: var(--font-sans);
 	--font-mono: var(--font-mono);

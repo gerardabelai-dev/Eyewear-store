@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -141,13 +142,16 @@ export function SubcategoryForm({
 				/>
 
 				<Button type="submit" disabled={isSubmitting} className="w-full">
-					{isSubmitting
-						? isEditing
-							? "Atualizando subcategoria..."
-							: "Criando subcategoria..."
-						: isEditing
-							? "Atualizar Subcategoria"
-							: "Criar Subcategoria"}
+					{isSubmitting ? (
+						<>
+							<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+							{isEditing ? "Atualizando subcategoria" : "Criando subcategoria"}
+						</>
+					) : isEditing ? (
+						"Atualizar Subcategoria"
+					) : (
+						"Criar Subcategoria"
+					)}
 				</Button>
 			</form>
 		</Form>

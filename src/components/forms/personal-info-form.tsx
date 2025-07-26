@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, User } from "lucide-react";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -129,7 +130,14 @@ export function PersonalInfoForm({
 
 						<div className="flex justify-end pt-2">
 							<Button type="submit" disabled={isPending}>
-								{isPending ? "Salvando..." : "Salvar Informações"}
+								{isPending ? (
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										Salvando
+									</>
+								) : (
+									"Salvar Informações"
+								)}
 							</Button>
 						</div>
 					</form>

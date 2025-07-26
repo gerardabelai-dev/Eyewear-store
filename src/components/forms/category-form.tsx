@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -130,13 +131,16 @@ export function CategoryForm({ onSuccess, category }: CategoryFormProps) {
 				/>
 
 				<Button type="submit" disabled={isSubmitting} className="w-full">
-					{isSubmitting
-						? isEditing
-							? "Atualizando categoria..."
-							: "Criando categoria..."
-						: isEditing
-							? "Atualizar Categoria"
-							: "Criar Categoria"}
+					{isSubmitting ? (
+						<>
+							<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+							{isEditing ? "Atualizando categoria" : "Criando categoria"}
+						</>
+					) : isEditing ? (
+						"Atualizar Categoria"
+					) : (
+						"Criar Categoria"
+					)}
 				</Button>
 			</form>
 		</Form>

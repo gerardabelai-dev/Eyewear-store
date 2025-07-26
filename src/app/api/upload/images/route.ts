@@ -1,3 +1,4 @@
+import "server-only";
 import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { serverEnv } from "@/lib/env";
@@ -15,10 +16,15 @@ export async function POST(request: Request): Promise<NextResponse> {
 		}
 
 		// Validate file type (only images)
-		const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+		const allowedFileTypes = [
+			"image/jpeg",
+			"image/png",
+			"image/webp",
+			"image/gif",
+		];
 		const contentType = request.headers.get("content-type") || "";
 
-		if (!allowedTypes.some((type) => contentType.includes(type))) {
+		if (!allowedFileTypes.some((type) => contentType.includes(type))) {
 			return NextResponse.json(
 				{ error: "Invalid file type. Only images are allowed." },
 				{ status: 400 },
@@ -36,7 +42,13 @@ export async function POST(request: Request): Promise<NextResponse> {
 		// Generate unique filename with timestamp to avoid conflicts
 		const timestamp = Date.now();
 		const extension = filename.split(".").pop();
-		const uniqueFilename = `products/${timestamp}-${filename}`;
+
+		// Determine folder based on type parameter or default to products
+		const type = searchParams.get("type") || "products";
+		const allowedFolders = ["products", "avatars"];
+		const folder = allowedFolders.includes(type) ? type : "products";
+
+		const uniqueFilename = `${folder}/${timestamp}-${filename}`;
 
 		// Upload to Vercel Blob
 		const blob = await put(uniqueFilename, request.body, {

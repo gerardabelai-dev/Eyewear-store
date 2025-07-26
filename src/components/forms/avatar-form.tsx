@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Upload, X } from "lucide-react";
+import { Loader2, Upload, X } from "lucide-react";
 import { useRef, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/form";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { updateUserAvatar } from "@/lib/actions/user";
+import { uploadFileToBlob } from "@/lib/upload";
 
 // Since file uploads are handled differently, we'll use a simpler schema
 const avatarSchema = z.object({
@@ -74,15 +75,6 @@ export function AvatarForm({ userImage, userInitials }: AvatarFormProps) {
 		}
 	};
 
-	const convertImageToBase64 = (file: File): Promise<string> => {
-		return new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.onload = () => resolve(reader.result as string);
-			reader.onerror = reject;
-			reader.readAsDataURL(file);
-		});
-	};
-
 	const onSubmit = (_data: AvatarFormData) => {
 		if (!image) {
 			toast.error("Por favor, selecione uma imagem");
@@ -91,8 +83,16 @@ export function AvatarForm({ userImage, userInitials }: AvatarFormProps) {
 
 		startTransition(async () => {
 			try {
-				const base64Image = await convertImageToBase64(image);
-				const result = await updateUserAvatar({ image: base64Image });
+				// Upload to blob storage first
+				const uploadResult = await uploadFileToBlob(image, "avatars");
+
+				if (!uploadResult.success || !uploadResult.data) {
+					toast.error(uploadResult.error || "Erro ao fazer upload da imagem");
+					return;
+				}
+
+				// Update user avatar with the blob URL
+				const result = await updateUserAvatar({ image: uploadResult.data.url });
 
 				if (result.error) {
 					toast.error(result.error);
@@ -177,7 +177,14 @@ export function AvatarForm({ userImage, userInitials }: AvatarFormProps) {
 												<FormItem>
 													<FormControl>
 														<Button type="submit" disabled={isPending}>
-															{isPending ? "Salvando..." : "Salvar"}
+															{isPending ? (
+																<>
+																	<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+																	Salvando
+																</>
+															) : (
+																"Salvar"
+															)}
 														</Button>
 													</FormControl>
 													<FormMessage />

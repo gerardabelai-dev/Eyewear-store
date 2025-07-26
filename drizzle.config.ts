@@ -1,3 +1,4 @@
+import "server-only";
 import { defineConfig } from "drizzle-kit";
 import { serverEnv } from "./src/lib/env";
 

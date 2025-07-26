@@ -64,16 +64,16 @@ export default async function Dashboard() {
 					/>
 
 					{/* Personal Information Form */}
-					<PersonalInfoForm
+					{/* <PersonalInfoForm
 						firstName={userProfile.firstName}
 						lastName={userProfile.lastName}
-					/>
+					/> */}
 
 					{/* Email Form */}
-					<EmailForm email={userProfile.email} />
+					{/* <EmailForm email={userProfile.email} /> */}
 
 					{/* Password Form */}
-					<PasswordForm hasPassword={userProfile.hasPassword} />
+					{/* <PasswordForm hasPassword={userProfile.hasPassword} /> */}
 				</div>
 			</div>
 		</div>

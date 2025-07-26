@@ -1,10 +1,10 @@
 "use client";
 
-import { MoonIcon, SunIcon } from "lucide-react";
+import { Monitor, MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
-import { Toggle } from "@/components/ui/toggle";
+import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
 	const { theme, setTheme, systemTheme } = useTheme();
@@ -18,47 +18,59 @@ export function ThemeToggle() {
 	if (!mounted) {
 		// Return a placeholder that matches the final component structure
 		return (
-			<Toggle
+			<Button
 				variant="outline"
-				className="group data-[state=on]:hover:bg-muted size-9 data-[state=on]:bg-transparent"
+				size="icon"
+				className="h-9 w-9"
 				aria-label="Loading theme toggle"
 			>
-				<SunIcon size={16} className="shrink-0" aria-hidden="true" />
-			</Toggle>
+				<Monitor className="h-4 w-4" />
+			</Button>
 		);
 	}
 
-	// Determine if we're currently in dark mode
-	const currentTheme = theme === "system" ? systemTheme : theme;
-	const isDark = currentTheme === "dark";
+	// Cycle through themes: system -> light -> dark -> system
+	const handleThemeToggle = () => {
+		if (theme === "system") {
+			setTheme("light");
+		} else if (theme === "light") {
+			setTheme("dark");
+		} else {
+			setTheme("system");
+		}
+	};
+
+	// Determine current icon and label
+	const getThemeIcon = () => {
+		if (theme === "system") {
+			return <Monitor className="h-4 w-4" />;
+		} else if (theme === "light") {
+			return <SunIcon className="h-4 w-4" />;
+		} else {
+			return <MoonIcon className="h-4 w-4" />;
+		}
+	};
+
+	const getThemeLabel = () => {
+		if (theme === "system") {
+			return "Sistema";
+		} else if (theme === "light") {
+			return "Claro";
+		} else {
+			return "Escuro";
+		}
+	};
 
 	return (
-		<Toggle
+		<Button
 			variant="outline"
-			className="group data-[state=on]:hover:bg-muted size-9 data-[state=on]:bg-transparent"
-			pressed={isDark}
-			onPressedChange={() => {
-				if (theme === "system" || !theme) {
-					// If user hasn't clicked before (system default), set to opposite of current system theme
-					setTheme(systemTheme === "dark" ? "light" : "dark");
-				} else {
-					// If user has clicked before, toggle between light and dark
-					setTheme(isDark ? "light" : "dark");
-				}
-			}}
-			aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
+			size="icon"
+			className="h-9 w-9"
+			onClick={handleThemeToggle}
+			aria-label={`Tema atual: ${getThemeLabel()}. Clique para alternar`}
+			title={`Tema: ${getThemeLabel()}`}
 		>
-			{/* Note: After dark mode implementation, rely on dark: prefix rather than group-data-[state=on]: */}
-			<MoonIcon
-				size={16}
-				className="shrink-0 scale-0 opacity-0 transition-all group-data-[state=on]:scale-100 group-data-[state=on]:opacity-100"
-				aria-hidden="true"
-			/>
-			<SunIcon
-				size={16}
-				className="absolute shrink-0 scale-100 opacity-100 transition-all group-data-[state=on]:scale-0 group-data-[state=on]:opacity-0"
-				aria-hidden="true"
-			/>
-		</Toggle>
+			{getThemeIcon()}
+		</Button>
 	);
 }

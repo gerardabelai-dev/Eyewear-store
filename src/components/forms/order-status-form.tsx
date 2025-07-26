@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -269,13 +270,16 @@ export function OrderStatusForm({
 				</div>
 
 				<Button type="submit" disabled={isSubmitting} className="w-full">
-					{isSubmitting
-						? isEditing
-							? "Atualizando status..."
-							: "Criando status..."
-						: isEditing
-							? "Atualizar Status"
-							: "Criar Status"}
+					{isSubmitting ? (
+						<>
+							<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+							{isEditing ? "Atualizando status" : "Criando status"}
+						</>
+					) : isEditing ? (
+						"Atualizar Status"
+					) : (
+						"Criar Status"
+					)}
 				</Button>
 			</form>
 		</Form>

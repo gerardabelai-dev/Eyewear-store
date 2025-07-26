@@ -22,7 +22,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "DrVista Admin - Plataforma de Autenticação Segura",
+	title: "Dr. Vista - Plataforma de Autenticação Segura",
 	description:
 		"Sistema administrativo moderno com autenticação segura e interface intuitiva para gestão completa",
 	icons: {
