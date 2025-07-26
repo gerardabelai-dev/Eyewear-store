@@ -1,6 +1,7 @@
 "use server";
 
 import { eq, sql } from "drizzle-orm";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { category, product, subcategory } from "@/lib/db/schema";
@@ -108,6 +109,9 @@ export async function createCategory(data: CategoryFormData) {
 			})
 			.returning();
 
+		revalidateTag("categories");
+		revalidateTag("products"); // Products may depend on categories
+		revalidatePath("/categorias");
 		return { data: newCategory[0], success: "Categoria criada com sucesso!" };
 	} catch (error: unknown) {
 		if (error instanceof z.ZodError) {
@@ -146,6 +150,9 @@ export async function updateCategory(data: CategoryFormData & { id: string }) {
 			return { error: "Categoria não encontrada" };
 		}
 
+		revalidateTag("categories");
+		revalidateTag("products"); // Products may depend on categories
+		revalidatePath("/categorias");
 		return {
 			data: updatedCategory[0],
 			success: "Categoria atualizada com sucesso!",
@@ -171,6 +178,9 @@ export async function deleteCategory(id: string) {
 			return { error: "Categoria não encontrada" };
 		}
 
+		revalidateTag("categories");
+		revalidateTag("products"); // Products may have referenced this category
+		revalidatePath("/categorias");
 		return { success: "Categoria excluída com sucesso!" };
 	} catch (error: unknown) {
 		console.error("Erro ao excluir categoria:", error);
@@ -544,44 +554,60 @@ export async function seedCategories() {
 	}
 }
 
+// Internal function to get categories with counts
+async function _getCategoriesWithCountsInternal() {
+	const categoriesData = await db
+		.select({
+			id: category.id,
+			name: category.name,
+			slug: category.slug,
+			description: category.description,
+			createdAt: category.createdAt,
+			updatedAt: category.updatedAt,
+		})
+		.from(category)
+		.orderBy(category.name);
+
+	// Get counts for each category
+	const categoriesWithCounts = await Promise.all(
+		categoriesData.map(async (cat) => {
+			// Count products using this category
+			const productsCount = await db
+				.select({ count: sql<number>`count(*)` })
+				.from(product)
+				.where(eq(product.categoryId, cat.id));
+
+			// Count subcategories
+			const subcategoriesCount = await db
+				.select({ count: sql<number>`count(*)` })
+				.from(subcategory)
+				.where(eq(subcategory.categoryId, cat.id));
+
+			return {
+				...cat,
+				productsCount: Number(productsCount[0]?.count || 0),
+				subcategoriesCount: Number(subcategoriesCount[0]?.count || 0),
+			};
+		}),
+	);
+
+	return categoriesWithCounts;
+}
+
+// Cached version of getCategoriesWithCounts
+const getCachedCategoriesWithCounts = unstable_cache(
+	async () => _getCategoriesWithCountsInternal(),
+	["categories-with-counts"],
+	{
+		revalidate: 60, // Cache for 60 seconds
+		tags: ["categories"],
+	},
+);
+
 // Get all categories with counts
 export async function getCategoriesWithCounts() {
 	try {
-		const categoriesData = await db
-			.select({
-				id: category.id,
-				name: category.name,
-				slug: category.slug,
-				description: category.description,
-				createdAt: category.createdAt,
-				updatedAt: category.updatedAt,
-			})
-			.from(category)
-			.orderBy(category.name);
-
-		// Get counts for each category
-		const categoriesWithCounts = await Promise.all(
-			categoriesData.map(async (cat) => {
-				// Count products using this category
-				const productsCount = await db
-					.select({ count: sql<number>`count(*)` })
-					.from(product)
-					.where(eq(product.categoryId, cat.id));
-
-				// Count subcategories
-				const subcategoriesCount = await db
-					.select({ count: sql<number>`count(*)` })
-					.from(subcategory)
-					.where(eq(subcategory.categoryId, cat.id));
-
-				return {
-					...cat,
-					productsCount: Number(productsCount[0]?.count || 0),
-					subcategoriesCount: Number(subcategoriesCount[0]?.count || 0),
-				};
-			}),
-		);
-
+		const categoriesWithCounts = await getCachedCategoriesWithCounts();
 		return { data: categoriesWithCounts };
 	} catch (error: unknown) {
 		console.error("Erro ao buscar categorias:", error);

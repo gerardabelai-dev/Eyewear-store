@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { DashboardHeader } from "@/components/dashboard-header";
+import { Suspense } from "react";
 import { Footer } from "@/components/shared/footer";
-import { getUserProfile } from "@/lib/actions/user";
+import { UserHeaderSkeleton } from "@/components/user-header-skeleton";
+import { UserHeaderWrapper } from "@/components/user-header-wrapper";
 import { getCurrentUser } from "@/lib/auth-server";
 
-// Force dynamic rendering for all authenticated pages
-export const dynamic = "force-dynamic";
+// Remove force-dynamic to allow caching of auth check
+// export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
 	title: "Dr. Vista - Plataforma de Autenticação Segura",
@@ -19,45 +20,18 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	// Only check authentication, don't fetch full profile here
 	const user = await getCurrentUser();
 	if (!user) {
 		redirect("/auth/sign-in");
 	}
 
-	// Load user profile for header
-	const userResult = await getUserProfile();
-	if (userResult.error || !userResult.data) {
-		redirect("/auth/sign-in");
-	}
-
-	const userProfile = userResult.data;
-
-	const getInitials = (name: string) => {
-		return name
-			.split(" ")
-			.map((n) => n[0])
-			.join("")
-			.toUpperCase()
-			.slice(0, 2);
-	};
-
-	const userInitials = getInitials(
-		`${userProfile.firstName || ""} ${userProfile.lastName || ""}`.trim() ||
-			"User",
-	);
-
-	const userName =
-		`${userProfile.firstName || ""} ${userProfile.lastName || ""}`.trim() ||
-		"Usuário";
-
 	return (
 		<div className="min-h-screen flex flex-col">
-			<DashboardHeader
-				userImage={userProfile.image}
-				userInitials={userInitials}
-				userName={userName}
-				userEmail={userProfile.email}
-			/>
+			{/* Stream header with user data */}
+			<Suspense fallback={<UserHeaderSkeleton />}>
+				<UserHeaderWrapper />
+			</Suspense>
 			<main className="flex-1 space-y-6 p-6">
 				<div className="flex flex-col max-w-7xl p-6 mx-auto gap-6 w-full">
 					{children}

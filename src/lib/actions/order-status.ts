@@ -1,6 +1,7 @@
 "use server";
 
 import { eq } from "drizzle-orm";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { orderStatus } from "@/lib/db/schema";
@@ -30,15 +31,31 @@ const orderStatusSchema = z.object({
 
 type OrderStatusFormData = z.infer<typeof orderStatusSchema>;
 
+// Internal function to get order statuses
+async function _getOrderStatusesInternal() {
+	const statuses = await db
+		.select()
+		.from(orderStatus)
+		.where(eq(orderStatus.isActive, true))
+		.orderBy(orderStatus.sortOrder, orderStatus.name);
+
+	return statuses;
+}
+
+// Cached version of getOrderStatuses
+const getCachedOrderStatuses = unstable_cache(
+	async () => _getOrderStatusesInternal(),
+	["order-statuses"],
+	{
+		revalidate: 60, // Cache for 60 seconds
+		tags: ["order-statuses"],
+	},
+);
+
 // Get all active order statuses
 export async function getOrderStatuses() {
 	try {
-		const statuses = await db
-			.select()
-			.from(orderStatus)
-			.where(eq(orderStatus.isActive, true))
-			.orderBy(orderStatus.sortOrder, orderStatus.name);
-
+		const statuses = await getCachedOrderStatuses();
 		return { data: statuses };
 	} catch (error) {
 		console.error("Erro ao buscar status de pedidos:", error);
@@ -110,6 +127,8 @@ export async function createOrderStatus(data: OrderStatusFormData) {
 			})
 			.returning();
 
+		revalidateTag("order-statuses");
+		revalidatePath("/pedidos");
 		return { data: newStatus[0], success: "Status criado com sucesso!" };
 	} catch (error: unknown) {
 		if (error instanceof z.ZodError) {
@@ -158,6 +177,8 @@ export async function updateOrderStatus(
 			return { error: "Status não encontrado" };
 		}
 
+		revalidateTag("order-statuses");
+		revalidatePath("/pedidos");
 		return {
 			data: updatedStatus[0],
 			success: "Status atualizado com sucesso!",
@@ -200,6 +221,8 @@ export async function deleteOrderStatus(id: string) {
 			return { error: "Status não encontrado" };
 		}
 
+		revalidateTag("order-statuses");
+		revalidatePath("/pedidos");
 		return { success: "Status desativado com sucesso!" };
 	} catch (error: unknown) {
 		console.error("Erro ao desativar status:", error);
@@ -259,6 +282,8 @@ export async function seedOrderStatuses() {
 
 		await db.insert(orderStatus).values(defaultStatuses).onConflictDoNothing();
 
+		revalidateTag("order-statuses");
+		revalidatePath("/pedidos");
 		return { success: "Status padrão criados com sucesso" };
 	} catch (error: unknown) {
 		console.error("Erro ao criar status padrão:", error);

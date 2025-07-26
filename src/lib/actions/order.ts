@@ -1,7 +1,7 @@
 "use server";
 
 import { and, desc, eq, sql } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { z } from "zod";
 import { getDefaultOrderStatus } from "@/lib/actions/order-status";
 import { getCurrentUser } from "@/lib/auth-server";
@@ -58,6 +58,32 @@ function generateOrderNumber(): string {
 	return `PED-${timestamp.slice(-6)}${random}`;
 }
 
+// Internal function to get orders
+async function _getOrdersInternal(userId: string) {
+	const orders = await db
+		.select({
+			id: order.id,
+			orderNumber: order.orderNumber,
+			userId: order.userId,
+			customerName: order.customerName,
+			customerEmail: order.customerEmail,
+			customerPhone: order.customerPhone,
+			statusId: order.statusId,
+			statusName: orderStatus.name,
+			statusColor: orderStatus.color,
+			totalAmount: order.totalAmount,
+			notes: order.notes,
+			createdAt: order.createdAt,
+			updatedAt: order.updatedAt,
+		})
+		.from(order)
+		.leftJoin(orderStatus, eq(order.statusId, orderStatus.id))
+		.where(eq(order.userId, userId))
+		.orderBy(desc(order.createdAt));
+
+	return orders;
+}
+
 // Get all orders with details
 export async function getOrders() {
 	try {
@@ -66,27 +92,17 @@ export async function getOrders() {
 			return { error: "Usuário não autenticado" };
 		}
 
-		const orders = await db
-			.select({
-				id: order.id,
-				orderNumber: order.orderNumber,
-				userId: order.userId,
-				customerName: order.customerName,
-				customerEmail: order.customerEmail,
-				customerPhone: order.customerPhone,
-				statusId: order.statusId,
-				statusName: orderStatus.name,
-				statusColor: orderStatus.color,
-				totalAmount: order.totalAmount,
-				notes: order.notes,
-				createdAt: order.createdAt,
-				updatedAt: order.updatedAt,
-			})
-			.from(order)
-			.leftJoin(orderStatus, eq(order.statusId, orderStatus.id))
-			.where(eq(order.userId, currentUser.id))
-			.orderBy(desc(order.createdAt));
+		// Use unstable_cache with a more predictable approach
+		const getCachedOrders = unstable_cache(
+			async (userId: string) => _getOrdersInternal(userId),
+			["user-orders"],
+			{
+				revalidate: 60, // Cache for 60 seconds
+				tags: ["orders"],
+			},
+		);
 
+		const orders = await getCachedOrders(currentUser.id);
 		return { data: orders };
 	} catch (error) {
 		console.error("Erro ao buscar pedidos:", error);
@@ -275,7 +291,8 @@ export async function createOrder(data: z.infer<typeof createOrderSchema>) {
 			// Don't fail the order creation if email fails
 		}
 
-		revalidatePath("/orders");
+		revalidateTag("orders");
+		revalidatePath("/pedidos");
 		return { success: "Pedido criado com sucesso!" };
 	} catch (error: unknown) {
 		if (error instanceof z.ZodError) {
@@ -432,7 +449,8 @@ export async function updateOrder(data: z.infer<typeof updateOrderSchema>) {
 			}
 		}
 
-		revalidatePath("/orders");
+		revalidateTag("orders");
+		revalidatePath("/pedidos");
 		return { success: "Pedido atualizado com sucesso!" };
 	} catch (error: unknown) {
 		if (error instanceof z.ZodError) {
@@ -514,7 +532,8 @@ export async function updateOrderStatus(
 			}
 		}
 
-		revalidatePath("/orders");
+		revalidateTag("orders");
+		revalidatePath("/pedidos");
 		return { success: "Status do pedido atualizado com sucesso!" };
 	} catch (error: unknown) {
 		if (error instanceof z.ZodError) {
@@ -563,12 +582,38 @@ export async function deleteOrder(orderId: string) {
 				.where(eq(product.id, item.productId));
 		}
 
-		revalidatePath("/orders");
+		revalidateTag("orders");
+		revalidatePath("/pedidos");
 		return { success: "Pedido deletado com sucesso!" };
 	} catch (error) {
 		console.error("Erro ao deletar pedido:", error);
 		return { error: "Erro interno do servidor" };
 	}
+}
+
+// Internal function to get order stats
+async function _getOrderStatsInternal(userId: string) {
+	const orders = await db
+		.select({
+			statusId: order.statusId,
+			totalAmount: order.totalAmount,
+			createdAt: order.createdAt,
+		})
+		.from(order)
+		.where(eq(order.userId, userId));
+
+	const stats = {
+		totalOrders: orders.length,
+		pendingOrders: orders.filter((o) => o.statusId === "pending").length,
+		processingOrders: orders.filter((o) => o.statusId === "processing").length,
+		completedOrders: orders.filter((o) => o.statusId === "completed").length,
+		cancelledOrders: orders.filter((o) => o.statusId === "cancelled").length,
+		totalRevenue: orders
+			.filter((o) => o.statusId === "completed")
+			.reduce((sum, o) => sum + parseFloat(o.totalAmount), 0),
+	};
+
+	return stats;
 }
 
 // Get order statistics
@@ -579,27 +624,17 @@ export async function getOrderStats() {
 			return { error: "Usuário não autenticado" };
 		}
 
-		const orders = await db
-			.select({
-				statusId: order.statusId,
-				totalAmount: order.totalAmount,
-				createdAt: order.createdAt,
-			})
-			.from(order)
-			.where(eq(order.userId, currentUser.id));
+		// Use unstable_cache with a more predictable approach
+		const getCachedOrderStats = unstable_cache(
+			async (userId: string) => _getOrderStatsInternal(userId),
+			["user-order-stats"],
+			{
+				revalidate: 60, // Cache for 60 seconds
+				tags: ["orders"],
+			},
+		);
 
-		const stats = {
-			totalOrders: orders.length,
-			pendingOrders: orders.filter((o) => o.statusId === "pending").length,
-			processingOrders: orders.filter((o) => o.statusId === "processing")
-				.length,
-			completedOrders: orders.filter((o) => o.statusId === "completed").length,
-			cancelledOrders: orders.filter((o) => o.statusId === "cancelled").length,
-			totalRevenue: orders
-				.filter((o) => o.statusId === "completed")
-				.reduce((sum, o) => sum + parseFloat(o.totalAmount), 0),
-		};
-
+		const stats = await getCachedOrderStats(currentUser.id);
 		return { data: stats };
 	} catch (error) {
 		console.error("Erro ao buscar estatísticas dos pedidos:", error);

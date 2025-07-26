@@ -1,8 +1,9 @@
 "use server";
 
-import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { and, eq, ilike, or } from "drizzle-orm";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { z } from "zod";
+import { getCurrentUser } from "@/lib/auth-server";
 import { db } from "@/lib/db";
 import { category, product, subcategory } from "@/lib/db/schema";
 
@@ -58,32 +59,48 @@ const updateProductSchema = z.object({
 		.optional(),
 });
 
+// Internal function to get products
+async function _getProductsInternal() {
+	const products = await db
+		.select({
+			id: product.id,
+			name: product.name,
+			description: product.description,
+			price: product.price,
+			stock: product.stock,
+			status: product.status,
+			categoryId: product.categoryId,
+			subcategoryId: product.subcategoryId,
+			images: product.images,
+			createdAt: product.createdAt,
+			updatedAt: product.updatedAt,
+			categoryName: category.name,
+			categorySlug: category.slug,
+			subcategoryName: subcategory.name,
+			subcategorySlug: subcategory.slug,
+		})
+		.from(product)
+		.leftJoin(category, eq(product.categoryId, category.id))
+		.leftJoin(subcategory, eq(product.subcategoryId, subcategory.id))
+		.orderBy(product.name);
+
+	return products;
+}
+
+// Cached version of getProducts
+const getCachedProducts = unstable_cache(
+	async () => _getProductsInternal(),
+	["products"],
+	{
+		revalidate: 60, // Cache for 60 seconds
+		tags: ["products"],
+	},
+);
+
 // Get all products with category info
 export async function getProducts() {
 	try {
-		const products = await db
-			.select({
-				id: product.id,
-				name: product.name,
-				description: product.description,
-				price: product.price,
-				stock: product.stock,
-				status: product.status,
-				categoryId: product.categoryId,
-				subcategoryId: product.subcategoryId,
-				images: product.images,
-				createdAt: product.createdAt,
-				updatedAt: product.updatedAt,
-				categoryName: category.name,
-				categorySlug: category.slug,
-				subcategoryName: subcategory.name,
-				subcategorySlug: subcategory.slug,
-			})
-			.from(product)
-			.leftJoin(category, eq(product.categoryId, category.id))
-			.leftJoin(subcategory, eq(product.subcategoryId, subcategory.id))
-			.orderBy(product.name);
-
+		const products = await getCachedProducts();
 		return { data: products };
 	} catch (error) {
 		console.error("Erro ao buscar produtos:", error);
@@ -112,6 +129,7 @@ export async function createProduct(data: z.infer<typeof createProductSchema>) {
 			})
 			.returning();
 
+		revalidateTag("products");
 		revalidatePath("/produtos");
 		return { data: newProduct[0], success: "Produto criado com sucesso" };
 	} catch (error) {
@@ -156,6 +174,7 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
 			.where(eq(product.id, validatedData.id))
 			.returning();
 
+		revalidateTag("products");
 		revalidatePath("/produtos");
 		return {
 			data: updatedProduct[0],
@@ -188,6 +207,7 @@ export async function deleteProduct(productId: string) {
 
 		await db.delete(product).where(eq(product.id, productId));
 
+		revalidateTag("products");
 		revalidatePath("/produtos");
 		return { success: "Produto deletado com sucesso" };
 	} catch (error) {

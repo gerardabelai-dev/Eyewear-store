@@ -1,6 +1,7 @@
 "use client";
 
 import { Edit, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -15,13 +16,14 @@ import { deleteCategory } from "@/lib/actions/category";
 
 interface CategoriesTableWrapperProps {
 	categories: CategoryWithCounts[];
-	onRefresh: () => void;
+	onRefresh?: () => void;
 }
 
 export function CategoriesTableWrapper({
 	categories,
 	onRefresh,
 }: CategoriesTableWrapperProps) {
+	const router = useRouter();
 	const [editingCategory, setEditingCategory] =
 		useState<CategoryWithCounts | null>(null);
 	const [deletingCategory, setDeletingCategory] =
@@ -33,6 +35,14 @@ export function CategoriesTableWrapper({
 	const filteredCategories = categories.filter((category) =>
 		category.name.toLowerCase().includes(searchQuery.toLowerCase()),
 	);
+
+	const handleRefresh = () => {
+		if (onRefresh) {
+			onRefresh();
+		} else {
+			router.refresh();
+		}
+	};
 
 	const handleEditCategory = (category: CategoryWithCounts) => {
 		setEditingCategory(category);
@@ -54,7 +64,7 @@ export function CategoriesTableWrapper({
 			} else {
 				toast.success("Categoria excluída com sucesso!");
 				setDeletingCategory(null);
-				onRefresh();
+				handleRefresh();
 			}
 		} catch (error) {
 			toast.error("Erro ao excluir categoria");
@@ -65,7 +75,7 @@ export function CategoriesTableWrapper({
 
 	const handleSuccess = () => {
 		setEditingCategory(null);
-		onRefresh();
+		handleRefresh();
 	};
 
 	return (

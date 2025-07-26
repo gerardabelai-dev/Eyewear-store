@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { cache } from "react";
 import { auth } from "./auth";
 
 export async function getSession() {
@@ -13,9 +14,10 @@ export async function getSession() {
 	}
 }
 
-export async function getCurrentUser() {
+// Cache getCurrentUser for the duration of the request to avoid multiple auth checks
+export const getCurrentUser = cache(async () => {
 	const session = await getSession();
 	return session?.user || null;
-}
+});
 
 export { auth };
