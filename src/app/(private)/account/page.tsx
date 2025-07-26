@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button";
 import { getUserProfile } from "@/lib/actions/user";
 import { getSession } from "@/lib/auth-server";
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = "force-dynamic";
+
 export default async function Dashboard() {
 	const session = await getSession();
 

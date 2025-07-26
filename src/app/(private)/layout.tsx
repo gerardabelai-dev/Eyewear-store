@@ -5,6 +5,9 @@ import { Footer } from "@/components/shared/footer";
 import { getUserProfile } from "@/lib/actions/user";
 import { getCurrentUser } from "@/lib/auth-server";
 
+// Force dynamic rendering for all authenticated pages
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
 	title: "Dr. Vista - Plataforma de Autenticação Segura",
 	description:

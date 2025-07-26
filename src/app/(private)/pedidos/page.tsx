@@ -21,10 +21,12 @@ import {
 } from "@/components/ui/card";
 import { getOrderStats, getOrders } from "@/lib/actions/order";
 import { getOrderStatuses } from "@/lib/actions/order-status";
-import { getUserProfile } from "@/lib/actions/user";
-import { getCurrentUser } from "@/lib/auth-server";
+import { getSession } from "@/lib/auth-server";
 
-export default async function PedidosPage() {
+// Force dynamic rendering for authenticated pages
+export const dynamic = "force-dynamic";
+
+export default async function OrdersPage() {
 	const [ordersResult, statsResult, statusesResult] = await Promise.all([
 		getOrders(),
 		getOrderStats(),

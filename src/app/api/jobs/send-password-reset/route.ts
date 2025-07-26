@@ -58,16 +58,30 @@ export async function POST(request: NextRequest) {
 			payload.email,
 		);
 
-		console.log(
-			`Password reset email sent successfully to ${payload.email}:`,
-			result.data,
-		);
+		if (result.success) {
+			console.log(
+				`Password reset email sent successfully to ${payload.email}:`,
+				result.messageId,
+			);
 
-		return NextResponse.json({
-			success: true,
-			messageId: result.messageId,
-			email: payload.email,
-		});
+			return NextResponse.json({
+				success: true,
+				messageId: result.messageId,
+				email: payload.email,
+			});
+		} else {
+			console.error(
+				`Failed to send password reset email to ${payload.email}:`,
+				result.error,
+			);
+			return NextResponse.json(
+				{
+					error: "Failed to send email",
+					details: result.error,
+				},
+				{ status: 500 },
+			);
+		}
 	} catch (error) {
 		console.error("Error in send-password-reset job:", error);
 

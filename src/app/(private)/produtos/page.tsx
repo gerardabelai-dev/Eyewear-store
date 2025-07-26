@@ -12,8 +12,12 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { getProducts } from "@/lib/actions/product";
+import { getSession } from "@/lib/auth-server";
 
-export default async function ProdutosPage() {
+// Force dynamic rendering for authenticated pages
+export const dynamic = "force-dynamic";
+
+export default async function ProductsPage() {
 	const result = await getProducts();
 	if (result.error) {
 		redirect("/account");
