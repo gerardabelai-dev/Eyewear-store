@@ -1,13 +1,14 @@
-import "server-only";
+import * as dotenv from "dotenv";
 import { defineConfig } from "drizzle-kit";
-import { serverEnv } from "./src/lib/env";
+
+dotenv.config();
 
 export default defineConfig({
 	schema: "./src/lib/db/schema.ts",
 	out: "./migrations",
 	dialect: "postgresql",
 	dbCredentials: {
-		url: serverEnv.DATABASE_URL,
+		url: process.env.DATABASE_URL!,
 	},
 	verbose: true,
 	strict: true,

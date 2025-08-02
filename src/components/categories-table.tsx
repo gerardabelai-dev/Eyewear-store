@@ -1,7 +1,6 @@
 "use client";
 
 import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
-import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +25,7 @@ export type CategoryWithCounts = {
 	id: string;
 	name: string;
 	slug: string;
-	description: string | null;
+	description: string | undefined;
 	createdAt: Date;
 	updatedAt: Date;
 	productsCount: number;

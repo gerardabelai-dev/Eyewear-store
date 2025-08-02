@@ -1,38 +1,20 @@
 import {
-	AlertCircle,
 	CheckCircle,
 	Clock,
 	Package,
 	ShoppingCart,
 	TrendingUp,
 } from "lucide-react";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
-import { getCurrentUser } from "@/lib/auth-server";
-import { getOrderStatsQuery } from "@/lib/queries/orders";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export async function OrdersStatistics() {
-	const user = await getCurrentUser();
-	if (!user) {
-		throw new Error("User not authenticated");
-	}
-
-	const stats = await getOrderStatsQuery(user.id);
-
-	const {
-		totalOrders,
-		pendingOrders,
-		processingOrders,
-		completedOrders,
-		cancelledOrders,
-		totalRevenue,
-	} = stats;
-
+export function OrdersStatistics() {
+	// Mock statistics
+	const totalOrders = 156;
+	const pendingOrders = 12;
+	const processingOrders = 8;
+	const completedOrders = 130;
+	const _cancelledOrders = 6;
+	const totalRevenue = 45780.5;
 	return (
 		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
 			<Card>
@@ -43,7 +25,7 @@ export async function OrdersStatistics() {
 					<ShoppingCart className="h-4 w-4 text-muted-foreground" />
 				</CardHeader>
 				<CardContent>
-					<div className="text-2xl font-bold">{stats.totalOrders}</div>
+					<div className="text-2xl font-bold">{totalOrders}</div>
 					<p className="text-xs text-muted-foreground">pedidos registrados</p>
 				</CardContent>
 			</Card>
@@ -54,7 +36,7 @@ export async function OrdersStatistics() {
 					<Clock className="h-4 w-4 text-muted-foreground" />
 				</CardHeader>
 				<CardContent>
-					<div className="text-2xl font-bold">{stats.pendingOrders}</div>
+					<div className="text-2xl font-bold">{pendingOrders}</div>
 					<p className="text-xs text-muted-foreground">aguardando ação</p>
 				</CardContent>
 			</Card>
@@ -65,7 +47,7 @@ export async function OrdersStatistics() {
 					<Package className="h-4 w-4 text-muted-foreground" />
 				</CardHeader>
 				<CardContent>
-					<div className="text-2xl font-bold">{stats.processingOrders}</div>
+					<div className="text-2xl font-bold">{processingOrders}</div>
 					<p className="text-xs text-muted-foreground">em preparação</p>
 				</CardContent>
 			</Card>
@@ -76,7 +58,7 @@ export async function OrdersStatistics() {
 					<CheckCircle className="h-4 w-4 text-muted-foreground" />
 				</CardHeader>
 				<CardContent>
-					<div className="text-2xl font-bold">{stats.completedOrders}</div>
+					<div className="text-2xl font-bold">{completedOrders}</div>
 					<p className="text-xs text-muted-foreground">pedidos finalizados</p>
 				</CardContent>
 			</Card>
@@ -89,7 +71,7 @@ export async function OrdersStatistics() {
 				<CardContent>
 					<div className="text-2xl font-bold">
 						R${" "}
-						{stats.totalRevenue.toLocaleString("pt-BR", {
+						{totalRevenue.toLocaleString("pt-BR", {
 							minimumFractionDigits: 2,
 							maximumFractionDigits: 2,
 						})}

@@ -1,7 +1,7 @@
 "use client";
 
 import { Package, Plus } from "lucide-react";
-import { ProductForm } from "@/components/forms/product-form";
+import { ProductFormSimple } from "@/components/forms/product-form-simple";
 import { Button } from "@/components/ui/button";
 import { DrawerControlled } from "@/components/ui/drawer";
 
@@ -19,7 +19,7 @@ export function ProductCreationSheet() {
 			icon={<Package className="h-5 w-5" />}
 		>
 			{({ onClose }) => (
-				<ProductForm
+				<ProductFormSimple
 					onSuccess={() => {
 						// Close the sheet after successful creation
 						onClose();

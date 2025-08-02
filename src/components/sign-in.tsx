@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -79,7 +78,7 @@ function SignIn() {
 						const message = "Bem-vindo de volta!";
 						if (globalToastTracker.canShowToast(message)) {
 							toast.success(message);
-							router.push("/produtos");
+							router.push("/");
 						}
 					},
 					onError: (ctx) => {
@@ -103,7 +102,7 @@ function SignIn() {
 			await signIn.social(
 				{
 					provider: "google",
-					callbackURL: "/account",
+					callbackURL: "/",
 				},
 				{
 					onSuccess: () => {

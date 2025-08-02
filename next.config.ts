@@ -24,7 +24,7 @@ const nextConfig: NextConfig = {
 		],
 	},
 	// Move serverComponentsExternalPackages to the correct location
-	serverExternalPackages: ["bcrypt", "drizzle-orm", "@neondatabase/serverless"],
+	serverExternalPackages: ["drizzle-orm", "@neondatabase/serverless"],
 	// Experimental features that help with performance and server/client boundaries
 	experimental: {
 		// Enable server components HMR cache for better performance

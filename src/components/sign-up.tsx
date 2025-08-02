@@ -1,11 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Upload, X } from "lucide-react";
-import Image from "next/image";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -44,8 +42,7 @@ const globalToastTracker = {
 
 const signUpSchema = z
 	.object({
-		firstName: z.string().min(1, "Nome é obrigatório"),
-		lastName: z.string().min(1, "Sobrenome é obrigatório"),
+		name: z.string().min(1, "Nome é obrigatório"),
 		email: z
 			.string()
 			.min(1, "Email é obrigatório")
@@ -65,40 +62,16 @@ type SignUpValues = z.infer<typeof signUpSchema>;
 
 function SignUp() {
 	const router = useRouter();
-	const fileInputRef = useRef<HTMLInputElement>(null);
-	const [image, setImage] = useState<File | null>(null);
-	const [imagePreview, setImagePreview] = useState<string | null>(null);
 
 	const form = useForm<SignUpValues>({
 		resolver: zodResolver(signUpSchema),
 		defaultValues: {
-			firstName: "",
-			lastName: "",
+			name: "",
 			email: "",
 			password: "",
 			confirmPassword: "",
 		},
 	});
-
-	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		if (file) {
-			setImage(file);
-			const reader = new FileReader();
-			reader.onloadend = () => {
-				setImagePreview(reader.result as string);
-			};
-			reader.readAsDataURL(file);
-		}
-	};
-
-	const removeImage = () => {
-		setImage(null);
-		setImagePreview(null);
-		if (fileInputRef.current) {
-			fileInputRef.current.value = "";
-		}
-	};
 
 	const onSubmit = async (values: SignUpValues) => {
 		try {
@@ -106,18 +79,15 @@ function SignUp() {
 				{
 					email: values.email,
 					password: values.password,
-					name: `${values.firstName} ${values.lastName}`,
-					firstName: values.firstName,
-					lastName: values.lastName,
-					image: image ? await convertImageToBase64(image) : "",
-					callbackURL: "/dashboard",
-				} as any,
+					name: values.name,
+					callbackURL: "/",
+				},
 				{
 					onSuccess: () => {
 						const message = "Conta criada com sucesso!";
 						if (globalToastTracker.canShowToast(message)) {
 							toast.success(message);
-							router.push("/account");
+							router.push("/");
 						}
 					},
 					onError: (ctx) => {
@@ -141,7 +111,7 @@ function SignUp() {
 			await signIn.social(
 				{
 					provider: "google",
-					callbackURL: "/account",
+					callbackURL: "/",
 				},
 				{
 					onSuccess: () => {
@@ -190,90 +160,23 @@ function SignUp() {
 							})}
 							className="space-y-4"
 						>
-							{/* Profile Picture Upload */}
-							<div className="flex flex-col items-center space-y-4">
-								<div className="relative">
-									{imagePreview ? (
-										<div className="relative w-20 h-20 rounded-full overflow-hidden">
-											<Image
-												src={imagePreview}
-												alt="Prévia do perfil"
-												width={80}
-												height={80}
-												className="object-cover w-full h-full"
+							<FormField
+								control={form.control}
+								name="name"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Nome completo</FormLabel>
+										<FormControl>
+											<Input
+												placeholder="João Silva"
+												className="w-full"
+												{...field}
 											/>
-											<Button
-												type="button"
-												variant="outline"
-												size="sm"
-												className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 bg-red-500 text-white border-red-500 hover:bg-red-600"
-												onClick={removeImage}
-											>
-												<X className="h-3 w-3" />
-											</Button>
-										</div>
-									) : (
-										<div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
-											<Upload className="h-8 w-8 text-muted-foreground" />
-										</div>
-									)}
-								</div>
-								<div className="text-center">
-									<Button
-										type="button"
-										variant="outline"
-										size="sm"
-										onClick={() => fileInputRef.current?.click()}
-									>
-										Enviar Foto
-									</Button>
-									<p className="text-xs text-muted-foreground mt-1">Opcional</p>
-								</div>
-								<input
-									ref={fileInputRef}
-									type="file"
-									accept="image/*"
-									onChange={handleImageChange}
-									className="hidden"
-								/>
-							</div>
-
-							<div className="space-y-4">
-								<FormField
-									control={form.control}
-									name="firstName"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Nome</FormLabel>
-											<FormControl>
-												<Input
-													placeholder="João"
-													className="w-full"
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name="lastName"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Sobrenome</FormLabel>
-											<FormControl>
-												<Input
-													placeholder="Silva"
-													className="w-full"
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 
 							<FormField
 								control={form.control}
@@ -408,12 +311,3 @@ function SignUp() {
 
 SignUp.displayName = "SignUp";
 export default SignUp;
-
-async function convertImageToBase64(file: File): Promise<string> {
-	return new Promise((resolve, reject) => {
-		const reader = new FileReader();
-		reader.readAsDataURL(file);
-		reader.onload = () => resolve(reader.result as string);
-		reader.onerror = (error) => reject(error);
-	});
-}

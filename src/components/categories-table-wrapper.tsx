@@ -8,7 +8,7 @@ import {
 	CategoriesTable,
 	type CategoryWithCounts,
 } from "@/components/categories-table";
-import { CategoryEditForm } from "@/components/forms/category-edit-form";
+import { CategoryForm } from "@/components/forms/category-form";
 import { CategoryDeleteDialog } from "@/components/ui/category-delete-dialog";
 import { Drawer } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
@@ -113,10 +113,7 @@ export function CategoriesTableWrapper({
 				}}
 			>
 				{editingCategory && (
-					<CategoryEditForm
-						category={editingCategory}
-						onSuccess={handleSuccess}
-					/>
+					<CategoryForm category={editingCategory} onSuccess={handleSuccess} />
 				)}
 			</Drawer>
 

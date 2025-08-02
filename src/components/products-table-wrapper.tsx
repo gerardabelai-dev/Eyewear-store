@@ -3,9 +3,18 @@
 import { Edit } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ProductForm } from "@/components/forms/product-form";
-import { ProductsAdvancedTable } from "@/components/products-advanced-table";
+import { ProductFormSimple } from "@/components/forms/product-form-simple";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Drawer } from "@/components/ui/drawer";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
 import type { Product } from "@/lib/types";
 
 // Extended Product type with category information
@@ -30,49 +39,65 @@ export function ProductsTableWrapper({ products }: ProductsTableWrapperProps) {
 		setIsEditDrawerOpen(true);
 	};
 
-	const handleDeleteProduct = async (product: ProductWithCategory) => {
-		try {
-			const result = await fetch(`/api/products/${product.id}`, {
-				method: "DELETE",
-			});
-			if (!result.ok) {
-				const errorData = await result.json();
-				toast.error(errorData.error || "Erro ao excluir produto");
-			} else {
-				toast.success("Produto excluído com sucesso!");
-				// Data will be automatically revalidated by server action
-			}
-		} catch (error) {
-			console.error("Error deleting product:", error);
-			toast.error("Erro ao excluir produto");
-		}
+	const formatCurrency = (value: string) => {
+		return new Intl.NumberFormat("pt-BR", {
+			style: "currency",
+			currency: "BRL",
+		}).format(parseFloat(value));
 	};
 
-	const handleEditSuccess = () => {
-		setIsEditDrawerOpen(false);
-		setEditingProduct(null);
-		// Data will be automatically revalidated by server action
-	};
-
-	const handleEditCancel = () => {
-		setIsEditDrawerOpen(false);
-		setEditingProduct(null);
+	const getStatusBadge = (status: string) => {
+		return status === "active" ? (
+			<Badge variant="default">Ativo</Badge>
+		) : (
+			<Badge variant="secondary">Inativo</Badge>
+		);
 	};
 
 	return (
 		<>
-			<ProductsAdvancedTable
-				products={products}
-				onEditProduct={handleEditProduct}
-				onDeleteProduct={handleDeleteProduct}
-			/>
+			<div className="rounded-md border">
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead>Nome</TableHead>
+							<TableHead>Categoria</TableHead>
+							<TableHead>Preço</TableHead>
+							<TableHead>Estoque</TableHead>
+							<TableHead>Status</TableHead>
+							<TableHead className="w-[100px]">Ações</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{products.map((product) => (
+							<TableRow key={product.id}>
+								<TableCell className="font-medium">{product.name}</TableCell>
+								<TableCell>{product.categoryName}</TableCell>
+								<TableCell>{formatCurrency(product.price)}</TableCell>
+								<TableCell>{product.stock}</TableCell>
+								<TableCell>{getStatusBadge(product.status)}</TableCell>
+								<TableCell>
+									<Button
+										variant="ghost"
+										size="sm"
+										onClick={() => handleEditProduct(product)}
+									>
+										<Edit className="h-4 w-4" />
+									</Button>
+								</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</div>
 
 			{/* Edit Product Drawer */}
 			<Drawer
 				open={isEditDrawerOpen}
 				onOpenChange={(open: boolean) => {
 					if (!open) {
-						handleEditCancel();
+						setIsEditDrawerOpen(false);
+						setEditingProduct(null);
 					}
 				}}
 				trigger={<div style={{ display: "none" }} />}
@@ -80,9 +105,13 @@ export function ProductsTableWrapper({ products }: ProductsTableWrapperProps) {
 				description="Atualize as informações do produto"
 				icon={<Edit className="h-5 w-5" />}
 			>
-				<ProductForm
+				<ProductFormSimple
 					product={editingProduct || undefined}
-					onSuccess={handleEditSuccess}
+					onSuccess={() => {
+						setIsEditDrawerOpen(false);
+						setEditingProduct(null);
+						toast.success("Produto atualizado com sucesso!");
+					}}
 				/>
 			</Drawer>
 		</>

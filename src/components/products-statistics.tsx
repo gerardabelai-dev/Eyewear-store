@@ -1,18 +1,13 @@
 import { AlertTriangle, Package, Package2, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
-import { getProductStatsQuery } from "@/lib/queries/products";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export async function ProductsStatistics() {
-	const stats = await getProductStatsQuery();
-
-	const { totalProducts, activeProducts, lowStockProducts, totalValue } = stats;
+export function ProductsStatistics() {
+	// Mock statistics
+	const totalProducts = 45;
+	const activeProducts = 38;
+	const lowStockProducts = 7;
+	const totalValue = 125430;
 
 	return (
 		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

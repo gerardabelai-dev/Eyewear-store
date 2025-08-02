@@ -3,22 +3,22 @@ import { IBM_Plex_Mono, Libre_Baskerville, Lora } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import "./globals.css";
-import { QueryErrorResetBoundary } from "@tanstack/react-query";
+
 import { cn } from "@/lib/utils";
 import { QueryProvider } from "./providers";
 
-const libreBaskerville = Libre_Baskerville({
+const _libreBaskerville = Libre_Baskerville({
 	weight: ["400", "700"],
 	variable: "--font-sans",
 	subsets: ["latin"],
 });
 
-const lora = Lora({
+const _lora = Lora({
 	variable: "--font-serif",
 	subsets: ["latin"],
 });
 
-const ibmPlexMono = IBM_Plex_Mono({
+const _ibmPlexMono = IBM_Plex_Mono({
 	weight: ["400", "500", "600"],
 	variable: "--font-mono",
 	subsets: ["latin"],
@@ -50,7 +50,7 @@ export default function RootLayout({
 						enableSystem
 						disableTransitionOnChange
 					>
-						<QueryErrorResetBoundary>{children}</QueryErrorResetBoundary>
+						{children}
 						<Toaster
 							richColors
 							position="bottom-right"

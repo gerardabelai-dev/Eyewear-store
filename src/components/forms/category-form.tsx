@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -18,7 +17,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { Category } from "@/lib/db/schema";
+import type { Category } from "@/lib/types";
 
 const categoryFormSchema = z.object({
 	name: z
@@ -50,16 +49,22 @@ export function CategoryForm({ onSuccess, category }: CategoryFormProps) {
 		},
 	});
 
-	const { mutate, isPending } = useMutation({
-		mutationFn: (data) =>
-			fetch(category ? `/api/categories/${category.id}` : "/api/categories", {
-				method: category ? "PUT" : "POST",
-				body: JSON.stringify(data),
-			}),
-		onSuccess: onSuccess,
-	});
+	const onSubmit = async (_data: CategoryFormData) => {
+		setIsSubmitting(true);
 
-	const onSubmit = (data: CategoryFormData) => mutate(data);
+		// Simulate API call with 3 second delay
+		setTimeout(() => {
+			setIsSubmitting(false);
+			toast.success(
+				isEditing
+					? "Categoria atualizada com sucesso!"
+					: "Categoria criada com sucesso!",
+			);
+			if (onSuccess) {
+				onSuccess();
+			}
+		}, 3000);
+	};
 
 	return (
 		<Form {...form}>

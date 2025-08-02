@@ -1,41 +1,12 @@
-"use client";
-import { useQuery } from "@tanstack/react-query";
-import { Settings } from "lucide-react";
-import { redirect } from "next/navigation";
-import { AvatarForm } from "@/components/forms/avatar-form";
-import { EmailForm } from "@/components/forms/email-form";
-import { PasswordForm } from "@/components/forms/password-form";
-import { PersonalInfoForm } from "@/components/forms/personal-info-form";
 import { ProfileDisplay } from "@/components/forms/profile-display";
-import { Button } from "@/components/ui/button";
 
-// Force dynamic rendering for authenticated pages
-export const dynamic = "force-dynamic";
-
-export default async function Dashboard() {
-	// Remove getSession; use useAuth hook for session check
-
-	// Load user profile
-	const {
-		data: userProfile,
-		isLoading,
-		error,
-	} = useQuery({
-		queryKey: ["userProfile"],
-		queryFn: () =>
-			fetch("/api/user")
-				.then((res) => res.json())
-				.then((data) => {
-					if (data.error) {
-						throw new Error(data.error);
-					}
-					return data;
-				}),
-	});
-
-	if (error || !userProfile) {
-		redirect("/auth");
-	}
+export default function Dashboard() {
+	// Mock user data
+	const userProfile = {
+		name: "João Silva",
+		email: "joao.silva@example.com",
+		image: null,
+	};
 
 	const getInitials = (name: string) => {
 		return name
@@ -46,10 +17,7 @@ export default async function Dashboard() {
 			.slice(0, 2);
 	};
 
-	const userInitials = getInitials(
-		`${userProfile.firstName || ""} ${userProfile.lastName || ""}`.trim() ||
-			"User",
-	);
+	const _userInitials = getInitials(userProfile.name || "User");
 
 	return (
 		<div className="mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
@@ -62,16 +30,10 @@ export default async function Dashboard() {
 			<div className="flex flex-col gap-6">
 				{/* Main Content */}
 				<div className="flex-1 space-y-4 sm:space-y-6 min-w-0">
-					{/* Avatar Section */}
-					<AvatarForm
-						userImage={userProfile.image}
-						userInitials={userInitials}
-					/>
-
 					{/* Profile Information Display */}
 					<ProfileDisplay
-						firstName={userProfile.firstName}
-						lastName={userProfile.lastName}
+						firstName={userProfile.name.split(" ")[0]}
+						lastName={userProfile.name.split(" ").slice(1).join(" ")}
 						email={userProfile.email}
 					/>
 

@@ -1,30 +1,12 @@
-"use client";
-import { useQuery } from "@tanstack/react-query";
 import { DashboardHeader } from "@/components/dashboard-header";
 
 export function UserHeaderWrapper() {
-	const { data: userProfile, error } = useQuery({
-		queryKey: ["user", "profile"],
-		queryFn: async () => {
-			const response = await fetch("/api/user");
-			if (!response.ok) {
-				throw new Error("Failed to fetch user profile");
-			}
-			return response.json();
-		},
-	});
-
-	if (error || !userProfile) {
-		// Return a minimal header for error state
-		return (
-			<DashboardHeader
-				userImage={null}
-				userInitials="??"
-				userName="Usuário"
-				userEmail=""
-			/>
-		);
-	}
+	// Mock user data
+	const userProfile = {
+		name: "João Silva",
+		email: "joao.silva@example.com",
+		image: null,
+	};
 
 	const getInitials = (name: string) => {
 		return name
@@ -35,20 +17,13 @@ export function UserHeaderWrapper() {
 			.slice(0, 2);
 	};
 
-	const userInitials = getInitials(
-		`${userProfile.firstName || ""} ${userProfile.lastName || ""}`.trim() ||
-			"User",
-	);
-
-	const userName =
-		`${userProfile.firstName || ""} ${userProfile.lastName || ""}`.trim() ||
-		"Usuário";
+	const userInitials = getInitials(userProfile.name || "User");
 
 	return (
 		<DashboardHeader
 			userImage={userProfile.image}
 			userInitials={userInitials}
-			userName={userName}
+			userName={userProfile.name}
 			userEmail={userProfile.email}
 		/>
 	);
