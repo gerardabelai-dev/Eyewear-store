@@ -19,6 +19,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { ROUTES } from "@/constants/routes";
 import { signIn } from "@/lib/auth-client";
 
 // Create a global toast tracker to prevent duplicates across all sign-in attempts
@@ -78,7 +79,7 @@ function SignIn() {
 						const message = "Bem-vindo de volta!";
 						if (globalToastTracker.canShowToast(message)) {
 							toast.success(message);
-							router.push("/");
+							router.push(ROUTES.PRODUCTS);
 						}
 					},
 					onError: (ctx) => {
@@ -102,7 +103,7 @@ function SignIn() {
 			await signIn.social(
 				{
 					provider: "google",
-					callbackURL: "/",
+					callbackURL: ROUTES.PRODUCTS,
 				},
 				{
 					onSuccess: () => {
@@ -286,7 +287,7 @@ function SignIn() {
 			<div className="text-center mt-4">
 				<p className="text-sm text-muted-foreground">
 					Não tem uma conta?{" "}
-					<Link href="/auth/sign-up" className="text-primary hover:underline">
+					<Link href={ROUTES.SIGN_UP} className="text-primary hover:underline">
 						Criar conta
 					</Link>
 				</p>

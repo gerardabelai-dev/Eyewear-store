@@ -1,4 +1,4 @@
-import { ProfileDisplay } from "@/components/forms/profile-display";
+import { ProfileDisplay } from "./profile-display";
 
 export default function Dashboard() {
 	// Mock user data
@@ -7,17 +7,6 @@ export default function Dashboard() {
 		email: "joao.silva@example.com",
 		image: null,
 	};
-
-	const getInitials = (name: string) => {
-		return name
-			.split(" ")
-			.map((n) => n[0])
-			.join("")
-			.toUpperCase()
-			.slice(0, 2);
-	};
-
-	const _userInitials = getInitials(userProfile.name || "User");
 
 	return (
 		<div className="mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
@@ -31,23 +20,7 @@ export default function Dashboard() {
 				{/* Main Content */}
 				<div className="flex-1 space-y-4 sm:space-y-6 min-w-0">
 					{/* Profile Information Display */}
-					<ProfileDisplay
-						firstName={userProfile.name.split(" ")[0]}
-						lastName={userProfile.name.split(" ").slice(1).join(" ")}
-						email={userProfile.email}
-					/>
-
-					{/* Personal Information Form */}
-					{/* <PersonalInfoForm
-						firstName={userProfile.firstName}
-						lastName={userProfile.lastName}
-					/> */}
-
-					{/* Email Form */}
-					{/* <EmailForm email={userProfile.email} /> */}
-
-					{/* Password Form */}
-					{/* <PasswordForm hasPassword={userProfile.hasPassword} /> */}
+					<ProfileDisplay name={userProfile.name} email={userProfile.email} />
 				</div>
 			</div>
 		</div>

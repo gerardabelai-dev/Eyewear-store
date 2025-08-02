@@ -1,10 +1,9 @@
 import { Suspense } from "react";
-import { OrdersTableSkeleton } from "@/components/orders-table-skeleton";
-import { ProductCreationSheet } from "@/components/product-creation-sheet";
-import { ProductsStatistics } from "@/components/products-statistics";
-import { ProductsStatisticsSkeleton } from "@/components/products-statistics-skeleton";
-import { ProductsTableClient } from "@/components/products-table-client";
-import { PageHeader } from "@/components/shared/page-header";
+import { PageHeader } from "@/components/page-header";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ProductCreationSheet } from "./product-creation-sheet";
+import { ProductsStatistics } from "./products-statistics";
+import { ProductsTable } from "./products-table";
 
 // Add revalidation time for ISR
 export const revalidate = 60; // Revalidate every 60 seconds
@@ -20,13 +19,13 @@ export default function ProductsPage() {
 			/>
 
 			{/* Statistics Cards - Stream with Suspense */}
-			<Suspense fallback={<ProductsStatisticsSkeleton />}>
+			<Suspense fallback={<Skeleton className="h-32 w-full" />}>
 				<ProductsStatistics />
 			</Suspense>
 
 			{/* Products Table - Stream with Suspense */}
-			<Suspense fallback={<OrdersTableSkeleton />}>
-				<ProductsTableClient />
+			<Suspense fallback={<Skeleton className="h-96 w-full" />}>
+				<ProductsTable />
 			</Suspense>
 		</>
 	);

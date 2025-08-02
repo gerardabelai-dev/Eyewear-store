@@ -1,11 +1,9 @@
 import { Suspense } from "react";
-import { OrderCreationSheet } from "@/components/order-creation-sheet";
-import { OrdersStatistics } from "@/components/orders-statistics";
-import { OrdersStatisticsSkeleton } from "@/components/orders-statistics-skeleton";
-import { OrdersTableClient } from "@/components/orders-table-client";
-import { OrdersTableSkeleton } from "@/components/orders-table-skeleton";
-import { OrdersTableWrapper } from "@/components/orders-table-wrapper";
-import { PageHeader } from "@/components/shared/page-header";
+import { PageHeader } from "@/components/page-header";
+import { Skeleton } from "@/components/ui/skeleton";
+import { OrderCreationSheet } from "./order-creation-sheet";
+import { OrdersStatistics } from "./orders-statistics";
+import { OrdersTable } from "./orders-table";
 
 export default function OrdersPage() {
 	return (
@@ -15,11 +13,11 @@ export default function OrdersPage() {
 				description="Gerencie seus pedidos e vendas"
 				action={<OrderCreationSheet />}
 			/>
-			<Suspense fallback={<OrdersStatisticsSkeleton />}>
+			<Suspense fallback={<Skeleton className="h-32 w-full" />}>
 				<OrdersStatistics />
 			</Suspense>
-			<Suspense fallback={<OrdersTableSkeleton />}>
-				<OrdersTableClient />
+			<Suspense fallback={<Skeleton className="h-96 w-full" />}>
+				<OrdersTable />
 			</Suspense>
 		</>
 	);

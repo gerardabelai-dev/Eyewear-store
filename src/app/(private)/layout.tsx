@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { Footer } from "@/components/shared/footer";
+import { Footer } from "@/components/footer";
 import { UserHeaderSkeleton } from "@/components/user-header-skeleton";
 import { UserHeaderWrapper } from "@/components/user-header-wrapper";
+import { ROUTES } from "@/constants/routes";
 import { getCurrentUser } from "@/lib/auth-server";
 
 // Remove force-dynamic to allow caching of auth check
@@ -23,7 +24,7 @@ export default async function RootLayout({
 	// Only check authentication, don't fetch full profile here
 	const user = await getCurrentUser();
 	if (!user) {
-		redirect("/auth/sign-in");
+		redirect(ROUTES.SIGN_IN);
 	}
 
 	return (

@@ -1,7 +1,6 @@
 import { ArrowRight, Shield, Users, Zap } from "lucide-react";
 import Link from "next/link";
-import { Footer } from "@/components/shared/footer";
-import { Header } from "@/components/shared/header";
+import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -10,16 +9,20 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { ROUTES } from "@/constants/routes";
+import { getCurrentUser } from "@/lib/auth-server";
 
 // Fast Refresh Test - updated comment to test refresh functionality
-export default function HomePage() {
+export default async function HomePage() {
+	// Redirect authenticated users to products page
+	const user = await getCurrentUser();
+	if (user) {
+		redirect(ROUTES.PRODUCTS);
+	}
 	// Test Fast Refresh - Change this text to see if it updates
 	// Current time: 2024-01-15 10:30 AM
 	return (
-		<div className="min-h-screen bg-background">
-			{/* Header */}
-			<Header />
-
+		<>
 			{/* Hero Section */}
 			<section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
 				<div className="max-w-7xl mx-auto text-center">
@@ -34,7 +37,7 @@ export default function HomePage() {
 						um só lugar.
 					</p>
 					<div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4 sm:px-0">
-						<Link href="/auth/sign-up" className="w-full sm:w-auto">
+						<Link href={ROUTES.SIGN_UP} className="w-full sm:w-auto">
 							<Button
 								size="lg"
 								className="flex items-center justify-center space-x-2 w-full sm:w-auto"
@@ -43,7 +46,7 @@ export default function HomePage() {
 								<ArrowRight className="w-4 h-4 text-primary-foreground" />
 							</Button>
 						</Link>
-						<Link href="/auth/sign-in" className="w-full sm:w-auto">
+						<Link href={ROUTES.SIGN_IN} className="w-full sm:w-auto">
 							<Button size="lg" variant="outline" className="w-full sm:w-auto">
 								Fazer Login
 							</Button>
@@ -119,7 +122,7 @@ export default function HomePage() {
 					</p>
 					<div className="px-4 sm:px-0">
 						<Link
-							href="/auth/sign-up"
+							href={ROUTES.SIGN_UP}
 							className="inline-block w-full sm:w-auto"
 						>
 							<Button
@@ -133,9 +136,6 @@ export default function HomePage() {
 					</div>
 				</div>
 			</section>
-
-			{/* Footer */}
-			<Footer />
-		</div>
+		</>
 	);
 }

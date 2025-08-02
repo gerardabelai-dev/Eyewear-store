@@ -1,10 +1,9 @@
 import { Suspense } from "react";
-import { CategoriesStatistics } from "@/components/categories-statistics";
-import { CategoriesTableClient } from "@/components/categories-table-client";
-import { CategoryCreationSheet } from "@/components/category-creation-sheet";
-import { OrdersTableSkeleton } from "@/components/orders-table-skeleton";
-import { ProductsStatisticsSkeleton } from "@/components/products-statistics-skeleton";
-import { PageHeader } from "@/components/shared/page-header";
+import { PageHeader } from "@/components/page-header";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CategoriesStatistics } from "./categories-statistics";
+import { CategoriesTable } from "./categories-table";
+import { CategoryCreationSheet } from "./category-creation-sheet";
 
 // Add revalidation time for ISR
 export const revalidate = 60; // Revalidate every 60 seconds
@@ -20,13 +19,13 @@ export default function CategoriesPage() {
 			/>
 
 			{/* Statistics Cards - Stream with Suspense */}
-			<Suspense fallback={<ProductsStatisticsSkeleton />}>
+			<Suspense fallback={<Skeleton className="h-32 w-full" />}>
 				<CategoriesStatistics />
 			</Suspense>
 
 			{/* Categories Table - Stream with Suspense */}
-			<Suspense fallback={<OrdersTableSkeleton />}>
-				<CategoriesTableClient />
+			<Suspense fallback={<Skeleton className="h-96 w-full" />}>
+				<CategoriesTable />
 			</Suspense>
 		</>
 	);

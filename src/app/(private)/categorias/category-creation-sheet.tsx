@@ -1,28 +1,28 @@
 "use client";
 
-import { Plus, ShoppingCart } from "lucide-react";
-import { OrderForm } from "@/components/forms/order-form-simple";
+import { FolderOpen, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DrawerControlled } from "@/components/ui/drawer";
+import { CategoryForm } from "./category-form";
 
-export function OrderCreationSheet() {
+export function CategoryCreationSheet() {
 	return (
 		<DrawerControlled
 			trigger={
 				<Button>
 					<Plus className="mr-2 h-4 w-4" />
-					Novo Pedido
+					Nova Categoria
 				</Button>
 			}
-			title="Novo Pedido"
-			description="Preencha os dados do cliente e adicione os produtos desejados"
-			icon={<ShoppingCart className="h-5 w-5" />}
+			title="Nova Categoria"
+			description="Adicione uma nova categoria para organizar seus produtos"
+			icon={<FolderOpen className="h-5 w-5" />}
 		>
 			{({ onClose }) => (
-				<OrderForm
+				<CategoryForm
 					onSuccess={() => {
 						// Close the sheet after successful creation
-						console.log("Order form success, closing drawer");
+						console.log("Category form success, closing drawer");
 						onClose();
 					}}
 				/>

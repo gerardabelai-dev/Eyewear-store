@@ -1,9 +1,9 @@
 "use client";
 
-import { LogOut, Menu, Settings, User, X } from "lucide-react";
+import { LogOut, Menu, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { AppLogo } from "@/components/shared/brand";
+import { AppLogo } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { UserAvatar } from "@/components/ui/user-avatar";
+import { ROUTES } from "@/constants/routes";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
@@ -26,9 +27,9 @@ interface DashboardHeaderProps {
 }
 
 const navigationItems = [
-	{ name: "Produtos", href: "/produtos" },
-	{ name: "Categorias", href: "/categorias" },
-	{ name: "Pedidos", href: "/pedidos" },
+	{ name: "Produtos", href: ROUTES.PRODUCTS },
+	{ name: "Categorias", href: ROUTES.CATEGORIES },
+	{ name: "Pedidos", href: ROUTES.ORDERS },
 	{ name: "Clientes", href: "#" },
 ];
 
@@ -44,7 +45,7 @@ export function DashboardHeader({
 	const handleSignOut = async () => {
 		try {
 			await authClient.signOut();
-			router.push("/auth/sign-in");
+			router.push(ROUTES.SIGN_IN);
 		} catch (error) {
 			console.error("Error signing out:", error);
 		}
@@ -142,7 +143,7 @@ export function DashboardHeader({
 								</DropdownMenuLabel>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem asChild>
-									<Link href="/account" className="cursor-pointer">
+									<Link href={ROUTES.ACCOUNT} className="cursor-pointer">
 										<User className="mr-2 h-4 w-4" />
 										<span>Perfil</span>
 									</Link>

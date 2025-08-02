@@ -2,16 +2,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 
 interface ProfileDisplayProps {
-	firstName?: string | null;
-	lastName?: string | null;
+	name: string;
 	email: string;
 }
 
-export function ProfileDisplay({
-	firstName,
-	lastName,
-	email,
-}: ProfileDisplayProps) {
+export function ProfileDisplay({ name, email }: ProfileDisplayProps) {
 	return (
 		<Card>
 			<CardContent className="pt-6">
@@ -26,10 +21,7 @@ export function ProfileDisplay({
 						<div className="space-y-2">
 							<div>
 								<Label className="text-sm font-medium">Nome Completo</Label>
-								<p className="text-sm text-muted-foreground">
-									{`${firstName || ""} ${lastName || ""}`.trim() ||
-										"Não informado"}
-								</p>
+								<p className="text-sm text-muted-foreground">{name}</p>
 							</div>
 							<div>
 								<Label className="text-sm font-medium">Email</Label>

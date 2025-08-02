@@ -1,4 +1,4 @@
-import { AppLogo } from "@/components/shared/brand";
+import { AppLogo } from "@/components/brand";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function Footer() {

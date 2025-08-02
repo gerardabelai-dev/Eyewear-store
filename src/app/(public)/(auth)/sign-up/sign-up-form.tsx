@@ -18,6 +18,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { ROUTES } from "@/constants/routes";
 import { signIn, signUp } from "@/lib/auth-client";
 
 // Create a global toast tracker to prevent duplicates across all sign-up attempts
@@ -80,7 +81,7 @@ function SignUp() {
 					email: values.email,
 					password: values.password,
 					name: values.name,
-					callbackURL: "/",
+					callbackURL: ROUTES.PRODUCTS,
 				},
 				{
 					onSuccess: () => {
@@ -111,7 +112,7 @@ function SignUp() {
 			await signIn.social(
 				{
 					provider: "google",
-					callbackURL: "/",
+					callbackURL: ROUTES.PRODUCTS,
 				},
 				{
 					onSuccess: () => {
@@ -300,7 +301,7 @@ function SignUp() {
 			<div className="text-center mt-4">
 				<p className="text-sm text-muted-foreground">
 					Já tem uma conta?{" "}
-					<Link href="/auth/sign-in" className="text-primary hover:underline">
+					<Link href={ROUTES.SIGN_IN} className="text-primary hover:underline">
 						Fazer login
 					</Link>
 				</p>
