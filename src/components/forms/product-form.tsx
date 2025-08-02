@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import {
 	AlertCircleIcon,
 	ImageIcon,
@@ -39,16 +40,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useFileUpload } from "@/hooks/use-file-upload";
-import {
-	getCategories,
-	getSubcategoriesByCategory,
-} from "@/lib/actions/category";
-import {
-	createProduct,
-	deleteProduct,
-	updateProduct,
-} from "@/lib/actions/product";
-import type { Category, Product, Subcategory } from "@/lib/db/schema";
+import type { Category, Product, Subcategory } from "@/lib/types";
 
 const productFormSchema = z.object({
 	name: z
@@ -309,10 +301,9 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 	// Load categories on component mount
 	useEffect(() => {
 		async function loadCategories() {
-			const result = await getCategories();
-			if (result.data) {
-				setCategories(result.data);
-			}
+			const res = await fetch("/api/categories");
+			const result = await res.json();
+			setCategories(result);
 		}
 		loadCategories();
 	}, []);
@@ -321,9 +312,12 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 	useEffect(() => {
 		async function loadSubcategories() {
 			if (selectedCategoryId) {
-				const result = await getSubcategoriesByCategory(selectedCategoryId);
-				if (result.data) {
-					setSubcategories(result.data);
+				const res = await fetch(
+					`/api/categories?type=subcategories&categoryId=${selectedCategoryId}`,
+				);
+				if (res.ok) {
+					const result = await res.json();
+					setSubcategories(result);
 				}
 			} else {
 				setSubcategories([]);
@@ -341,18 +335,22 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 
 	// Function to reload categories after creation
 	const reloadCategories = async () => {
-		const result = await getCategories();
-		if (result.data) {
-			setCategories(result.data);
+		const res = await fetch("/api/categories");
+		if (res.ok) {
+			const result = await res.json();
+			setCategories(result);
 		}
 	};
 
 	// Function to reload subcategories after creation
 	const reloadSubcategories = async () => {
 		if (selectedCategoryId) {
-			const result = await getSubcategoriesByCategory(selectedCategoryId);
-			if (result.data) {
-				setSubcategories(result.data);
+			const res = await fetch(
+				`/api/categories?type=subcategories&categoryId=${selectedCategoryId}`,
+			);
+			if (res.ok) {
+				const result = await res.json();
+				setSubcategories(result);
 			}
 		}
 	};
@@ -360,13 +358,24 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 	async function onSubmit(data: ProductFormData) {
 		setIsSubmitting(true);
 		try {
-			const result = isEditing
-				? await updateProduct({ ...data, id: product.id })
-				: await createProduct(data);
+			const url = isEditing ? `/api/products/${product.id}` : "/api/products";
+			const method = isEditing ? "PUT" : "POST";
 
-			if (result.error) {
-				console.error(result.error);
+			const res = await fetch(url, {
+				method,
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data),
+			});
+
+			if (!res.ok) {
+				const error = await res.text();
+				toast.error(
+					error || `Erro ao ${isEditing ? "atualizar" : "criar"} produto`,
+				);
 			} else {
+				toast.success(
+					`Produto ${isEditing ? "atualizado" : "criado"} com sucesso!`,
+				);
 				if (!isEditing) {
 					form.reset();
 				}
@@ -377,6 +386,7 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 				`Erro ao ${isEditing ? "atualizar" : "criar"} produto:`,
 				error,
 			);
+			toast.error(`Erro ao ${isEditing ? "atualizar" : "criar"} produto`);
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -387,9 +397,13 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 
 		setIsDeleting(true);
 		try {
-			const result = await deleteProduct(product.id);
-			if (result.error) {
-				toast.error(result.error);
+			const res = await fetch(`/api/products/${product.id}`, {
+				method: "DELETE",
+			});
+
+			if (!res.ok) {
+				const error = await res.text();
+				toast.error(error || "Erro ao excluir produto");
 			} else {
 				toast.success("Produto excluído com sucesso!");
 				onSuccess?.();

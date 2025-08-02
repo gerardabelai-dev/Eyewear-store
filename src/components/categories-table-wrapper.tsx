@@ -12,7 +12,6 @@ import { CategoryEditForm } from "@/components/forms/category-edit-form";
 import { CategoryDeleteDialog } from "@/components/ui/category-delete-dialog";
 import { Drawer } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { deleteCategory } from "@/lib/actions/category";
 
 interface CategoriesTableWrapperProps {
 	categories: CategoryWithCounts[];
@@ -48,7 +47,7 @@ export function CategoriesTableWrapper({
 		setEditingCategory(category);
 	};
 
-	const handleDeleteCategory = (category: CategoryWithCounts) => {
+	const handleDeleteCategory = async (category: CategoryWithCounts) => {
 		setDeletingCategory(category);
 	};
 
@@ -57,17 +56,20 @@ export function CategoriesTableWrapper({
 
 		setIsDeleting(true);
 		try {
-			const result = await deleteCategory(deletingCategory.id);
+			const response = await fetch(`/api/categories/${deletingCategory.id}`, {
+				method: "DELETE",
+			});
 
-			if (result.error) {
-				toast.error(result.error);
-			} else {
-				toast.success("Categoria excluída com sucesso!");
-				setDeletingCategory(null);
-				handleRefresh();
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.error || "Erro ao excluir categoria");
 			}
-		} catch (error) {
-			toast.error("Erro ao excluir categoria");
+
+			toast.success("Categoria excluída com sucesso!");
+			setDeletingCategory(null);
+			handleRefresh();
+		} catch (error: any) {
+			toast.error(error.message || "Erro ao excluir categoria");
 		} finally {
 			setIsDeleting(false);
 		}

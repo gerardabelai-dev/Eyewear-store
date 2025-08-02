@@ -6,8 +6,7 @@ import { toast } from "sonner";
 import { ProductForm } from "@/components/forms/product-form";
 import { ProductsAdvancedTable } from "@/components/products-advanced-table";
 import { Drawer } from "@/components/ui/drawer";
-import { deleteProduct } from "@/lib/actions/product";
-import type { Product } from "@/lib/db/schema";
+import type { Product } from "@/lib/types";
 
 // Extended Product type with category information
 type ProductWithCategory = Product & {
@@ -33,9 +32,12 @@ export function ProductsTableWrapper({ products }: ProductsTableWrapperProps) {
 
 	const handleDeleteProduct = async (product: ProductWithCategory) => {
 		try {
-			const result = await deleteProduct(product.id);
-			if (result.error) {
-				toast.error(result.error);
+			const result = await fetch(`/api/products/${product.id}`, {
+				method: "DELETE",
+			});
+			if (!result.ok) {
+				const errorData = await result.json();
+				toast.error(errorData.error || "Erro ao excluir produto");
 			} else {
 				toast.success("Produto excluído com sucesso!");
 				// Data will be automatically revalidated by server action

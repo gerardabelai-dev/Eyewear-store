@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -17,7 +18,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { createCategory, updateCategory } from "@/lib/actions/category";
 import type { Category } from "@/lib/db/schema";
 
 const categoryFormSchema = z.object({
@@ -50,41 +50,16 @@ export function CategoryForm({ onSuccess, category }: CategoryFormProps) {
 		},
 	});
 
-	async function onSubmit(data: CategoryFormData) {
-		setIsSubmitting(true);
-		try {
-			let result: { error?: string; success?: string };
+	const { mutate, isPending } = useMutation({
+		mutationFn: (data) =>
+			fetch(category ? `/api/categories/${category.id}` : "/api/categories", {
+				method: category ? "PUT" : "POST",
+				body: JSON.stringify(data),
+			}),
+		onSuccess: onSuccess,
+	});
 
-			if (isEditing) {
-				result = await updateCategory({ ...data, id: category.id });
-			} else {
-				result = await createCategory(data);
-			}
-
-			if (result.error) {
-				toast.error(result.error);
-			} else {
-				toast.success(
-					result.success ||
-						(isEditing
-							? "Categoria atualizada com sucesso!"
-							: "Categoria criada com sucesso!"),
-				);
-				if (!isEditing) {
-					form.reset();
-				}
-				onSuccess?.();
-			}
-		} catch (error) {
-			console.error(
-				`Erro ao ${isEditing ? "atualizar" : "criar"} categoria:`,
-				error,
-			);
-			toast.error("Erro ao salvar categoria");
-		} finally {
-			setIsSubmitting(false);
-		}
-	}
+	const onSubmit = (data: CategoryFormData) => mutate(data);
 
 	return (
 		<Form {...form}>

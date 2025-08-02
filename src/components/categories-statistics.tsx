@@ -6,25 +6,29 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { getCategoriesWithCounts } from "@/lib/actions/category";
+import { getCategoriesWithCountsQuery } from "@/lib/queries/categories";
 
 export async function CategoriesStatistics() {
-	const result = await getCategoriesWithCounts();
-	const categories = result.data || [];
+	const categories = await getCategoriesWithCountsQuery();
 
 	// Calculate statistics
-	const totalCategories = categories.length;
-	const totalSubcategories = categories.reduce(
-		(acc, cat) => acc + cat.subcategoriesCount,
+	const totalCategories = (categories || []).length;
+	type CategoryWithCounts = {
+		productsCount: number;
+		subcategoriesCount: number;
+	};
+	const totalSubcategories = (categories || []).reduce(
+		(acc, cat: CategoryWithCounts) => acc + cat.subcategoriesCount,
 		0,
 	);
-	const totalProducts = categories.reduce(
-		(acc, cat) => acc + cat.productsCount,
+	const totalProducts = (categories || []).reduce(
+		(acc, cat: CategoryWithCounts) => acc + cat.productsCount,
 		0,
 	);
-	const categoriesWithProducts = categories.filter(
-		(cat) => cat.productsCount > 0,
+	const categoriesWithProducts = (categories || []).filter(
+		(cat: CategoryWithCounts) => cat.productsCount > 0,
 	).length;
+	const averageProducts = totalProducts / categoriesWithProducts;
 
 	return (
 		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

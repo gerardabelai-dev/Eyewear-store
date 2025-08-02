@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 
 // Client-side environment validation (safe for browser)
 const clientEnvSchema = z.object({

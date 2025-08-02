@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { CategoriesStatistics } from "@/components/categories-statistics";
-import { CategoriesTableServer } from "@/components/categories-table-server";
+import { CategoriesTableClient } from "@/components/categories-table-client";
 import { CategoryCreationSheet } from "@/components/category-creation-sheet";
 import { OrdersTableSkeleton } from "@/components/orders-table-skeleton";
 import { ProductsStatisticsSkeleton } from "@/components/products-statistics-skeleton";
@@ -26,7 +26,7 @@ export default function CategoriesPage() {
 
 			{/* Categories Table - Stream with Suspense */}
 			<Suspense fallback={<OrdersTableSkeleton />}>
-				<CategoriesTableServer />
+				<CategoriesTableClient />
 			</Suspense>
 		</>
 	);

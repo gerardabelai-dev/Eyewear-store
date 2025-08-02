@@ -7,25 +7,12 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { getProducts } from "@/lib/actions/product";
+import { getProductStatsQuery } from "@/lib/queries/products";
 
 export async function ProductsStatistics() {
-	const result = await getProducts();
+	const stats = await getProductStatsQuery();
 
-	if (result.error) {
-		console.error("Error loading products:", result.error);
-	}
-
-	const products = result.data || [];
-
-	// Calculate statistics
-	const totalProducts = products.length;
-	const activeProducts = products.filter((p) => p.status === "active").length;
-	const lowStockProducts = products.filter((p) => p.stock <= 10).length;
-	const totalValue = products.reduce(
-		(acc, p) => acc + parseFloat(p.price) * p.stock,
-		0,
-	);
+	const { totalProducts, activeProducts, lowStockProducts, totalValue } = stats;
 
 	return (
 		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

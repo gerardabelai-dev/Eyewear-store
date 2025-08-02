@@ -1,5 +1,5 @@
 import "server-only";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 // Re-export client env for convenience
 export { type ClientEnv, clientEnv } from "./env-client";

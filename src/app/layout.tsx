@@ -3,6 +3,9 @@ import { IBM_Plex_Mono, Libre_Baskerville, Lora } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import "./globals.css";
+import { QueryErrorResetBoundary } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
+import { QueryProvider } from "./providers";
 
 const libreBaskerville = Libre_Baskerville({
 	weight: ["400", "700"],
@@ -34,28 +37,28 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
 	children,
-}: Readonly<{
+}: {
 	children: React.ReactNode;
-}>) {
+}) {
 	return (
-		<html lang="pt-BR" suppressHydrationWarning>
-			<body
-				className={`${libreBaskerville.variable} ${lora.variable} ${ibmPlexMono.variable} font-sans antialiased bg-background text-foreground`}
-			>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="system"
-					enableSystem
-					disableTransitionOnChange
-				>
-					{children}
-					<Toaster
-						richColors
-						position="bottom-right"
-						expand={false}
-						closeButton={true}
-					/>
-				</ThemeProvider>
+		<html lang="en">
+			<body className={cn("min-h-screen bg-background antialiased")}>
+				<QueryProvider>
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="system"
+						enableSystem
+						disableTransitionOnChange
+					>
+						<QueryErrorResetBoundary>{children}</QueryErrorResetBoundary>
+						<Toaster
+							richColors
+							position="bottom-right"
+							expand={false}
+							closeButton={true}
+						/>
+					</ThemeProvider>
+				</QueryProvider>
 			</body>
 		</html>
 	);

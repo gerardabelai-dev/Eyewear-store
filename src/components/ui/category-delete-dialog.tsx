@@ -16,10 +16,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-	getCategoryDeletionInfo,
-	getProductsCountForDeletion,
-} from "@/lib/actions/category";
 
 interface CategoryDeleteDialogProps {
 	open: boolean;
@@ -56,7 +52,8 @@ export function CategoryDeleteDialog({
 
 			// If deleting a category, get both products and subcategories count
 			if (categoryId && itemType === "categoria") {
-				getCategoryDeletionInfo(categoryId)
+				fetch(`/api/categories/deletion?id=${categoryId}`)
+					.then((response) => response.json())
 					.then((result) => {
 						if (result.data) {
 							setProductsCount(result.data.productsCount);
@@ -71,7 +68,10 @@ export function CategoryDeleteDialog({
 					});
 			} else if (subcategoryId && itemType === "subcategoria") {
 				// If deleting a subcategory, only get products count
-				getProductsCountForDeletion(categoryId, subcategoryId)
+				fetch(
+					`/api/categories/deletion?id=${categoryId}&subcategoryId=${subcategoryId}`,
+				)
+					.then((response) => response.json())
 					.then((result) => {
 						if (result.data !== undefined) {
 							setProductsCount(result.data);

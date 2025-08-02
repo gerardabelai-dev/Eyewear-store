@@ -13,23 +13,25 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { getOrderStats } from "@/lib/actions/order";
+import { getCurrentUser } from "@/lib/auth-server";
+import { getOrderStatsQuery } from "@/lib/queries/orders";
 
 export async function OrdersStatistics() {
-	const statsResult = await getOrderStats();
-
-	if (statsResult.error) {
-		console.error("Error loading order stats:", statsResult.error);
+	const user = await getCurrentUser();
+	if (!user) {
+		throw new Error("User not authenticated");
 	}
 
-	const stats = statsResult.data || {
-		totalOrders: 0,
-		pendingOrders: 0,
-		processingOrders: 0,
-		completedOrders: 0,
-		cancelledOrders: 0,
-		totalRevenue: 0,
-	};
+	const stats = await getOrderStatsQuery(user.id);
+
+	const {
+		totalOrders,
+		pendingOrders,
+		processingOrders,
+		completedOrders,
+		cancelledOrders,
+		totalRevenue,
+	} = stats;
 
 	return (
 		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">

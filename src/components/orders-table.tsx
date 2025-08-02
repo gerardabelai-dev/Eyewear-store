@@ -11,7 +11,7 @@ import {
 import type * as React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { OrderForm } from "@/components/forms/order-form";
+import { OrderForm } from "@/components/forms/order-form-simple";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Drawer } from "@/components/ui/drawer";
@@ -31,8 +31,8 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getOrderById } from "@/lib/actions/order";
-import type { Order } from "@/lib/db/schema";
+// import { getOrderById } from "@/lib/actions/order"; // Temporarily disabled
+import type { Order } from "@/lib/types";
 
 interface OrdersTableProps {
 	orders: Order[];

@@ -1,13 +1,17 @@
 "use client";
 
+import type { InfiniteData } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { Edit, ShoppingCart } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useInView } from "react-intersection-observer";
 import { toast } from "sonner";
 import { OrderForm } from "@/components/forms/order-form";
 import { OrdersAdvancedTable } from "@/components/orders-advanced-table";
 import { Drawer } from "@/components/ui/drawer";
-import { getOrderById } from "@/lib/actions/order";
-import type { Order, OrderStatus } from "@/lib/db/schema";
+import { useAuth } from "@/lib/hooks/use-auth";
+import type { Order, OrderStatus } from "@/lib/types";
+import { ordersKey } from "@/lib/utils/query-keys";
 
 interface OrdersTableWrapperProps {
 	orders: Order[];
@@ -18,67 +22,30 @@ export function OrdersTableWrapper({
 	orders,
 	orderStatuses,
 }: OrdersTableWrapperProps) {
-	const [editingOrder, setEditingOrder] = useState<any>(null);
-	const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
-	const [isLoadingOrder, setIsLoadingOrder] = useState(false);
-
-	const handleEditOrder = async (order: Order) => {
-		setIsLoadingOrder(true);
-		try {
-			// Fetch complete order data with items
-			const result = await getOrderById(order.id);
-			if (result.error) {
-				toast.error(result.error);
-				return;
-			}
-
-			setEditingOrder(result.data);
-			setIsEditDrawerOpen(true);
-		} catch (error) {
-			console.error("Error loading order:", error);
-			toast.error("Erro ao carregar dados do pedido");
-		} finally {
-			setIsLoadingOrder(false);
-		}
-	};
-
-	const handleEditSuccess = () => {
-		setIsEditDrawerOpen(false);
-		setEditingOrder(null);
-		// Data will be automatically revalidated by server action
-	};
-
-	const handleEditCancel = () => {
-		setIsEditDrawerOpen(false);
-		setEditingOrder(null);
-	};
-
-	return (
-		<>
-			<OrdersAdvancedTable
-				orders={orders}
-				orderStatuses={orderStatuses}
-				onEditOrder={handleEditOrder}
-			/>
-
-			{/* Edit Order Drawer */}
-			<Drawer
-				open={isEditDrawerOpen}
-				onOpenChange={(open: boolean) => {
-					if (!open) {
-						handleEditCancel();
-					}
-				}}
-				trigger={<div style={{ display: "none" }} />}
-				title="Editar Pedido"
-				description="Atualize as informações do pedido e seus produtos"
-				icon={<Edit className="h-5 w-5" />}
-			>
-				<OrderForm
-					order={editingOrder || undefined}
-					onSuccess={handleEditSuccess}
-				/>
-			</Drawer>
-		</>
-	);
+	const { data: user } = useAuth();
+	const queryClient = useQueryClient();
+	const { ref, inView } = useInView();
+	const { data, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery<
+		Order[],
+		Error,
+		InfiniteData<Order[]>,
+		typeof ordersKey,
+		number
+	>({
+		queryKey: ordersKey(user?.id || ""),
+		queryFn: async ({ pageParam = 1 }) => {
+			const res = await fetch(`/api/orders?page=${pageParam}`);
+			return res.json();
+		},
+		getNextPageParam: (lastPage) =>
+			lastPage.length === 10 ? (data?.pages.length ?? 0) + 1 : undefined,
+		initialPageParam: 1,
+		enabled: !!user?.id,
+	});
+	const allOrders = data?.pages.flat() ?? [];
+	useEffect(() => {
+		if (inView && hasNextPage) fetchNextPage();
+	}, [inView, hasNextPage]);
+	// Render table with orders, add ref to last row for infinite scroll
+	// Handle editing with getOrderByIdQuery if needed
 }

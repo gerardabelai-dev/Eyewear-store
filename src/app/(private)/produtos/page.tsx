@@ -3,7 +3,7 @@ import { OrdersTableSkeleton } from "@/components/orders-table-skeleton";
 import { ProductCreationSheet } from "@/components/product-creation-sheet";
 import { ProductsStatistics } from "@/components/products-statistics";
 import { ProductsStatisticsSkeleton } from "@/components/products-statistics-skeleton";
-import { ProductsTableServer } from "@/components/products-table-server";
+import { ProductsTableClient } from "@/components/products-table-client";
 import { PageHeader } from "@/components/shared/page-header";
 
 // Add revalidation time for ISR
@@ -26,7 +26,7 @@ export default function ProductsPage() {
 
 			{/* Products Table - Stream with Suspense */}
 			<Suspense fallback={<OrdersTableSkeleton />}>
-				<ProductsTableServer />
+				<ProductsTableClient />
 			</Suspense>
 		</>
 	);

@@ -1,3 +1,5 @@
+"use client";
+import { useQuery } from "@tanstack/react-query";
 import { Settings } from "lucide-react";
 import { redirect } from "next/navigation";
 import { AvatarForm } from "@/components/forms/avatar-form";
@@ -6,27 +8,34 @@ import { PasswordForm } from "@/components/forms/password-form";
 import { PersonalInfoForm } from "@/components/forms/personal-info-form";
 import { ProfileDisplay } from "@/components/forms/profile-display";
 import { Button } from "@/components/ui/button";
-import { getUserProfile } from "@/lib/actions/user";
-import { getSession } from "@/lib/auth-server";
 
 // Force dynamic rendering for authenticated pages
 export const dynamic = "force-dynamic";
 
 export default async function Dashboard() {
-	const session = await getSession();
-
-	if (!session) {
-		redirect("/auth");
-	}
+	// Remove getSession; use useAuth hook for session check
 
 	// Load user profile
-	const result = await getUserProfile();
+	const {
+		data: userProfile,
+		isLoading,
+		error,
+	} = useQuery({
+		queryKey: ["userProfile"],
+		queryFn: () =>
+			fetch("/api/user")
+				.then((res) => res.json())
+				.then((data) => {
+					if (data.error) {
+						throw new Error(data.error);
+					}
+					return data;
+				}),
+	});
 
-	if (result.error || !result.data) {
+	if (error || !userProfile) {
 		redirect("/auth");
 	}
-
-	const userProfile = result.data;
 
 	const getInitials = (name: string) => {
 		return name

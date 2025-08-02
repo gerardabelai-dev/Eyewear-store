@@ -1,227 +1,164 @@
 import {
 	boolean,
-	decimal,
 	integer,
-	json,
 	pgTable,
 	text,
 	timestamp,
 } from "drizzle-orm/pg-core";
 
+// User
 export const user = pgTable("user", {
 	id: text("id").primaryKey(),
-	name: text("name").notNull(),
+	firstName: text("first_name").notNull(),
+	lastName: text("last_name").notNull(),
+	passwordHash: text("password_hash").notNull(),
 	email: text("email").notNull().unique(),
-	emailVerified: boolean("emailVerified").notNull().default(false),
-	image: text("image"),
-	firstName: text("firstName"),
-	lastName: text("lastName"),
-	createdAt: timestamp("createdAt").notNull().defaultNow(),
-	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const session = pgTable("session", {
+export const userRole = pgTable("user_role", {
 	id: text("id").primaryKey(),
-	expiresAt: timestamp("expiresAt").notNull(),
-	token: text("token").notNull().unique(),
-	createdAt: timestamp("createdAt").notNull().defaultNow(),
-	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-	ipAddress: text("ipAddress"),
-	userAgent: text("userAgent"),
-	userId: text("userId")
+	label: text("label").notNull(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const userAddress = pgTable("user_address", {
+	id: text("id").primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	street: text("street").notNull(),
+	number: text("number").notNull(),
+	complement: text("complement"),
+	neighborhood: text("neighborhood").notNull(),
+	city: text("city").notNull(),
+	state: text("state").notNull(),
+	zipCode: text("zip_code").notNull(),
+	country: text("country").notNull(),
+	isDefault: boolean("is_default").notNull().default(false),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// Auth
+export const authSession = pgTable("auth_session", {
+	id: text("id").primaryKey(),
+	expiresAt: timestamp("expires_at").notNull(),
+	accessToken: text("access_token"),
+	refreshToken: text("refresh_token"),
+	googleAccessToken: text("google_access_token"),
+	googleRefreshToken: text("google_refresh_token"),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
+	ipAddress: text("ip_address"),
+	clientAgent: text("client_agent"),
+	userId: text("user_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
 });
 
-export const account = pgTable("account", {
-	id: text("id").primaryKey(),
-	accountId: text("accountId").notNull(),
-	providerId: text("providerId").notNull(),
-	userId: text("userId")
-		.notNull()
-		.references(() => user.id, { onDelete: "cascade" }),
-	accessToken: text("accessToken"),
-	refreshToken: text("refreshToken"),
-	idToken: text("idToken"),
-	accessTokenExpiresAt: timestamp("accessTokenExpiresAt"),
-	refreshTokenExpiresAt: timestamp("refreshTokenExpiresAt"),
-	scope: text("scope"),
-	password: text("password"),
-	createdAt: timestamp("createdAt").notNull().defaultNow(),
-	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-});
-
-export const verification = pgTable("verification", {
-	id: text("id").primaryKey(),
-	identifier: text("identifier").notNull(),
-	value: text("value").notNull(),
-	expiresAt: timestamp("expiresAt").notNull(),
-	createdAt: timestamp("createdAt").notNull().defaultNow(),
-	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-});
-
+// Category
 export const category = pgTable("category", {
 	id: text("id").primaryKey(),
-	name: text("name").notNull().unique(),
+	label: text("label").notNull().unique(),
 	slug: text("slug").notNull().unique(),
-	description: text("description"),
-	createdAt: timestamp("createdAt").notNull().defaultNow(),
-	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const subcategory = pgTable("subcategory", {
 	id: text("id").primaryKey(),
-	name: text("name").notNull(),
+	label: text("label").notNull(),
 	slug: text("slug").notNull(),
-	description: text("description"),
-	categoryId: text("categoryId")
+	categoryId: text("category_id")
 		.notNull()
 		.references(() => category.id, { onDelete: "cascade" }),
-	createdAt: timestamp("createdAt").notNull().defaultNow(),
-	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// Product
 export const product = pgTable("product", {
 	id: text("id").primaryKey(),
 	name: text("name").notNull(),
+	categoryId: text("category_id").references(() => category.id, {
+		onDelete: "set null",
+	}),
+	subcategoryId: text("subcategory_id").references(() => subcategory.id, {
+		onDelete: "set null",
+	}),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const productStatus = pgTable("product_status", {
+	id: text("id").primaryKey(),
+	status: text("status").notNull(),
 	description: text("description"),
-	price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const productImage = pgTable("product_image", {
+	id: text("id").primaryKey(),
+	productId: text("product_id")
+		.notNull()
+		.references(() => product.id, { onDelete: "cascade" }),
+	imageUrl: text("image_url").notNull(),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const productPrice = pgTable("product_price", {
+	id: text("id").primaryKey(),
+	productId: text("product_id")
+		.notNull()
+		.references(() => product.id, { onDelete: "cascade" }),
+	price: integer("price").notNull(),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const productStock = pgTable("product_stock", {
+	id: text("id").primaryKey(),
+	productId: text("product_id")
+		.notNull()
+		.references(() => product.id, { onDelete: "cascade" }),
 	stock: integer("stock").notNull().default(0),
-	status: text("status").notNull().default("active"), // active, inactive, draft, discontinued
-	categoryId: text("categoryId").references(() => category.id, {
-		onDelete: "set null",
-	}),
-	subcategoryId: text("subcategoryId").references(() => subcategory.id, {
-		onDelete: "set null",
-	}),
-	images: json("images").$type<string[]>().default([]),
-	createdAt: timestamp("createdAt").notNull().defaultNow(),
-	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
+
+// Order
+export const order = pgTable("order", {
+	id: text("id").primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const orderProduct = pgTable("order_product", {
+	id: text("id").primaryKey(),
+	orderId: text("order_id")
+		.notNull()
+		.references(() => order.id, { onDelete: "cascade" }),
+	productPriceId: text("product_price_id")
+		.notNull()
+		.references(() => productPrice.id, { onDelete: "cascade" }),
+	quantity: integer("quantity").default(1).notNull(),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const orderStatus = pgTable("order_status", {
 	id: text("id").primaryKey(),
-	name: text("name").notNull().unique(),
-	slug: text("slug").notNull().unique(),
+	status: text("status").notNull(),
 	description: text("description"),
-	color: text("color").notNull().default("#6b7280"), // hex color for UI display
-	icon: text("icon").default("Package"), // lucide icon name
-	isDefault: boolean("is_default").notNull().default(false), // for new orders
-	isActive: boolean("is_active").notNull().default(true),
-	sortOrder: integer("sort_order").notNull().default(0),
-	createdAt: timestamp("createdAt").notNull().defaultNow(),
-	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
-
-export const order = pgTable("order", {
-	id: text("id").primaryKey(),
-	orderNumber: text("orderNumber").notNull().unique(),
-	userId: text("userId")
-		.notNull()
-		.references(() => user.id, { onDelete: "cascade" }),
-	customerName: text("customerName").notNull(),
-	customerEmail: text("customerEmail").notNull(),
-	customerPhone: text("customerPhone"),
-	statusId: text("statusId")
-		.notNull()
-		.references(() => orderStatus.id, { onDelete: "restrict" }),
-	totalAmount: decimal("totalAmount", { precision: 10, scale: 2 }).notNull(),
-	notes: text("notes"),
-	createdAt: timestamp("createdAt").notNull().defaultNow(),
-	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-});
-
-export const orderItem = pgTable("orderItem", {
-	id: text("id").primaryKey(),
-	orderId: text("orderId")
-		.notNull()
-		.references(() => order.id, { onDelete: "cascade" }),
-	productId: text("productId")
-		.notNull()
-		.references(() => product.id, { onDelete: "restrict" }),
-	quantity: integer("quantity").notNull(),
-	unitPrice: decimal("unitPrice", { precision: 10, scale: 2 }).notNull(),
-	totalPrice: decimal("totalPrice", { precision: 10, scale: 2 }).notNull(),
-	createdAt: timestamp("createdAt").notNull().defaultNow(),
-	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-});
-
-// Notification system tables
-export const userNotificationSettings = pgTable("user_notification_settings", {
-	id: text("id").primaryKey(),
-	userId: text("userId")
-		.notNull()
-		.references(() => user.id, { onDelete: "cascade" })
-		.unique(),
-	// Notification preferences - true means enabled
-	marketing: boolean("marketing").notNull().default(true),
-	orderUpdates: boolean("order_updates").notNull().default(true),
-	systemNotifications: boolean("system_notifications").notNull().default(true),
-	promotions: boolean("promotions").notNull().default(true),
-	newsletters: boolean("newsletters").notNull().default(true),
-	// Channel preferences
-	emailEnabled: boolean("email_enabled").notNull().default(true),
-	smsEnabled: boolean("sms_enabled").notNull().default(false),
-	pushEnabled: boolean("push_enabled").notNull().default(true),
-	whatsappEnabled: boolean("whatsapp_enabled").notNull().default(false),
-	createdAt: timestamp("createdAt").notNull().defaultNow(),
-	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-});
-
-export const userNotification = pgTable("user_notification", {
-	id: text("id").primaryKey(),
-	userId: text("userId")
-		.notNull()
-		.references(() => user.id, { onDelete: "cascade" }),
-	// Notification type
-	notificationType: text("notification_type").notNull(), // "marketing", "order_updates", "system_notifications", "transactional", "promotions", "newsletters"
-	// Channel used
-	channel: text("channel").notNull(), // "email", "sms", "push", "whatsapp", "web"
-	// Content and metadata
-	subject: text("subject"),
-	content: text("content"),
-	metadata: json("metadata").$type<Record<string, any>>().default({}),
-	// External service tracking
-	externalId: text("external_id"), // Resend message ID, SMS gateway ID, etc.
-	externalProvider: text("external_provider"), // "resend", "twilio", "firebase", etc.
-	// Status tracking
-	status: text("status").notNull().default("pending"), // "pending", "sent", "delivered", "failed", "opened", "clicked"
-	sentAt: timestamp("sent_at"),
-	deliveredAt: timestamp("delivered_at"),
-	openedAt: timestamp("opened_at"),
-	clickedAt: timestamp("clicked_at"),
-	failedAt: timestamp("failed_at"),
-	failureReason: text("failure_reason"),
-	// Unsubscribe tracking
-	unsubscribeToken: text("unsubscribe_token").unique(),
-	unsubscribedAt: timestamp("unsubscribed_at"),
-	createdAt: timestamp("createdAt").notNull().defaultNow(),
-	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-});
-
-export type User = typeof user.$inferSelect;
-export type NewUser = typeof user.$inferInsert;
-export type Session = typeof session.$inferSelect;
-export type NewSession = typeof session.$inferInsert;
-export type Account = typeof account.$inferSelect;
-export type NewAccount = typeof account.$inferInsert;
-export type Verification = typeof verification.$inferSelect;
-export type NewVerification = typeof verification.$inferInsert;
-export type Category = typeof category.$inferSelect;
-export type NewCategory = typeof category.$inferInsert;
-export type Subcategory = typeof subcategory.$inferSelect;
-export type NewSubcategory = typeof subcategory.$inferInsert;
-export type Product = typeof product.$inferSelect;
-export type NewProduct = typeof product.$inferInsert;
-export type OrderStatus = typeof orderStatus.$inferSelect;
-export type NewOrderStatus = typeof orderStatus.$inferInsert;
-export type Order = typeof order.$inferSelect;
-export type NewOrder = typeof order.$inferInsert;
-export type OrderItem = typeof orderItem.$inferSelect;
-export type NewOrderItem = typeof orderItem.$inferInsert;
-export type UserNotificationSettings =
-	typeof userNotificationSettings.$inferSelect;
-export type NewUserNotificationSettings =
-	typeof userNotificationSettings.$inferInsert;
-export type UserNotification = typeof userNotification.$inferSelect;
-export type NewUserNotification = typeof userNotification.$inferInsert;

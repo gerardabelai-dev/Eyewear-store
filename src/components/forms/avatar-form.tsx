@@ -16,7 +16,6 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { UserAvatar } from "@/components/ui/user-avatar";
-import { updateUserAvatar } from "@/lib/actions/user";
 import { uploadFileToBlob } from "@/lib/upload";
 
 // Since file uploads are handled differently, we'll use a simpler schema
@@ -92,7 +91,11 @@ export function AvatarForm({ userImage, userInitials }: AvatarFormProps) {
 				}
 
 				// Update user avatar with the blob URL
-				const result = await updateUserAvatar({ image: uploadResult.data.url });
+				const response = await fetch("/api/user/avatar", {
+					method: "PATCH",
+					body: JSON.stringify({ image: uploadResult.data.url }),
+				});
+				const result = await response.json();
 
 				if (result.error) {
 					toast.error(result.error);

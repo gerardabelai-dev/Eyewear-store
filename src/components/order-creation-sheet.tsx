@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus, ShoppingCart } from "lucide-react";
-import { OrderForm } from "@/components/forms/order-form";
+import { OrderForm } from "@/components/forms/order-form-simple";
 import { Button } from "@/components/ui/button";
 import { DrawerControlled } from "@/components/ui/drawer";
 

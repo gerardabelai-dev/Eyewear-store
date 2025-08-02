@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	Edit,
 	ImageOff,
@@ -36,10 +37,14 @@ import { Input } from "@/components/ui/input";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { createOrder, deleteOrder, updateOrder } from "@/lib/actions/order";
-import { getOrderStatuses } from "@/lib/actions/order-status";
-import { getProducts } from "@/lib/actions/product";
 import type { Order, OrderStatus, Product } from "@/lib/db/schema";
+import { useAuth } from "@/lib/hooks/use-auth";
+
+// import {
+// 	createOrderMutation,
+// 	updateOrderMutation,
+// } from "@/lib/mutations/orders";
+import { ordersKey } from "@/lib/utils/query-keys";
 
 const orderItemSchema = z.object({
 	productId: z.string().min(1, "Produto é obrigatório"),
@@ -173,16 +178,55 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 		},
 	});
 
+	const queryClient = useQueryClient();
+	const { data: user } = useAuth();
+	const mutationFn = async (data) => {
+		const url = order ? `/api/orders/${order.id}` : "/api/orders";
+		const method = order ? "PUT" : "POST";
+		const res = await fetch(url, {
+			method,
+			body: JSON.stringify(data),
+			headers: { "Content-Type": "application/json" },
+		});
+		if (!res.ok) throw new Error(await res.text());
+		return res.json();
+	};
+	const { mutate } = useMutation({
+		mutationFn: mutationFn,
+		onMutate: async (newData) => {
+			if (!user?.id) return;
+			await queryClient.cancelQueries({ queryKey: ordersKey(user?.id || "") });
+			const previous = queryClient.getQueryData(ordersKey(user?.id || ""));
+			queryClient.setQueryData(
+				ordersKey(user?.id || ""),
+				(old: Order[] | undefined) =>
+					order
+						? (old?.map((o) =>
+								o.id === order.id ? { ...o, ...newData } : o,
+							) ?? [])
+						: [...(old ?? []), newData],
+			);
+			return { previous };
+		},
+		onError: (_err, _newDataa, context) =>
+			queryClient.setQueryData(ordersKey(user?.id || ""), context?.previous),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ordersKey(user?.id || "") });
+			onSuccess();
+		},
+	});
+
 	// Load products
 	useEffect(() => {
 		const loadProducts = async () => {
 			setLoadingProducts(true);
 			try {
-				const result = await getProducts();
-				if (result.error) {
+				const res = await fetch("/api/products");
+				if (!res.ok) {
 					toast.error("Erro ao carregar produtos");
 				} else {
-					setProducts((result.data as any[]) || []);
+					const result = await res.json();
+					setProducts(result || []);
 				}
 			} catch (error) {
 				console.error("Error loading products:", error);
@@ -200,11 +244,12 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 		const loadOrderStatuses = async () => {
 			setLoadingStatuses(true);
 			try {
-				const result = await getOrderStatuses();
-				if (result.error) {
+				const res = await fetch("/api/order-status");
+				if (!res.ok) {
 					toast.error("Erro ao carregar status");
 				} else {
-					setOrderStatuses(result.data || []);
+					const result = await res.json();
+					setOrderStatuses(result || []);
 				}
 			} catch (error) {
 				console.error("Error loading order statuses:", error);
@@ -402,16 +447,12 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 			if (order) {
 				console.log("Updating existing order...");
 				// Update existing order - include statusId if provided
-				result = await updateOrder({
-					id: order.id,
-					...finalOrderData,
-					statusId: data.statusId,
-				});
+				result = await mutate(finalOrderData);
 			} else {
 				console.log("Creating new order...");
 				// Create new order - include statusId if provided, otherwise use default
 				console.log("Data being sent to createOrder:", finalOrderData);
-				result = await createOrder(finalOrderData);
+				result = await mutate(finalOrderData);
 			}
 
 			console.log("Order creation result:", result);
@@ -427,7 +468,7 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 						: "Pedido criado com sucesso!",
 				);
 				console.log("Calling onSuccess callback...");
-				onSuccess?.();
+				onSuccess();
 			}
 		} catch (error) {
 			console.error("Error saving order:", error);
@@ -444,13 +485,12 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 
 		setIsDeleting(true);
 		try {
-			const result = await deleteOrder(order.id);
-			if (result.error) {
-				toast.error(result.error);
-			} else {
-				toast.success("Pedido excluído com sucesso!");
-				onSuccess?.();
+			const res = await fetch(`/api/orders/${order.id}`, { method: "DELETE" });
+			if (!res.ok) {
+				throw new Error(await res.text());
 			}
+			toast.success("Pedido excluído com sucesso!");
+			onSuccess?.();
 		} catch (error) {
 			console.error("Error deleting order:", error);
 			toast.error("Erro ao excluir pedido");
@@ -471,7 +511,7 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 
 	const reloadProducts = async () => {
 		try {
-			const result = await getProducts();
+			const result = await getProductsQuery();
 			if (result.data) {
 				setProducts(result.data as any[]);
 			}
@@ -482,7 +522,7 @@ export function OrderForm({ onSuccess, order }: OrderFormProps) {
 
 	const reloadOrderStatuses = async () => {
 		try {
-			const result = await getOrderStatuses();
+			const result = await getOrderStatusesQuery();
 			if (result.data) {
 				setOrderStatuses(result.data);
 			}

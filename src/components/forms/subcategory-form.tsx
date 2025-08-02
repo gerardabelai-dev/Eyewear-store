@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { createSubcategory, updateSubcategory } from "@/lib/actions/category";
 import type { Subcategory } from "@/lib/db/schema";
 
 const subcategoryFormSchema = z.object({

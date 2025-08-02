@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Edit, ImageOff, Loader2, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -31,14 +32,6 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import {
-	createSubcategory,
-	deleteCategory,
-	deleteSubcategory,
-	getCategoryDetails,
-	updateCategory,
-	updateSubcategory,
-} from "@/lib/actions/category";
 import type { Category } from "@/lib/db/schema";
 
 const categoryFormSchema = z.object({
@@ -107,7 +100,7 @@ export function CategoryEditForm({
 	const [newSubcategoryName, setNewSubcategoryName] = useState("");
 	const [showDeleteCategoryDialog, setShowDeleteCategoryDialog] =
 		useState(false);
-	const [isDeletingCategory, setIsDeletingCategory] = useState(false);
+	const [isDeletingCat, setIsDeletingCat] = useState(false);
 
 	const form = useForm<CategoryFormData>({
 		resolver: zodResolver(categoryFormSchema),
@@ -132,12 +125,14 @@ export function CategoryEditForm({
 	const loadCategoryDetails = async () => {
 		setIsLoading(true);
 		try {
-			const result = await getCategoryDetails(category.id);
-			if (result.data) {
-				setSubcategories(result.data.subcategories);
-				setProducts(result.data.products);
-			} else if (result.error) {
-				toast.error(result.error);
+			const result = await fetch(`/api/categories/details?id=${category.id}`);
+			if (result.ok) {
+				const data = await result.json();
+				setSubcategories(data.subcategories);
+				setProducts(data.products);
+			} else {
+				const error = await result.json();
+				toast.error(error.message || "Erro ao carregar detalhes da categoria");
 			}
 		} catch (error) {
 			toast.error("Erro ao carregar detalhes da categoria");
@@ -146,114 +141,143 @@ export function CategoryEditForm({
 		}
 	};
 
-	async function onSubmit(data: CategoryFormData) {
-		setIsSubmitting(true);
-		try {
-			const result = await updateCategory({ ...data, id: category.id });
-
-			if (result.error) {
-				toast.error(result.error);
-			} else {
+	const { mutate: updateCategoryMutation, isPending: isUpdatingCategory } =
+		useMutation<unknown, Error, CategoryFormData>({
+			mutationFn: async (data) => {
+				const result = await fetch(`/api/categories/${category.id}`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(data),
+				});
+				if (!result.ok) {
+					const error = await result.json();
+					throw new Error(error.message || "Erro ao atualizar categoria");
+				}
+				return result.json();
+			},
+			onSuccess: () => {
 				toast.success("Categoria atualizada com sucesso!");
 				onSuccess?.();
+			},
+			onError: (error) => {
+				toast.error(error.message || "Erro ao atualizar categoria");
+			},
+		});
+
+	const {
+		mutate: createSubcategoryMutation,
+		isPending: isCreatingSubcategory,
+	} = useMutation({
+		mutationFn: async (data: { name: string; categoryId: string }) => {
+			const result = await fetch(
+				`/api/categories/${category.id}/subcategories`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(data),
+				},
+			);
+			if (!result.ok) {
+				const error = await result.json();
+				throw new Error(error.message || "Erro ao criar subcategoria");
 			}
-		} catch (error) {
-			toast.error("Erro ao atualizar categoria");
-		} finally {
-			setIsSubmitting(false);
-		}
-	}
+			return result.json();
+		},
+		onSuccess: () => {
+			toast.success("Subcategoria criada com sucesso!");
+			setNewSubcategoryName("");
+			loadCategoryDetails();
+			onSuccess?.(); // Invalidate parent categories table
+		},
+		onError: (error) => {
+			toast.error(error.message || "Erro ao criar subcategoria");
+		},
+	});
 
-	const handleAddSubcategory = async () => {
-		if (!newSubcategoryName.trim()) {
-			toast.error("Nome da subcategoria é obrigatório");
-			return;
-		}
-
-		setIsAddingSubcategory(true);
-		try {
-			const result = await createSubcategory({
-				name: newSubcategoryName,
-				categoryId: category.id,
+	const {
+		mutate: updateSubcategoryMutation,
+		isPending: isUpdatingSubcategory,
+	} = useMutation({
+		mutationFn: async (data: {
+			id: string;
+			name: string;
+			categoryId: string;
+		}) => {
+			const result = await fetch(`/api/subcategories/${data.id}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(data),
 			});
-
-			if (result.error) {
-				toast.error(result.error);
-			} else {
-				toast.success("Subcategoria criada com sucesso!");
-				setNewSubcategoryName("");
-				await loadCategoryDetails();
-				onSuccess?.(); // Invalidate parent categories table
+			if (!result.ok) {
+				const error = await result.json();
+				throw new Error(error.message || "Erro ao atualizar subcategoria");
 			}
-		} catch (error) {
-			toast.error("Erro ao criar subcategoria");
-		} finally {
-			setIsAddingSubcategory(false);
-		}
-	};
+			return result.json();
+		},
+		onSuccess: () => {
+			toast.success("Subcategoria atualizada com sucesso!");
+			setEditingSubcategory(null);
+			subcategoryForm.reset();
+			loadCategoryDetails();
+			onSuccess?.(); // Invalidate parent categories table
+		},
+		onError: (error) => {
+			toast.error(error.message || "Erro ao atualizar subcategoria");
+		},
+	});
 
-	const handleUpdateSubcategory = async () => {
-		if (!editingSubcategory) return;
-
-		const formData = subcategoryForm.getValues();
-		try {
-			const result = await updateSubcategory({
-				id: editingSubcategory.id,
-				name: formData.name,
-				categoryId: category.id,
+	const {
+		mutate: deleteSubcategoryMutation,
+		isPending: isDeletingSubcategory,
+	} = useMutation({
+		mutationFn: async (id: string) => {
+			const result = await fetch(`/api/subcategories/${id}`, {
+				method: "DELETE",
 			});
-
-			if (result.error) {
-				toast.error(result.error);
-			} else {
-				toast.success("Subcategoria atualizada com sucesso!");
-				setEditingSubcategory(null);
-				subcategoryForm.reset();
-				await loadCategoryDetails();
-				onSuccess?.(); // Invalidate parent categories table
+			if (!result.ok) {
+				const error = await result.json();
+				throw new Error(error.message || "Erro ao excluir subcategoria");
 			}
-		} catch (error) {
-			toast.error("Erro ao atualizar subcategoria");
-		}
-	};
+			return result.json();
+		},
+		onSuccess: () => {
+			toast.success("Subcategoria excluída com sucesso!");
+			setDeletingSubcategory(null);
+			loadCategoryDetails();
+			onSuccess?.(); // Invalidate parent categories table
+		},
+		onError: (error) => {
+			toast.error(error.message || "Erro ao excluir subcategoria");
+		},
+	});
 
-	const handleDeleteSubcategory = async () => {
-		if (!deletingSubcategory) return;
-
-		try {
-			const result = await deleteSubcategory(deletingSubcategory.id);
-
-			if (result.error) {
-				toast.error(result.error);
-			} else {
-				toast.success("Subcategoria excluída com sucesso!");
-				setDeletingSubcategory(null);
-				await loadCategoryDetails();
-				onSuccess?.(); // Invalidate parent categories table
-			}
-		} catch (error) {
-			toast.error("Erro ao excluir subcategoria");
-		}
-	};
-
-	const handleDeleteCategory = async () => {
-		setIsDeletingCategory(true);
-		try {
-			const result = await deleteCategory(category.id);
-			if (result.error) {
-				toast.error(result.error);
-			} else {
+	const { mutate: deleteCategoryMutation, isPending: isDeletingCategory } =
+		useMutation({
+			mutationFn: async (id: string) => {
+				const result = await fetch(`/api/categories/${id}`, {
+					method: "DELETE",
+				});
+				if (!result.ok) {
+					const error = await result.json();
+					throw new Error(error.message || "Erro ao excluir categoria");
+				}
+				return result.json();
+			},
+			onSuccess: () => {
 				toast.success("Categoria excluída com sucesso!");
 				onSuccess?.();
-			}
-		} catch (error) {
-			console.error("Error deleting category:", error);
-			toast.error("Erro ao excluir categoria");
-		} finally {
-			setIsDeletingCategory(false);
-			setShowDeleteCategoryDialog(false);
-		}
-	};
+			},
+			onError: (error) => {
+				console.error("Error deleting category:", error);
+				toast.error("Erro ao excluir categoria");
+			},
+		});
 
 	const formatPrice = (price: string) => {
 		return new Intl.NumberFormat("pt-BR", {
@@ -261,6 +285,18 @@ export function CategoryEditForm({
 			currency: "BRL",
 		}).format(parseFloat(price));
 	};
+
+	const onSubmit = (data: CategoryFormData) => updateCategoryMutation(data);
+
+	const onSubcategorySubmit = (data: SubcategoryFormData) => {
+		if (!editingSubcategory) return;
+		updateSubcategoryMutation({
+			id: editingSubcategory.id,
+			name: data.name,
+			categoryId: category.id,
+		});
+	};
+	// onSubmit={subcategoryForm.handleSubmit(onSubcategorySubmit)}
 
 	return (
 		<div className="space-y-6">
@@ -300,8 +336,12 @@ export function CategoryEditForm({
 						)}
 					/>
 
-					<Button type="submit" disabled={isSubmitting} className="w-full">
-						{isSubmitting ? (
+					<Button
+						type="submit"
+						disabled={isSubmitting || isUpdatingCategory}
+						className="w-full"
+					>
+						{isSubmitting || isUpdatingCategory ? (
 							<>
 								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 								Atualizando categoria
@@ -348,20 +388,32 @@ export function CategoryEditForm({
 								placeholder="Nome da nova subcategoria"
 								value={newSubcategoryName}
 								onChange={(e) => setNewSubcategoryName(e.target.value)}
-								disabled={isAddingSubcategory}
+								disabled={isAddingSubcategory || isCreatingSubcategory}
 								onKeyPress={(e) => {
 									if (e.key === "Enter") {
 										e.preventDefault();
-										handleAddSubcategory();
+										createSubcategoryMutation({
+											name: newSubcategoryName,
+											categoryId: category.id,
+										});
 									}
 								}}
 							/>
 							<Button
-								onClick={handleAddSubcategory}
-								disabled={isAddingSubcategory || !newSubcategoryName.trim()}
+								onClick={() =>
+									createSubcategoryMutation({
+										name: newSubcategoryName,
+										categoryId: category.id,
+									})
+								}
+								disabled={
+									isAddingSubcategory ||
+									!newSubcategoryName.trim() ||
+									isCreatingSubcategory
+								}
 								size="icon"
 							>
-								{isAddingSubcategory ? (
+								{isCreatingSubcategory ? (
 									<Loader2 className="h-4 w-4 animate-spin" />
 								) : (
 									<Plus className="h-4 w-4" />
@@ -502,7 +554,7 @@ export function CategoryEditForm({
 					</DialogHeader>
 					<Form {...subcategoryForm}>
 						<form
-							onSubmit={subcategoryForm.handleSubmit(handleUpdateSubcategory)}
+							onSubmit={subcategoryForm.handleSubmit(onSubcategorySubmit)}
 							className="space-y-4"
 						>
 							<FormField
@@ -545,7 +597,11 @@ export function CategoryEditForm({
 				subcategoryId={deletingSubcategory?.id}
 				itemName={deletingSubcategory?.name || ""}
 				itemType="subcategoria"
-				onConfirm={handleDeleteSubcategory}
+				onConfirm={() =>
+					deletingSubcategory &&
+					deleteSubcategoryMutation(deletingSubcategory.id)
+				}
+				isLoading={isDeletingSubcategory}
 			/>
 
 			{/* Delete Category Confirmation Dialog */}
@@ -555,7 +611,7 @@ export function CategoryEditForm({
 				itemId={category.id}
 				itemName={category.name}
 				itemType="categoria"
-				onConfirm={handleDeleteCategory}
+				onConfirm={() => deleteCategoryMutation(category.id)}
 				isLoading={isDeletingCategory}
 				warningText={
 					products.length > 0 || subcategories.length > 0
