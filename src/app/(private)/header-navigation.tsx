@@ -22,6 +22,7 @@ import { UserAvatar } from "@/components/ui/user-avatar";
 import { ROUTES } from "@/constants/routes";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
+import { useModeStore } from "@/stores/mode-store";
 
 interface PrivateHeaderNavigationProps {
 	user: {
@@ -48,6 +49,7 @@ export function PrivateHeaderNavigation({
 }: PrivateHeaderNavigationProps) {
 	const pathname = usePathname();
 	const router = useRouter();
+	const { mode, setMode } = useModeStore();
 
 	const getInitials = (name: string) => {
 		return name
@@ -70,6 +72,20 @@ export function PrivateHeaderNavigation({
 		router.push(ROUTES.SIGN_IN);
 	};
 
+	const handleModeSwitch = (newMode: "customer" | "admin") => {
+		setMode(newMode);
+		// Navigate to appropriate home route based on mode
+		if (newMode === "admin") {
+			router.push(ROUTES.ADMIN_PRODUCTS);
+		} else {
+			router.push(ROUTES.CUSTOMER_PROFILE);
+		}
+	};
+
+	// Get navigation items based on current mode
+	const currentNavigationItems =
+		mode === "admin" ? adminNavigationItems : privateNavigationItems;
+
 	return (
 		<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -82,7 +98,7 @@ export function PrivateHeaderNavigation({
 
 						{/* Desktop Navigation */}
 						<nav className="hidden md:flex items-center space-x-6">
-							{privateNavigationItems.map((item) => (
+							{currentNavigationItems.map((item) => (
 								<Link
 									key={item.name}
 									href={item.href}
@@ -96,21 +112,6 @@ export function PrivateHeaderNavigation({
 									{item.name}
 								</Link>
 							))}
-							{isAdmin &&
-								adminNavigationItems.map((item) => (
-									<Link
-										key={item.name}
-										href={item.href}
-										className={cn(
-											"text-sm font-medium transition-colors hover:text-primary",
-											pathname === item.href
-												? "text-foreground"
-												: "text-muted-foreground",
-										)}
-									>
-										{item.name}
-									</Link>
-								))}
 						</nav>
 					</div>
 
@@ -131,7 +132,7 @@ export function PrivateHeaderNavigation({
 									</Link>
 								</div>
 								<nav className="flex flex-col space-y-3">
-									{privateNavigationItems.map((item) => (
+									{currentNavigationItems.map((item) => (
 										<Link
 											key={item.name}
 											href={item.href}
@@ -145,21 +146,6 @@ export function PrivateHeaderNavigation({
 											{item.name}
 										</Link>
 									))}
-									{isAdmin &&
-										adminNavigationItems.map((item) => (
-											<Link
-												key={item.name}
-												href={item.href}
-												className={cn(
-													"text-sm font-medium transition-colors hover:text-primary",
-													pathname === item.href
-														? "text-foreground"
-														: "text-muted-foreground",
-												)}
-											>
-												{item.name}
-											</Link>
-										))}
 								</nav>
 							</SheetContent>
 						</Sheet>
@@ -198,17 +184,25 @@ export function PrivateHeaderNavigation({
 										</DropdownMenuSubTrigger>
 										<DropdownMenuPortal>
 											<DropdownMenuSubContent>
-												<DropdownMenuItem asChild>
-													<Link href={ROUTES.ADMIN_PRODUCTS}>
-														<Cog className="mr-2 h-4 w-4" />
-														<span>Modo Administrador</span>
-													</Link>
+												<DropdownMenuItem
+													onClick={() => handleModeSwitch("admin")}
+													className={cn(
+														"cursor-pointer",
+														mode === "admin" && "bg-accent",
+													)}
+												>
+													<Cog className="mr-2 h-4 w-4" />
+													<span>Ver como Admin</span>
 												</DropdownMenuItem>
-												<DropdownMenuItem asChild>
-													<Link href={ROUTES.CUSTOMER_PROFILE}>
-														<ShoppingCart className="mr-2 h-4 w-4" />
-														<span>Modo Cliente</span>
-													</Link>
+												<DropdownMenuItem
+													onClick={() => handleModeSwitch("customer")}
+													className={cn(
+														"cursor-pointer",
+														mode === "customer" && "bg-accent",
+													)}
+												>
+													<ShoppingCart className="mr-2 h-4 w-4" />
+													<span>Ver como Cliente</span>
 												</DropdownMenuItem>
 											</DropdownMenuSubContent>
 										</DropdownMenuPortal>
