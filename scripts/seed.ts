@@ -4,9 +4,9 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 config();
 
-import { createHash } from "node:crypto";
 import { faker } from "@faker-js/faker";
 import { neon } from "@neondatabase/serverless";
+import bcrypt from "bcrypt";
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 import { nanoid } from "nanoid";
@@ -21,35 +21,47 @@ if (!databaseUrl) {
 }
 const seedSql = neon(databaseUrl);
 const seedDb = drizzle(seedSql, { schema });
-const _defaultPassword = "12341234";
+const defaultPassword = "12341234";
 
-// Simple password hashing function for seeding
-function _hashPassword(password: string): string {
-	return createHash("sha256").update(password).digest("hex");
+// Password hashing function using bcrypt (compatible with better-auth)
+function hashPassword(password: string): string {
+	// Use 10 rounds for bcrypt hashing (same as better-auth default)
+	return bcrypt.hashSync(password, 10);
 }
 
 async function clearDatabase() {
 	console.info("🗑️  Clearing existing data...");
 
-	// Clear better-auth tables in correct order (respecting foreign key constraints)
-	await seedDb.delete(schema.session);
-	await seedDb.delete(schema.account);
-	await seedDb.delete(schema.verification);
-	await seedDb.delete(schema.user);
+	// Clear tables in correct order (respecting foreign key constraints)
+	// Must delete child tables before parent tables
 
-	// Clear ecommerce tables in correct order (respecting foreign key constraints)
+	// Clear activity records first (references customer)
 	await seedDb.delete(schema.activity);
+
+	// Clear order-related tables (depend on customer)
 	await seedDb.delete(schema.orderPayment);
 	await seedDb.delete(schema.orderDelivery);
 	await seedDb.delete(schema.orderProduct);
 	await seedDb.delete(schema.order);
+
+	// Clear customer-related tables (depend on customer and user)
+	await seedDb.delete(schema.customerAddress);
+	await seedDb.delete(schema.customer);
+
+	// Clear product-related tables
 	await seedDb.delete(schema.productPrice);
 	await seedDb.delete(schema.productImage);
 	await seedDb.delete(schema.product);
+
+	// Clear category tables
 	await seedDb.delete(schema.categorySecondary);
 	await seedDb.delete(schema.category);
-	await seedDb.delete(schema.customerAddress);
-	await seedDb.delete(schema.customer);
+
+	// Clear better-auth tables last (user is referenced by customer)
+	await seedDb.delete(schema.session);
+	await seedDb.delete(schema.account);
+	await seedDb.delete(schema.verification);
+	await seedDb.delete(schema.user);
 
 	console.info("✅ Database cleared successfully");
 }
@@ -140,7 +152,7 @@ async function seedAccounts(userId: string) {
 		accountId: userId,
 		providerId: "credential",
 		userId,
-		password: null, // Password is handled by better-auth
+		password: hashPassword(defaultPassword),
 		scope: "email profile",
 		createdAt: new Date(),
 		updatedAt: new Date(),
