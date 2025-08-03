@@ -5,13 +5,18 @@ import { AppLogo } from "./brand";
 
 export function Header() {
 	return (
-		<header className="border-b bg-background/80 backdrop-blur-sm">
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-				<div className="flex justify-between items-center h-14 sm:h-16">
-					<Link href="/" className="hover:opacity-80 transition-opacity">
-						<AppLogo showText={true} />
-					</Link>
-					<nav className="flex items-center space-x-2 sm:space-x-4">
+		<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+			<div className="max-w-7xl mx-auto">
+				<div className="flex h-14 items-center justify-between">
+					{/* Logo */}
+					<div className="flex items-center space-x-4 sm:space-x-8">
+						<Link href="/" className="flex items-center space-x-2">
+							<AppLogo showText={true} />
+						</Link>
+					</div>
+
+					{/* Right side - Auth buttons */}
+					<div className="flex items-center space-x-2 sm:space-x-4">
 						<Link href={ROUTES.SIGN_IN}>
 							<Button
 								variant="ghost"
@@ -30,7 +35,7 @@ export function Header() {
 								Começar
 							</Button>
 						</Link>
-					</nav>
+					</div>
 				</div>
 			</div>
 		</header>
