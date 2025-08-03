@@ -52,35 +52,42 @@ export default async function HomePage() {
 					</div>
 				</div>
 			</section>
+			{/* Benefits Section */}
 			<section>
-				<ul className="flex flex-col md:flex-row gap-6 md:gap-2 justify-center font-medium text-xs bg-muted p-4 rounded-lg">
+				<ul className="flex flex-row overflow-x-scroll w-full gap-2 lg:justify-center font-medium text-xs bg-muted p-4 rounded-lg">
 					<li className="flex items-center gap-2">
 						<Glasses className="size-4 text-vibrant" />
-						<span>Lentes de alto índice 1,61 grátis</span>
+						<span className="whitespace-nowrap">
+							Lentes de alto índice 1,61 grátis
+						</span>
 					</li>
 					<Separator
-						className="hidden md:block bg-accent min-w-0.5 min-h-6"
+						className="bg-accent min-w-0.5 min-h-6"
 						orientation="vertical"
 					/>
 					<li className="flex items-center gap-2">
 						<Truck className="size-4 text-vibrant" />
-						<span>Frete USPS grátis</span>
+						<span className="whitespace-nowrap">Frete USPS grátis</span>
 					</li>
 					<Separator
-						className="hidden md:block bg-accent min-w-0.5 min-h-6"
+						className="bg-accent min-w-0.5 min-h-6"
 						orientation="vertical"
 					/>
 					<li className="flex items-center gap-2">
 						<ShieldCheck className="size-4 text-vibrant" />
-						<span>Garantia de ajuste e estilo de 14 dias</span>
+						<span className="whitespace-nowrap">
+							Garantia de ajuste e estilo de 14 dias
+						</span>
 					</li>
 					<Separator
-						className="hidden md:block bg-accent min-w-0.5 min-h-6"
+						className="bg-accent min-w-0.5 min-h-6"
 						orientation="vertical"
 					/>
 					<li className="flex items-center gap-2">
 						<BadgeCheck className="size-4 text-vibrant" />
-						<span>Garantia de qualidade de 365 dias</span>
+						<span className="whitespace-nowrap">
+							Garantia de qualidade de 365 dias
+						</span>
 					</li>
 				</ul>
 			</section>
