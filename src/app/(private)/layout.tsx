@@ -3,9 +3,9 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Footer } from "@/components/footer";
 import { UserHeaderSkeleton } from "@/components/user-header-skeleton";
-import { UserHeaderWrapper } from "@/components/user-header-wrapper";
 import { ROUTES } from "@/constants/routes";
 import { getCurrentUser } from "@/lib/auth-server";
+import { PrivateHeaderNavigation } from "./header-navigation";
 
 // Remove force-dynamic to allow caching of auth check
 // export const dynamic = "force-dynamic";
@@ -15,6 +15,13 @@ export const metadata: Metadata = {
 	description:
 		"Sistema administrativo moderno com autenticação segura e interface intuitiva para gestão completa",
 };
+
+async function PrivateHeaderWrapper() {
+	const user = await getCurrentUser();
+	if (!user) throw new Error("User not found");
+
+	return <PrivateHeaderNavigation user={user} />;
+}
 
 export default async function RootLayout({
 	children,
@@ -31,7 +38,7 @@ export default async function RootLayout({
 		<div className="min-h-screen flex flex-col">
 			{/* Stream header with user data */}
 			<Suspense fallback={<UserHeaderSkeleton />}>
-				<UserHeaderWrapper />
+				<PrivateHeaderWrapper />
 			</Suspense>
 			<main className="flex-1 space-y-6 p-6">
 				<div className="flex flex-col max-w-7xl p-6 mx-auto gap-6 w-full">
