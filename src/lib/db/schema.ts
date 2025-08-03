@@ -112,6 +112,7 @@ export const product = pgTable("product", {
 		.primaryKey()
 		.$defaultFn(() => generatePrefixId("product")),
 	name: text("name").notNull(),
+	description: text("description"),
 	stock: integer("stock").notNull().default(0),
 	status: productStatus("status").notNull().default("active"),
 	...timestamps,
@@ -147,6 +148,8 @@ export const category = pgTable("category", {
 		.primaryKey()
 		.$defaultFn(() => generatePrefixId("category")),
 	name: text("name").notNull(),
+	slug: text("slug"),
+	description: text("description"),
 	...timestamps,
 });
 
@@ -247,3 +250,43 @@ export const activity = pgTable("activity", {
 	}),
 	...timestamps,
 });
+
+// Type exports - inferred from schema
+export type User = typeof user.$inferSelect;
+export type NewUser = typeof user.$inferInsert;
+
+export type Customer = typeof customer.$inferSelect;
+export type NewCustomer = typeof customer.$inferInsert;
+
+export type CustomerAddress = typeof customerAddress.$inferSelect;
+export type NewCustomerAddress = typeof customerAddress.$inferInsert;
+
+export type Product = typeof product.$inferSelect;
+export type NewProduct = typeof product.$inferInsert;
+
+export type ProductImage = typeof productImage.$inferSelect;
+export type NewProductImage = typeof productImage.$inferInsert;
+
+export type ProductPrice = typeof productPrice.$inferSelect;
+export type NewProductPrice = typeof productPrice.$inferInsert;
+
+export type Category = typeof category.$inferSelect;
+export type NewCategory = typeof category.$inferInsert;
+
+export type CategorySecondary = typeof categorySecondary.$inferSelect;
+export type NewCategorySecondary = typeof categorySecondary.$inferInsert;
+
+export type Order = typeof order.$inferSelect;
+export type NewOrder = typeof order.$inferInsert;
+
+export type OrderProduct = typeof orderProduct.$inferSelect;
+export type NewOrderProduct = typeof orderProduct.$inferInsert;
+
+export type OrderDelivery = typeof orderDelivery.$inferSelect;
+export type NewOrderDelivery = typeof orderDelivery.$inferInsert;
+
+export type OrderPayment = typeof orderPayment.$inferSelect;
+export type NewOrderPayment = typeof orderPayment.$inferInsert;
+
+export type Activity = typeof activity.$inferSelect;
+export type NewActivity = typeof activity.$inferInsert;

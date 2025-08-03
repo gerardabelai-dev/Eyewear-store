@@ -24,16 +24,11 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import type { Category } from "@/lib/db/schema";
 import { CategoryForm } from "./category-form";
 
 // Category type with counts
-export type CategoryWithCounts = {
-	id: string;
-	name: string;
-	slug: string;
-	description: string | undefined;
-	createdAt: Date;
-	updatedAt: Date;
+export type CategoryWithCounts = Category & {
 	productsCount: number;
 	subcategoriesCount: number;
 };
@@ -45,30 +40,30 @@ const getMockCategories = (): CategoryWithCounts[] => [
 		name: "Eletrônicos",
 		slug: "eletronicos",
 		description: "Produtos eletrônicos e gadgets",
-		productsCount: 15,
-		subcategoriesCount: 3,
 		createdAt: new Date("2024-01-15"),
 		updatedAt: new Date("2024-01-15"),
+		productsCount: 15,
+		subcategoriesCount: 3,
 	},
 	{
 		id: "2",
 		name: "Roupas",
 		slug: "roupas",
 		description: "Vestuário masculino e feminino",
-		productsCount: 25,
-		subcategoriesCount: 5,
 		createdAt: new Date("2024-01-10"),
 		updatedAt: new Date("2024-01-10"),
+		productsCount: 25,
+		subcategoriesCount: 5,
 	},
 	{
 		id: "3",
 		name: "Casa e Decoração",
 		slug: "casa-decoracao",
 		description: "Móveis e itens de decoração",
-		productsCount: 10,
-		subcategoriesCount: 4,
 		createdAt: new Date("2024-01-05"),
 		updatedAt: new Date("2024-01-05"),
+		productsCount: 10,
+		subcategoriesCount: 4,
 	},
 ];
 

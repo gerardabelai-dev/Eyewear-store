@@ -23,11 +23,16 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import type { Product } from "@/lib/types";
+import type { Product } from "@/lib/db/schema";
 import { ProductForm } from "./product-form";
 
 // Extended Product type with category information
 type ProductWithCategory = Product & {
+	description?: string;
+	price?: string;
+	images?: string[];
+	categoryId?: string;
+	subcategoryId?: string;
 	categoryName: string | null;
 	categorySlug: string | null;
 	subcategoryName: string | null;
@@ -39,10 +44,12 @@ const getMockProducts = (): ProductWithCategory[] => [
 	{
 		id: "1",
 		name: "Notebook Dell Inspiron",
-		description: "Notebook com processador Intel Core i5",
-		price: "3599.90",
 		stock: 12,
 		status: "active" as const,
+		createdAt: new Date("2024-01-20"),
+		updatedAt: new Date("2024-01-20"),
+		description: "Notebook com processador Intel Core i5",
+		price: "3599.90",
 		images: ["https://via.placeholder.com/150"],
 		categoryId: "1",
 		categoryName: "Eletrônicos",
@@ -50,16 +57,16 @@ const getMockProducts = (): ProductWithCategory[] => [
 		subcategoryId: "1",
 		subcategoryName: "Notebooks",
 		subcategorySlug: "notebooks",
-		createdAt: new Date("2024-01-20"),
-		updatedAt: new Date("2024-01-20"),
 	},
 	{
 		id: "2",
 		name: "Camiseta Básica Preta",
-		description: "Camiseta 100% algodão",
-		price: "49.90",
 		stock: 50,
 		status: "active" as const,
+		createdAt: new Date("2024-01-18"),
+		updatedAt: new Date("2024-01-18"),
+		description: "Camiseta 100% algodão",
+		price: "49.90",
 		images: ["https://via.placeholder.com/150"],
 		categoryId: "2",
 		categoryName: "Roupas",
@@ -67,16 +74,16 @@ const getMockProducts = (): ProductWithCategory[] => [
 		subcategoryId: "2",
 		subcategoryName: "Camisetas",
 		subcategorySlug: "camisetas",
-		createdAt: new Date("2024-01-18"),
-		updatedAt: new Date("2024-01-18"),
 	},
 	{
 		id: "3",
 		name: "Sofá 3 Lugares",
-		description: "Sofá confortável para sala de estar",
-		price: "1899.00",
 		stock: 3,
 		status: "active" as const,
+		createdAt: new Date("2024-01-15"),
+		updatedAt: new Date("2024-01-15"),
+		description: "Sofá confortável para sala de estar",
+		price: "1899.00",
 		images: ["https://via.placeholder.com/150"],
 		categoryId: "3",
 		categoryName: "Casa e Decoração",
@@ -84,8 +91,6 @@ const getMockProducts = (): ProductWithCategory[] => [
 		subcategoryId: "3",
 		subcategoryName: "Móveis",
 		subcategorySlug: "moveis",
-		createdAt: new Date("2024-01-15"),
-		updatedAt: new Date("2024-01-15"),
 	},
 ];
 
@@ -158,16 +163,24 @@ export function ProductsTable({ products: productsProp }: ProductsTableProps) {
 					</TableHeader>
 					<TableBody>
 						{products.map((product) => (
-							<TableRow key={product.id}>
+							<TableRow
+								key={product.id}
+								className="cursor-pointer hover:bg-muted/50"
+								onClick={() => handleEditProduct(product)}
+							>
 								<TableCell className="font-medium">{product.name}</TableCell>
 								<TableCell>{product.categoryName}</TableCell>
-								<TableCell>{formatCurrency(product.price)}</TableCell>
+								<TableCell>{formatCurrency(product.price || "0")}</TableCell>
 								<TableCell>{product.stock}</TableCell>
 								<TableCell>{getStatusBadge(product.status)}</TableCell>
 								<TableCell className="text-right">
 									<DropdownMenu>
 										<DropdownMenuTrigger asChild>
-											<Button variant="ghost" className="h-8 w-8 p-0">
+											<Button
+												variant="ghost"
+												className="h-8 w-8 p-0"
+												onClick={(e) => e.stopPropagation()}
+											>
 												<span className="sr-only">Abrir menu</span>
 												<MoreHorizontal className="h-4 w-4" />
 											</Button>
@@ -176,14 +189,20 @@ export function ProductsTable({ products: productsProp }: ProductsTableProps) {
 											<DropdownMenuLabel>Ações</DropdownMenuLabel>
 											<DropdownMenuSeparator />
 											<DropdownMenuItem
-												onClick={() => handleEditProduct(product)}
+												onClick={(e) => {
+													e.stopPropagation();
+													handleEditProduct(product);
+												}}
 												className="cursor-pointer"
 											>
 												<Edit className="mr-2 h-4 w-4" />
 												Editar
 											</DropdownMenuItem>
 											<DropdownMenuItem
-												onClick={() => handleDeleteProduct(product)}
+												onClick={(e) => {
+													e.stopPropagation();
+													handleDeleteProduct(product);
+												}}
 												className="cursor-pointer"
 											>
 												<Trash2 className="mr-2 h-4 w-4" />

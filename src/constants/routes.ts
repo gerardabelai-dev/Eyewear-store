@@ -13,6 +13,7 @@ export const ROUTES = {
 	ADMIN_CATEGORIES: "/admin/categorias",
 	ADMIN_PRODUCTS: "/admin/produtos",
 	ADMIN_ORDERS: "/admin/pedidos",
+	ADMIN_CUSTOMERS: "/admin/clientes",
 
 	// Private user routes
 	CUSTOMER_PROFILE: "/minha-conta",

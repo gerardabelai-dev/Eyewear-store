@@ -21,7 +21,7 @@ interface GenericDeleteDialogProps {
 	onOpenChange: (open: boolean) => void;
 	itemId: string;
 	itemName: string;
-	itemType: "produto" | "pedido" | "categoria";
+	itemType: "produto" | "pedido" | "categoria" | "cliente";
 	onConfirm: () => void;
 	isLoading?: boolean;
 	warningText?: string;

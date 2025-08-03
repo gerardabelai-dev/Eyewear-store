@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { Category } from "@/lib/types";
+import type { Category } from "@/lib/db/schema";
 
 const categoryFormSchema = z.object({
 	name: z

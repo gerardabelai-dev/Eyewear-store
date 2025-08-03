@@ -17,6 +17,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import type { Product } from "@/lib/db/schema";
 
 const productFormSchema = z.object({
 	name: z.string().min(1, "Nome é obrigatório"),
@@ -25,10 +26,7 @@ const productFormSchema = z.object({
 type ProductFormValues = z.infer<typeof productFormSchema>;
 
 interface ProductFormProps {
-	product?: {
-		id: string;
-		name: string;
-	};
+	product?: Product;
 	onSuccess?: () => void;
 }
 
@@ -89,7 +87,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 							)}
 						/>
 
-						<div className="flex gap-2">
+						<div className="flex flex-col gap-3">
 							<Button type="submit" disabled={isSubmitting} className="w-full">
 								{isSubmitting
 									? "Salvando..."
@@ -104,6 +102,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 									variant="destructive"
 									onClick={handleDelete}
 									disabled={isSubmitting}
+									className="w-full"
 								>
 									{isSubmitting ? "Excluindo..." : "Excluir"}
 								</Button>

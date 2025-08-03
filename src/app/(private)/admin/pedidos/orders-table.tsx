@@ -23,49 +23,74 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import type { Order, OrderStatus } from "@/lib/types";
+import type { Order } from "@/lib/db/schema";
 import { OrderForm } from "./order-form";
 
+// Extended Order type with customer information for table display
+type OrderWithCustomer = Order & {
+	orderNumber?: string;
+	customerName?: string;
+	customerEmail?: string;
+	customerPhone?: string;
+	statusId?: string;
+	totalAmount?: string;
+	notes?: string;
+};
+
+type OrderStatus = {
+	id: string;
+	name: string;
+	color: string;
+	createdAt: Date;
+	updatedAt: Date;
+};
+
 // Mock data - in a real app this would come from props or server action
-const getMockOrders = (): Order[] => [
+const getMockOrders = (): OrderWithCustomer[] => [
 	{
 		id: "1",
+		customerId: "customer_1",
+		customerAddressId: "address_1",
+		totalPriceInCents: 359990,
+		createdAt: new Date("2024-01-20"),
+		updatedAt: new Date("2024-01-20"),
 		orderNumber: "ORD-2024-001",
-		userId: "1",
 		customerName: "João Silva",
 		customerEmail: "joao.silva@example.com",
 		customerPhone: "(11) 98765-4321",
 		statusId: "1",
 		totalAmount: "3599.90",
 		notes: "Entregar no período da manhã",
-		createdAt: new Date("2024-01-20"),
-		updatedAt: new Date("2024-01-20"),
 	},
 	{
 		id: "2",
+		customerId: "customer_2",
+		customerAddressId: "address_2",
+		totalPriceInCents: 14970,
+		createdAt: new Date("2024-01-19"),
+		updatedAt: new Date("2024-01-19"),
 		orderNumber: "ORD-2024-002",
-		userId: "1",
 		customerName: "Maria Santos",
 		customerEmail: "maria.santos@example.com",
 		customerPhone: "(21) 99876-5432",
 		statusId: "2",
 		totalAmount: "149.70",
 		notes: undefined,
-		createdAt: new Date("2024-01-19"),
-		updatedAt: new Date("2024-01-19"),
 	},
 	{
 		id: "3",
+		customerId: "customer_3",
+		customerAddressId: "address_3",
+		totalPriceInCents: 189900,
+		createdAt: new Date("2024-01-18"),
+		updatedAt: new Date("2024-01-18"),
 		orderNumber: "ORD-2024-003",
-		userId: "1",
 		customerName: "Pedro Oliveira",
 		customerEmail: "pedro.oliveira@example.com",
 		customerPhone: "(31) 97654-3210",
 		statusId: "3",
 		totalAmount: "1899.00",
 		notes: "Cliente VIP - Priorizar entrega",
-		createdAt: new Date("2024-01-18"),
-		updatedAt: new Date("2024-01-18"),
 	},
 ];
 
@@ -101,7 +126,7 @@ const getMockOrderStatuses = (): OrderStatus[] => [
 ];
 
 interface OrdersTableProps {
-	orders?: Order[];
+	orders?: OrderWithCustomer[];
 	orderStatuses?: OrderStatus[];
 }
 
@@ -111,15 +136,19 @@ export function OrdersTable({
 }: OrdersTableProps) {
 	const orders = ordersProp || getMockOrders();
 	const orderStatuses = orderStatusesProp || getMockOrderStatuses();
-	const [editingOrder, setEditingOrder] = useState<Order | null>(null);
-	const [deletingOrder, setDeletingOrder] = useState<Order | null>(null);
+	const [editingOrder, setEditingOrder] = useState<OrderWithCustomer | null>(
+		null,
+	);
+	const [deletingOrder, setDeletingOrder] = useState<OrderWithCustomer | null>(
+		null,
+	);
 	const [isDeleting, setIsDeleting] = useState(false);
 
-	const handleEditOrder = (order: Order) => {
+	const handleEditOrder = (order: OrderWithCustomer) => {
 		setEditingOrder(order);
 	};
 
-	const handleDeleteOrder = (order: Order) => {
+	const handleDeleteOrder = (order: OrderWithCustomer) => {
 		setDeletingOrder(order);
 	};
 
@@ -177,18 +206,28 @@ export function OrdersTable({
 					</TableHeader>
 					<TableBody>
 						{orders.map((order) => (
-							<TableRow key={order.id}>
+							<TableRow
+								key={order.id}
+								className="cursor-pointer hover:bg-muted/50"
+								onClick={() => handleEditOrder(order)}
+							>
 								<TableCell className="font-medium">
 									{order.orderNumber}
 								</TableCell>
 								<TableCell>{order.customerName}</TableCell>
-								<TableCell>{getStatusBadge(order.statusId)}</TableCell>
-								<TableCell>{formatCurrency(order.totalAmount)}</TableCell>
+								<TableCell>{getStatusBadge(order.statusId || "")}</TableCell>
+								<TableCell>
+									{formatCurrency(order.totalAmount || "0")}
+								</TableCell>
 								<TableCell>{formatDate(order.createdAt)}</TableCell>
 								<TableCell className="text-right">
 									<DropdownMenu>
 										<DropdownMenuTrigger asChild>
-											<Button variant="ghost" className="h-8 w-8 p-0">
+											<Button
+												variant="ghost"
+												className="h-8 w-8 p-0"
+												onClick={(e) => e.stopPropagation()}
+											>
 												<span className="sr-only">Abrir menu</span>
 												<MoreHorizontal className="h-4 w-4" />
 											</Button>
@@ -197,14 +236,20 @@ export function OrdersTable({
 											<DropdownMenuLabel>Ações</DropdownMenuLabel>
 											<DropdownMenuSeparator />
 											<DropdownMenuItem
-												onClick={() => handleEditOrder(order)}
+												onClick={(e) => {
+													e.stopPropagation();
+													handleEditOrder(order);
+												}}
 												className="cursor-pointer"
 											>
 												<Edit className="mr-2 h-4 w-4" />
 												Editar
 											</DropdownMenuItem>
 											<DropdownMenuItem
-												onClick={() => handleDeleteOrder(order)}
+												onClick={(e) => {
+													e.stopPropagation();
+													handleDeleteOrder(order);
+												}}
 												className="cursor-pointer"
 											>
 												<Trash2 className="mr-2 h-4 w-4" />

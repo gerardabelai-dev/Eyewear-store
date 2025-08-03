@@ -7,11 +7,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { Order } from "@/lib/types";
+import type { Order } from "@/lib/db/schema";
+
+// Extended Order type with customer information for form display
+type OrderWithCustomer = Order & {
+	orderNumber?: string;
+	customerName?: string;
+	customerEmail?: string;
+	customerPhone?: string;
+	statusId?: string;
+	totalAmount?: string;
+	notes?: string;
+};
 
 interface OrderFormProps {
 	onSuccess?: () => void;
-	order?: Order;
+	order?: OrderWithCustomer;
 }
 
 export function OrderForm({ onSuccess, order }: OrderFormProps) {
