@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { AppLogo } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
+import { AppLogo } from "./brand";
 
 export function Header() {
 	return (
@@ -9,7 +9,7 @@ export function Header() {
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex justify-between items-center h-14 sm:h-16">
 					<Link href="/" className="hover:opacity-80 transition-opacity">
-						<AppLogo size="lg" showText={true} />
+						<AppLogo showText={true} />
 					</Link>
 					<nav className="flex items-center space-x-2 sm:space-x-4">
 						<Link href={ROUTES.SIGN_IN}>

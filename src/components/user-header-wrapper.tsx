@@ -1,30 +1,18 @@
 import { DashboardHeader } from "@/components/dashboard-header";
 
-export function UserHeaderWrapper() {
-	// Mock user data
+export async function UserHeaderWrapper() {
+	// TODO: Replace with actual user data fetching
+	// const user = await getCurrentUser();
+	// if (!user) redirect to sign in
+
+	// Mock user data - replace with actual user data
 	const userProfile = {
 		name: "João Silva",
 		email: "joao.silva@example.com",
 		image: null,
+		initials: "JS",
+		role: "admin", // Change this to "user" to test customer navigation
 	};
 
-	const getInitials = (name: string) => {
-		return name
-			.split(" ")
-			.map((n) => n[0])
-			.join("")
-			.toUpperCase()
-			.slice(0, 2);
-	};
-
-	const userInitials = getInitials(userProfile.name || "User");
-
-	return (
-		<DashboardHeader
-			userImage={userProfile.image}
-			userInitials={userInitials}
-			userName={userProfile.name}
-			userEmail={userProfile.email}
-		/>
-	);
+	return <DashboardHeader user={userProfile} />;
 }

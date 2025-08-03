@@ -9,11 +9,13 @@ export const ROUTES = {
 	SIGN_IN: "/sign-in",
 	SIGN_UP: "/sign-up",
 
-	// Private routes
-	ACCOUNT: "/account",
-	CATEGORIES: "/categorias",
-	PRODUCTS: "/produtos",
-	ORDERS: "/pedidos",
+	// Private admin routes
+	ADMIN_CATEGORIES: "/admin/categorias",
+	ADMIN_PRODUCTS: "/admin/produtos",
+	ADMIN_ORDERS: "/admin/pedidos",
+
+	// Private user routes
+	CUSTOMER_PROFILE: "/minha-conta",
 
 	// API routes
 	API: {

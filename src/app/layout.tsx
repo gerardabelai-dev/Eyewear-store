@@ -7,20 +7,20 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { QueryProvider } from "./providers";
 
-const _libreBaskerville = Libre_Baskerville({
+const libreBaskerville = Libre_Baskerville({
 	weight: ["400", "700"],
-	variable: "--font-sans",
+	variable: "--font-libre",
 	subsets: ["latin"],
 });
 
-const _lora = Lora({
-	variable: "--font-serif",
+const lora = Lora({
+	variable: "--font-lora",
 	subsets: ["latin"],
 });
 
-const _ibmPlexMono = IBM_Plex_Mono({
+const ibmPlexMono = IBM_Plex_Mono({
 	weight: ["400", "500", "600"],
-	variable: "--font-mono",
+	variable: "--font-ibm-mono",
 	subsets: ["latin"],
 });
 
@@ -42,7 +42,14 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body className={cn("min-h-screen bg-background antialiased")}>
+			<body
+				className={cn(
+					"min-h-screen bg-background antialiased",
+					libreBaskerville.variable,
+					lora.variable,
+					ibmPlexMono.variable,
+				)}
+			>
 				<QueryProvider>
 					<ThemeProvider
 						attribute="class"

@@ -255,13 +255,37 @@
 		letter-spacing: var(--tracking-normal);
 		font-size: 1.0625rem; /* 17px - slightly larger than default 16px */
 		line-height: 1.6;
+		font-family: var(--font-lora); /* Default to Lora for base text */
 	}
 }
 
 @layer utilities {
-	/* Apply monospace font for small text sizes */
+	/* Font size specific font families */
+
+	/* Large text (lg, xl, 2xl, etc.) - Libre Baskerville */
+	.text-lg,
+	.text-xl,
+	.text-2xl,
+	.text-3xl,
+	.text-4xl,
+	.text-5xl,
+	.text-6xl,
+	.text-7xl,
+	.text-8xl,
+	.text-9xl {
+		font-family: var(--font-libre);
+	}
+
+	/* Base and medium text - Lora (already default) */
+	.text-base,
+	.text-md {
+		font-family: var(--font-lora);
+	}
+
+	/* Small text (sm, xs) - IBM Plex Mono */
+	.text-sm,
 	.text-xs {
-		font-family: var(--font-mono);
+		font-family: var(--font-ibm-mono);
 	}
 }
 

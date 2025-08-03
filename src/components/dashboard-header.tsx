@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Menu, User } from "lucide-react";
+import { Cog, LogOut, Menu, Repeat, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AppLogo } from "@/components/brand";
@@ -10,7 +10,11 @@ import {
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuLabel,
+	DropdownMenuPortal,
 	DropdownMenuSeparator,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -20,27 +24,43 @@ import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
 interface DashboardHeaderProps {
-	userImage?: string | null;
-	userInitials: string;
-	userName: string;
-	userEmail: string;
+	user: {
+		image: string | null;
+		initials: string;
+		name: string;
+		email: string;
+		role: string;
+	};
 }
 
-const navigationItems = [
-	{ name: "Produtos", href: ROUTES.PRODUCTS },
-	{ name: "Categorias", href: ROUTES.CATEGORIES },
-	{ name: "Pedidos", href: ROUTES.ORDERS },
-	{ name: "Clientes", href: "#" },
-];
+const getNavigationItems = (role: string) => {
+	if (role === "admin") {
+		return [
+			{ name: "Produtos", href: ROUTES.ADMIN_PRODUCTS },
+			{ name: "Categorias", href: ROUTES.ADMIN_CATEGORIES },
+			{ name: "Pedidos", href: ROUTES.ADMIN_ORDERS },
+			{ name: "Clientes", href: "#" },
+		];
+	} else {
+		return [{ name: "Perfil", href: ROUTES.CUSTOMER_PROFILE }];
+	}
+};
 
-export function DashboardHeader({
-	userImage,
-	userInitials,
-	userName,
-	userEmail,
-}: DashboardHeaderProps) {
+export function DashboardHeader({ user }: DashboardHeaderProps) {
 	const pathname = usePathname();
 	const router = useRouter();
+	const navigationItems = getNavigationItems(user.role);
+
+	const getInitials = (name: string) => {
+		return name
+			.split(" ")
+			.map((n) => n[0])
+			.join("")
+			.toUpperCase()
+			.slice(0, 2);
+	};
+
+	const userInitials = getInitials(user.name || "User");
 
 	const handleSignOut = async () => {
 		await authClient.signOut();
@@ -54,7 +74,7 @@ export function DashboardHeader({
 					{/* Logo and Navigation */}
 					<div className="flex items-center space-x-4 sm:space-x-8">
 						<Link href="/" className="flex items-center space-x-2">
-							<AppLogo size="md" showText={true} />
+							<AppLogo showText={true} />
 						</Link>
 
 						{/* Desktop Navigation */}
@@ -89,7 +109,7 @@ export function DashboardHeader({
 							<SheetContent side="left" className="w-[240px] sm:w-[280px]">
 								<div className="mb-6">
 									<Link href="/" onClick={() => document.body.click()}>
-										<AppLogo size="md" showText={true} />
+										<AppLogo showText={true} />
 									</Link>
 								</div>
 								<nav className="flex flex-col space-y-3">
@@ -120,7 +140,7 @@ export function DashboardHeader({
 									className="relative h-8 w-8 rounded-full"
 								>
 									<UserAvatar
-										userImage={userImage}
+										userImage={user.image}
 										userInitials={userInitials}
 										size="sm"
 									/>
@@ -130,16 +150,44 @@ export function DashboardHeader({
 								<DropdownMenuLabel className="font-normal">
 									<div className="flex flex-col space-y-1">
 										<p className="text-sm font-medium leading-none">
-											{userName}
+											{user.name}
 										</p>
 										<p className="text-xs leading-none text-muted-foreground">
-											{userEmail}
+											{user.email}
 										</p>
 									</div>
 								</DropdownMenuLabel>
 								<DropdownMenuSeparator />
+								{user.role === "admin" && (
+									<DropdownMenuSub>
+										<DropdownMenuSubTrigger>
+											<Repeat className="mr-2 h-4 w-4" />
+											<span>Gerenciar</span>
+										</DropdownMenuSubTrigger>
+										<DropdownMenuPortal>
+											<DropdownMenuSubContent>
+												<DropdownMenuItem asChild>
+													<Link href={ROUTES.ADMIN_PRODUCTS}>
+														<Cog className="mr-2 h-4 w-4" />
+														<span>Modo Administrador</span>
+													</Link>
+												</DropdownMenuItem>
+												<DropdownMenuItem asChild>
+													<Link href={ROUTES.CUSTOMER_PROFILE}>
+														<ShoppingCart className="mr-2 h-4 w-4" />
+														<span>Modo Cliente</span>
+													</Link>
+												</DropdownMenuItem>
+											</DropdownMenuSubContent>
+										</DropdownMenuPortal>
+									</DropdownMenuSub>
+								)}
+								<DropdownMenuSeparator />
 								<DropdownMenuItem asChild>
-									<Link href={ROUTES.ACCOUNT} className="cursor-pointer">
+									<Link
+										href={ROUTES.CUSTOMER_PROFILE}
+										className="cursor-pointer"
+									>
 										<User className="mr-2 h-4 w-4" />
 										<span>Perfil</span>
 									</Link>

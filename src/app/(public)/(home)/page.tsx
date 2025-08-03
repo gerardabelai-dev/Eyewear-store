@@ -17,7 +17,7 @@ export default async function HomePage() {
 	// Redirect authenticated users to products page
 	const user = await getCurrentUser();
 	if (user) {
-		redirect(ROUTES.PRODUCTS);
+		redirect(ROUTES.ADMIN_PRODUCTS);
 	}
 	// Test Fast Refresh - Change this text to see if it updates
 	// Current time: 2024-01-15 10:30 AM

@@ -42,23 +42,12 @@ export const BRAND_CONFIG = {
 
 // Logo component for web app with theme switching
 export function AppLogo({
-	size = "md",
 	showText = true,
 	className = "",
 }: {
-	size?: "sm" | "md" | "lg" | "xl";
 	showText?: boolean;
 	className?: string;
 }) {
-	const sizeConfig = {
-		sm: { width: 100, height: 24, logoOnly: 20 },
-		md: { width: 120, height: 28, logoOnly: 24 },
-		lg: { width: 140, height: 32, logoOnly: 32 },
-		xl: { width: 160, height: 36, logoOnly: 40 },
-	};
-
-	const config = sizeConfig[size];
-
 	if (!showText) {
 		// Logo only - use the favicon SVG
 		return (
@@ -66,12 +55,12 @@ export function AppLogo({
 				<Image
 					src="/drvista-favicon.svg"
 					alt="Dr. Vista"
-					width={config.logoOnly}
-					height={config.logoOnly}
+					width={32}
+					height={32}
 					className="object-contain"
 					style={{
-						width: config.logoOnly,
-						height: config.logoOnly,
+						width: 32,
+						height: 32,
 					}}
 				/>
 			</div>
@@ -85,27 +74,25 @@ export function AppLogo({
 			<Image
 				src="/drvista-logo-light.svg"
 				alt="Dr. Vista"
-				width={config.width}
-				height={config.height}
+				width={140}
+				height={32}
 				className="object-contain dark:hidden"
 				style={{
-					width: config.width,
-					height: config.height,
+					width: 140,
+					height: 32,
 				}}
-				priority
 			/>
 			{/* Dark theme logo - hidden in light mode */}
 			<Image
 				src="/drvista-logo-dark.svg"
 				alt="Dr. Vista"
-				width={config.width}
-				height={config.height}
+				width={140}
+				height={32}
 				className="object-contain hidden dark:block"
 				style={{
-					width: config.width,
-					height: config.height,
+					width: 140,
+					height: 32,
 				}}
-				priority
 			/>
 		</div>
 	);
