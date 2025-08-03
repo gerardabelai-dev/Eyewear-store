@@ -7,6 +7,7 @@ interface ModeState {
 	mode: UserMode;
 	setMode: (mode: UserMode) => void;
 	toggleMode: () => void;
+	resetToCustomer: () => void;
 }
 
 export const useModeStore = create<ModeState>()(
@@ -18,6 +19,7 @@ export const useModeStore = create<ModeState>()(
 				set((state) => ({
 					mode: state.mode === "customer" ? "admin" : "customer",
 				})),
+			resetToCustomer: () => set({ mode: "customer" }),
 		}),
 		{
 			name: "user-mode-storage", // localStorage key

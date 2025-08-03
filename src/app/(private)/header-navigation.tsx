@@ -3,6 +3,7 @@
 import { Cog, LogOut, Menu, Repeat, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import React from "react";
 import { AppLogo } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import {
@@ -50,7 +51,7 @@ export function PrivateHeaderNavigation({
 }: PrivateHeaderNavigationProps) {
 	const pathname = usePathname();
 	const router = useRouter();
-	const { mode, setMode } = useModeStore();
+	const { mode, setMode, resetToCustomer } = useModeStore();
 
 	const getInitials = (name: string) => {
 		return name
@@ -68,12 +69,26 @@ export function PrivateHeaderNavigation({
 	const userInitials = getInitials(userName);
 	const isAdmin = userRole === "admin";
 
+	// Reset mode to customer if user is not admin
+	// This ensures regular users can't access admin mode even if it's stored in localStorage
+	React.useEffect(() => {
+		if (!isAdmin && mode === "admin") {
+			resetToCustomer();
+		}
+	}, [isAdmin, mode, resetToCustomer]);
+
 	const handleSignOut = async () => {
+		// Reset mode to customer when signing out to prevent mode persistence across different users
+		resetToCustomer();
 		await authClient.signOut();
 		router.push(ROUTES.SIGN_IN);
 	};
 
 	const handleModeSwitch = (newMode: "customer" | "admin") => {
+		// Only allow admin mode if user is actually an admin
+		if (newMode === "admin" && !isAdmin) {
+			return;
+		}
 		setMode(newMode);
 		// Navigate to appropriate home route based on mode
 		if (newMode === "admin") {
@@ -83,9 +98,10 @@ export function PrivateHeaderNavigation({
 		}
 	};
 
-	// Get navigation items based on current mode
+	// Get navigation items based on current mode, but only allow admin navigation if user is admin
+	const effectiveMode = isAdmin ? mode : "customer";
 	const currentNavigationItems =
-		mode === "admin" ? adminNavigationItems : privateNavigationItems;
+		effectiveMode === "admin" ? adminNavigationItems : privateNavigationItems;
 
 	return (
 		<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -216,7 +232,7 @@ export function PrivateHeaderNavigation({
 										className="cursor-pointer"
 									>
 										<User className="mr-2 h-4 w-4" />
-										<span>Perfil</span>
+										<span>Minha conta</span>
 									</Link>
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
