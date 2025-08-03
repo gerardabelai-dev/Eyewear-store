@@ -3,7 +3,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, bearer } from "better-auth/plugins";
 import { db } from "./db";
-import { serverEnv } from "./env";
+import { env } from "./env";
 
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
@@ -26,12 +26,12 @@ export const auth = betterAuth({
 	},
 	socialProviders: {
 		google: {
-			clientId: serverEnv.GOOGLE_CLIENT_ID,
-			clientSecret: serverEnv.GOOGLE_CLIENT_SECRET,
+			clientId: env.GOOGLE_CLIENT_ID,
+			clientSecret: env.GOOGLE_CLIENT_SECRET,
 		},
 	},
-	baseURL: serverEnv.NEXT_PUBLIC_APP_URL,
-	trustedOrigins: [serverEnv.NEXT_PUBLIC_APP_URL],
+	baseURL: env.WEB_URL,
+	trustedOrigins: [env.WEB_URL],
 	plugins: [admin(), bearer()],
 	onAPIError: {
 		throw: true,

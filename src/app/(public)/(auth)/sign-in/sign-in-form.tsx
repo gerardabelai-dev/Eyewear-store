@@ -38,7 +38,7 @@ const signInSchema = z.object({
 type SignInValues = z.infer<typeof signInSchema>;
 
 function SignIn() {
-	const _router = useRouter();
+	const router = useRouter();
 	const searchParams = useSearchParams();
 	const form = useForm<SignInValues>({
 		resolver: zodResolver(signInSchema),
@@ -63,6 +63,9 @@ function SignIn() {
 				password: values.password,
 			},
 			{
+				onSuccess: () => {
+					router.push(ROUTES.PRODUCTS);
+				},
 				onError: (ctx) => {
 					const message = ctx.error.message || "Falha ao fazer login";
 					toast.error(message);
