@@ -14,6 +14,7 @@ export const ROUTES = {
 	ADMIN_PRODUCTS: "/admin/produtos",
 	ADMIN_ORDERS: "/admin/pedidos",
 	ADMIN_CUSTOMERS: "/admin/clientes",
+	ADMIN_ACTIVITIES: "/admin/atividades",
 
 	// Private user routes
 	CUSTOMER_PROFILE: "/minha-conta",

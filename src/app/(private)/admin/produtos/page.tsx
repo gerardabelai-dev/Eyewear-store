@@ -5,9 +5,6 @@ import { ProductCreationSheet } from "./product-creation-sheet";
 import { ProductsStatistics } from "./products-statistics";
 import { ProductsTable } from "./products-table";
 
-// Add revalidation time for ISR
-export const revalidate = 60; // Revalidate every 60 seconds
-
 export default function ProductsPage() {
 	return (
 		<>

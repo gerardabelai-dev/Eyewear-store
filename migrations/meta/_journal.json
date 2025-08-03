@@ -15,6 +15,13 @@
       "when": 1754176821443,
       "tag": "0001_awesome_galactus",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1754244126995,
+      "tag": "0002_safe_black_tarantula",
+      "breakpoints": true
     }
   ]
 }

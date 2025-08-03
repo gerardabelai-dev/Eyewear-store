@@ -5,9 +5,6 @@ import { CustomerCreationSheet } from "./customer-creation-sheet";
 import { CustomersStatistics } from "./customer-statistics";
 import { CustomersTable } from "./customer-table";
 
-// Add revalidation time for ISR
-export const revalidate = 60; // Revalidate every 60 seconds
-
 export default function CustomersPage() {
 	return (
 		<>

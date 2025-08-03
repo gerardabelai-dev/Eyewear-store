@@ -42,6 +42,7 @@ const adminNavigationItems = [
 	{ name: "Categorias", href: ROUTES.ADMIN_CATEGORIES },
 	{ name: "Pedidos", href: ROUTES.ADMIN_ORDERS },
 	{ name: "Clientes", href: ROUTES.ADMIN_CUSTOMERS },
+	{ name: "Atividades", href: ROUTES.ADMIN_ACTIVITIES },
 ];
 
 export function PrivateHeaderNavigation({

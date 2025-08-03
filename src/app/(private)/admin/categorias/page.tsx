@@ -5,9 +5,6 @@ import { CategoriesStatistics } from "./categories-statistics";
 import { CategoriesTable } from "./categories-table";
 import { CategoryCreationSheet } from "./category-creation-sheet";
 
-// Add revalidation time for ISR
-export const revalidate = 60; // Revalidate every 60 seconds
-
 export default function CategoriesPage() {
 	return (
 		<>

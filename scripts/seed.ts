@@ -157,9 +157,12 @@ async function seedCustomer(userId: string) {
 
 	await seedActivity({
 		type: "customer.created",
-		actorId: customer.id,
-		actorType: "customer",
+		actorId: userId,
+		actorType: "user",
 		customerId: customer.id,
+		metadata: {
+			content: customer,
+		},
 	});
 
 	return customer;
@@ -190,9 +193,12 @@ async function seedCustomerAddress(userId: string) {
 
 	await seedActivity({
 		type: "customerAddress.created",
-		actorId: customerAddress.id,
-		actorType: "customerAddress",
+		actorId: userId,
+		actorType: "user",
 		customerId: userId,
+		metadata: {
+			content: customerAddress,
+		},
 	});
 
 	const [secondaryAddress] = await seedDb
@@ -217,9 +223,12 @@ async function seedCustomerAddress(userId: string) {
 
 	await seedActivity({
 		type: "customerAddress.created",
-		actorId: secondaryAddress.id,
-		actorType: "customerAddress",
+		actorId: userId,
+		actorType: "user",
 		customerId: userId,
+		metadata: {
+			content: secondaryAddress,
+		},
 	});
 
 	return customerAddress;
@@ -243,8 +252,11 @@ async function seedProduct() {
 
 	await seedActivity({
 		type: "product.created",
-		actorId: product.id,
-		actorType: "product",
+		actorId: "system",
+		actorType: "system",
+		metadata: {
+			content: product,
+		},
 	});
 
 	return product;
@@ -267,8 +279,11 @@ async function seedProductImage(productId: string) {
 
 	await seedActivity({
 		type: "productImage.created",
-		actorId: productImage.id,
-		actorType: "productImage",
+		actorId: "system",
+		actorType: "system",
+		metadata: {
+			content: productImage,
+		},
 	});
 }
 
@@ -291,8 +306,11 @@ async function seedProductPrice(productId: string) {
 
 	await seedActivity({
 		type: "productPrice.created",
-		actorId: productPriceDefault.id,
-		actorType: "productPrice",
+		actorId: "system",
+		actorType: "system",
+		metadata: {
+			content: productPriceDefault,
+		},
 	});
 
 	const [productPriceSecondary] = await seedDb
@@ -311,8 +329,11 @@ async function seedProductPrice(productId: string) {
 
 	await seedActivity({
 		type: "productPrice.created",
-		actorId: productPriceSecondary.id,
-		actorType: "productPrice",
+		actorId: "system",
+		actorType: "system",
+		metadata: {
+			content: productPriceSecondary,
+		},
 	});
 
 	return productPriceDefault;
@@ -334,8 +355,11 @@ async function seedCategory() {
 
 	await seedActivity({
 		type: "category.created",
-		actorId: category.id,
-		actorType: "category",
+		actorId: "system",
+		actorType: "system",
+		metadata: {
+			content: category,
+		},
 	});
 
 	return category;
@@ -360,8 +384,11 @@ async function seedCategorySecondary(categoryId: string) {
 
 	await seedActivity({
 		type: "categorySecondary.created",
-		actorId: categorySecondary.id,
-		actorType: "categorySecondary",
+		actorId: "system",
+		actorType: "system",
+		metadata: {
+			content: categorySecondary,
+		},
 	});
 }
 
@@ -391,9 +418,12 @@ async function seedOrder({
 
 	await seedActivity({
 		type: "order.created",
-		actorId: order.id,
-		actorType: "order",
+		actorId: customerId,
+		actorType: "customer",
 		customerId,
+		metadata: {
+			content: order,
+		},
 	});
 
 	return order;
@@ -430,8 +460,11 @@ async function seedOrderProduct({
 
 	await seedActivity({
 		type: "orderProduct.created",
-		actorId: orderProduct.id,
-		actorType: "orderProduct",
+		actorId: "system",
+		actorType: "system",
+		metadata: {
+			content: orderProduct,
+		},
 	});
 }
 
@@ -451,8 +484,11 @@ async function seedOrderDelivery({ orderId }: { orderId: string }) {
 
 	await seedActivity({
 		type: "orderDelivery.created",
-		actorId: orderDelivery.id,
-		actorType: "orderDelivery",
+		actorId: "system",
+		actorType: "system",
+		metadata: {
+			content: orderDelivery,
+		},
 	});
 }
 
@@ -472,8 +508,11 @@ async function seedOrderPayment({ orderId }: { orderId: string }) {
 
 	await seedActivity({
 		type: "orderPayment.created",
-		actorId: orderPayment.id,
-		actorType: "orderPayment",
+		actorId: "system",
+		actorType: "system",
+		metadata: {
+			content: orderPayment,
+		},
 	});
 }
 
@@ -482,11 +521,13 @@ async function seedActivity({
 	actorId,
 	actorType,
 	customerId,
+	metadata,
 }: {
 	type: string;
 	actorId: string;
 	actorType: string;
 	customerId?: string;
+	metadata?: any;
 }) {
 	console.info(
 		`📋 Creating activity of type: ${type}, actor ID: ${actorId}, actor type: ${actorType}${customerId ? `, customer ID: ${customerId}` : ""}...`,
@@ -499,6 +540,7 @@ async function seedActivity({
 			actorId,
 			actorType,
 			customerId,
+			metadata,
 		})
 		.returning();
 

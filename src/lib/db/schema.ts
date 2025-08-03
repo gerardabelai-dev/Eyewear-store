@@ -1,6 +1,7 @@
 import {
 	boolean,
 	integer,
+	jsonb,
 	pgEnum,
 	pgTable,
 	text,
@@ -248,6 +249,7 @@ export const activity = pgTable("activity", {
 	customerId: text("customerId").references(() => customer.id, {
 		onDelete: "set null",
 	}),
+	metadata: jsonb("metadata"),
 	...timestamps,
 });
 
