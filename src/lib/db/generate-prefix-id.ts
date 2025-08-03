@@ -1,6 +1,10 @@
 import { customAlphabet } from "nanoid";
 
 const tableNameToPrefix = {
+	user: "usr",
+	session: "ses",
+	account: "acc",
+	verification: "ver",
 	customer: "cus",
 	customerAddress: "adr",
 	product: "pro",

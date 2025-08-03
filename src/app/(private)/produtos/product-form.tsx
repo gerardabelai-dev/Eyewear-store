@@ -44,40 +44,27 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 
 	const onSubmit = async (_values: ProductFormValues) => {
 		setIsSubmitting(true);
-		try {
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 3000));
+		// Simulate API call
+		await new Promise((resolve) => setTimeout(resolve, 3000));
 
-			toast.success(
-				product
-					? "Produto atualizado com sucesso!"
-					: "Produto criado com sucesso!",
-			);
-
-			form.reset();
-			onSuccess?.();
-		} catch (_error) {
-			toast.error("Erro ao salvar produto");
-		} finally {
-			setIsSubmitting(false);
-		}
+		toast.success(
+			product
+				? "Produto atualizado com sucesso!"
+				: "Produto criado com sucesso!",
+		);
+		setIsSubmitting(false);
+		form.reset();
+		onSuccess?.();
 	};
 
 	const handleDelete = async () => {
 		if (!product) return;
-
 		setIsSubmitting(true);
-		try {
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 3000));
-
-			toast.success("Produto excluído com sucesso!");
-			onSuccess?.();
-		} catch (_error) {
-			toast.error("Erro ao excluir produto");
-		} finally {
-			setIsSubmitting(false);
-		}
+		// Simulate API call
+		await new Promise((resolve) => setTimeout(resolve, 3000));
+		toast.success("Produto excluído com sucesso!");
+		setIsSubmitting(false);
+		onSuccess?.();
 	};
 
 	return (

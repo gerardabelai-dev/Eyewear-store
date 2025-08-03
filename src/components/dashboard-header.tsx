@@ -43,12 +43,8 @@ export function DashboardHeader({
 	const router = useRouter();
 
 	const handleSignOut = async () => {
-		try {
-			await authClient.signOut();
-			router.push(ROUTES.SIGN_IN);
-		} catch (error) {
-			console.error("Error signing out:", error);
-		}
+		await authClient.signOut();
+		router.push(ROUTES.SIGN_IN);
 	};
 
 	return (

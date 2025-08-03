@@ -15,16 +15,21 @@ const timestamps = {
 
 // Better-auth tables
 export const user = pgTable("user", {
-	id: text("id").primaryKey(),
+	id: text("id")
+		.primaryKey()
+		.$defaultFn(() => generatePrefixId("user")),
 	name: text("name").notNull(),
-	email: text("email").notNull().unique(),
 	emailVerified: boolean("emailVerified").notNull().default(false),
+	email: text("email").notNull().unique(),
+	role: text("role").notNull().default("user"),
 	image: text("image"),
 	...timestamps,
 });
 
 export const session = pgTable("session", {
-	id: text("id").primaryKey(),
+	id: text("id")
+		.primaryKey()
+		.$defaultFn(() => generatePrefixId("session")),
 	userId: text("userId")
 		.notNull()
 		.references(() => user.id, { onDelete: "set null" }),
@@ -36,24 +41,28 @@ export const session = pgTable("session", {
 });
 
 export const account = pgTable("account", {
-	id: text("id").primaryKey(),
-	accountId: text("accountId").notNull(),
+	id: text("id")
+		.primaryKey()
+		.$defaultFn(() => generatePrefixId("account")),
 	providerId: text("providerId").notNull(),
+	idToken: text("idToken"),
+	accountId: text("accountId"),
+	scope: text("scope"),
+	password: text("password"),
+	accessToken: text("accessToken"),
+	refreshToken: text("refreshToken"),
+	accessTokenExpiresAt: timestamp("accessTokenExpiresAt"),
+	refreshTokenExpiresAt: timestamp("refreshTokenExpiresAt"),
 	userId: text("userId")
 		.notNull()
 		.references(() => user.id, { onDelete: "set null" }),
-	accessToken: text("accessToken"),
-	refreshToken: text("refreshToken"),
-	idToken: text("idToken"),
-	accessTokenExpiresAt: timestamp("accessTokenExpiresAt"),
-	refreshTokenExpiresAt: timestamp("refreshTokenExpiresAt"),
-	scope: text("scope"),
-	password: text("password"),
 	...timestamps,
 });
 
 export const verification = pgTable("verification", {
-	id: text("id").primaryKey(),
+	id: text("id")
+		.primaryKey()
+		.$defaultFn(() => generatePrefixId("verification")),
 	identifier: text("identifier").notNull(),
 	value: text("value").notNull(),
 	expiresAt: timestamp("expiresAt").notNull(),
@@ -61,8 +70,6 @@ export const verification = pgTable("verification", {
 });
 
 // E-commerce tables
-export const customerRole = pgEnum("customerRole", ["admin", "customer"]);
-
 // Customer
 export const customer = pgTable("customer", {
 	id: text("id")
@@ -73,7 +80,6 @@ export const customer = pgTable("customer", {
 		.references(() => user.id, { onDelete: "set null" }),
 	firstName: text("firstName").notNull(),
 	lastName: text("lastName").notNull(),
-	role: customerRole("role").notNull().default("customer"),
 	...timestamps,
 });
 

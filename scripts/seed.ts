@@ -9,7 +9,6 @@ import { neon } from "@neondatabase/serverless";
 import bcrypt from "bcrypt";
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
-import { nanoid } from "nanoid";
 // Removed auth import due to server-only restriction
 // We'll create users directly in the database instead
 import * as schema from "../src/lib/db/schema";
@@ -21,10 +20,12 @@ if (!databaseUrl) {
 }
 const seedSql = neon(databaseUrl);
 const seedDb = drizzle(seedSql, { schema });
-const defaultPassword = "12341234";
+// Password hash "12341234"
+const defaultPassword =
+	"309cb9ae0272802462acadd782cf8efb:b6ad89b77f3def5c9168a769a92dfc4ef77b016e0a8468c3f333e5b790db3f3fd202d1142982fc1d52212492c165c3e0d1564a5b9dffb6f7c24cc955ca1a5a32";
 
 // Password hashing function using bcrypt (compatible with better-auth)
-function hashPassword(password: string): string {
+function _hashPassword(password: string): string {
 	// Use 10 rounds for bcrypt hashing (same as better-auth default)
 	return bcrypt.hashSync(password, 10);
 }
@@ -60,7 +61,6 @@ async function clearDatabase() {
 	// Clear better-auth tables last (user is referenced by customer)
 	await seedDb.delete(schema.session);
 	await seedDb.delete(schema.account);
-	await seedDb.delete(schema.verification);
 	await seedDb.delete(schema.user);
 
 	console.info("✅ Database cleared successfully");
@@ -71,46 +71,32 @@ async function seedUsers() {
 
 	try {
 		// Create admin user directly in database
-		const adminUserId = nanoid();
-		const adminUserData = {
-			id: adminUserId,
-			email: "admin@example.com",
-			name: "Admin User",
-			emailVerified: true,
-			image: null,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-		};
+		const [adminUserData] = await seedDb
+			.insert(schema.user)
+			.values({
+				email: "admin@example.com",
+				emailVerified: false,
+				name: "Admin User",
+				role: "admin",
+			})
+			.returning();
 
-		await seedDb.insert(schema.user).values(adminUserData);
-
-		console.info("✅ Admin user created successfully:", {
-			id: adminUserData.id,
-			email: adminUserData.email,
-			name: adminUserData.name,
-		});
+		console.info("✅ Admin user created successfully:", adminUserData);
 
 		// Create customer user directly in database
-		const customerUserId = nanoid();
-		const customerUserData = {
-			id: customerUserId,
-			email: "customer@example.com",
-			name: "Customer User",
-			emailVerified: true,
-			image: null,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-		};
+		const [customerUserData] = await seedDb
+			.insert(schema.user)
+			.values({
+				email: "customer@example.com",
+				emailVerified: false,
+				name: "Customer User",
+				role: "user",
+			})
+			.returning();
 
-		await seedDb.insert(schema.user).values(customerUserData);
+		console.info("✅ Customer user created successfully:", customerUserData);
 
-		console.info("✅ Customer user created successfully:", {
-			id: customerUserData.id,
-			email: customerUserData.email,
-			name: customerUserData.name,
-		});
-
-		return [{ user: adminUserData }, { user: customerUserData }];
+		return [adminUserData, customerUserData];
 	} catch (error) {
 		console.error("❌ Error creating users:", error);
 		throw error;
@@ -121,24 +107,18 @@ async function seedSessions(userId: string) {
 	console.info(`🔐 Creating sample session for user ID: ${userId}...`);
 
 	// Create a sample session (this would normally be done by better-auth during login)
-	const sessionData = {
-		id: `session_${Date.now()}`,
-		userId,
-		token: `token_${Date.now()}_${Math.random().toString(36).substring(2)}`,
-		expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-		ipAddress: "127.0.0.1",
-		userAgent: "Mozilla/5.0 (Seeding Script)",
-		createdAt: new Date(),
-		updatedAt: new Date(),
-	};
+	const [sessionData] = await seedDb
+		.insert(schema.session)
+		.values({
+			userId,
+			token: `token_${Date.now()}_${Math.random().toString(36).substring(2)}`,
+			expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+			ipAddress: "127.0.0.1",
+			userAgent: "Mozilla/5.0 (Seeding Script)",
+		})
+		.returning();
 
-	await seedDb.insert(schema.session).values(sessionData);
-
-	console.info("✅ Sample session created successfully:", {
-		sessionId: sessionData.id,
-		userId: sessionData.userId,
-		expiresAt: sessionData.expiresAt,
-	});
+	console.info("✅ Sample session created successfully:", sessionData);
 
 	return sessionData;
 }
@@ -148,55 +128,21 @@ async function seedAccounts(userId: string) {
 
 	// Create a sample account record (for credential-based auth)
 	const accountData = {
-		id: `account_${Date.now()}`,
-		accountId: userId,
 		providerId: "credential",
+		accountId: userId,
 		userId,
-		password: hashPassword(defaultPassword),
-		scope: "email profile",
-		createdAt: new Date(),
-		updatedAt: new Date(),
+		password: defaultPassword,
 	};
 
 	await seedDb.insert(schema.account).values(accountData);
 
-	console.info("✅ Sample account created successfully:", {
-		accountId: accountData.id,
-		providerId: accountData.providerId,
-		userId: accountData.userId,
-	});
+	console.info("✅ Sample account created successfully:", accountData);
 
 	return accountData;
 }
 
-async function seedVerifications(userEmail: string) {
-	console.info(`✉️  Creating sample verification for email: ${userEmail}...`);
-
-	// Create a sample verification record
-	const verificationData = {
-		id: `verification_${Date.now()}`,
-		identifier: userEmail,
-		value: `verification_code_${Math.random().toString(36).substring(2)}`,
-		expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
-		createdAt: new Date(),
-		updatedAt: new Date(),
-	};
-
-	await seedDb.insert(schema.verification).values(verificationData);
-
-	console.info("✅ Sample verification created successfully:", {
-		verificationId: verificationData.id,
-		identifier: verificationData.identifier,
-		expiresAt: verificationData.expiresAt,
-	});
-
-	return verificationData;
-}
-
-async function seedCustomer(userId: string, role: "admin" | "customer") {
-	console.info(
-		`👤 Creating customer for user ID: ${userId} with role: ${role}...`,
-	);
+async function seedCustomer(userId: string) {
+	console.info(`👤 Creating customer for user ID: ${userId}...`);
 
 	const [customer] = await seedDb
 		.insert(schema.customer)
@@ -204,7 +150,6 @@ async function seedCustomer(userId: string, role: "admin" | "customer") {
 			userId,
 			firstName: faker.person.firstName(),
 			lastName: faker.person.lastName(),
-			role,
 		})
 		.returning();
 
@@ -577,15 +522,11 @@ async function seed() {
 
 		// Seed data in correct order
 		const users = await seedUsers();
-		for (const [index, user] of users.entries()) {
-			await seedSessions(user.user.id);
-			await seedAccounts(user.user.id);
-			await seedVerifications(user.user.email);
+		for (const user of users) {
+			await seedSessions(user.id);
+			await seedAccounts(user.id);
 
-			const customer = await seedCustomer(
-				user.user.id,
-				index === 0 ? "admin" : "customer",
-			);
+			const customer = await seedCustomer(user.id);
 			const customerAddress = await seedCustomerAddress(customer.id);
 			const product = await seedProduct();
 			await seedProductImage(product.id);

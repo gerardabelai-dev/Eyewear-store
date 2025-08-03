@@ -3,7 +3,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -22,26 +23,6 @@ import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
 import { signIn } from "@/lib/auth-client";
 
-// Create a global toast tracker to prevent duplicates across all sign-in attempts
-const globalToastTracker = {
-	lastToast: "",
-	lastToastTime: 0,
-
-	canShowToast(message: string): boolean {
-		const now = Date.now();
-		const timeDiff = now - this.lastToastTime;
-
-		// Prevent same message within 2 seconds
-		if (this.lastToast === message && timeDiff < 2000) {
-			return false;
-		}
-
-		this.lastToast = message;
-		this.lastToastTime = now;
-		return true;
-	},
-};
-
 const signInSchema = z.object({
 	email: z
 		.string()
@@ -57,7 +38,8 @@ const signInSchema = z.object({
 type SignInValues = z.infer<typeof signInSchema>;
 
 function SignIn() {
-	const router = useRouter();
+	const _router = useRouter();
+	const searchParams = useSearchParams();
 	const form = useForm<SignInValues>({
 		resolver: zodResolver(signInSchema),
 		defaultValues: {
@@ -67,66 +49,42 @@ function SignIn() {
 		},
 	});
 
-	const onSubmit = async (values: SignInValues) => {
-		try {
-			await signIn.email(
-				{
-					email: values.email,
-					password: values.password,
-				},
-				{
-					onSuccess: () => {
-						const message = "Bem-vindo de volta!";
-						if (globalToastTracker.canShowToast(message)) {
-							toast.success(message);
-							router.push(ROUTES.PRODUCTS);
-						}
-					},
-					onError: (ctx) => {
-						const message = ctx.error.message || "Falha ao fazer login";
-						if (globalToastTracker.canShowToast(message)) {
-							toast.error(message);
-						}
-					},
-				},
-			);
-		} catch (_errorrr) {
-			const message = "Ocorreu um erro inesperado";
-			if (globalToastTracker.canShowToast(message)) {
-				toast.error(message);
-			}
+	useEffect(() => {
+		const error = searchParams.get("error");
+		if (error) {
+			toast.error("Falha na autenticação. Tente novamente.");
 		}
+	}, [searchParams]);
+
+	const onSubmit = async (values: SignInValues) => {
+		await signIn.email(
+			{
+				email: values.email,
+				password: values.password,
+			},
+			{
+				onError: (ctx) => {
+					const message = ctx.error.message || "Falha ao fazer login";
+					toast.error(message);
+				},
+			},
+		);
 	};
 
 	const handleGoogleSignIn = async () => {
-		try {
-			await signIn.social(
-				{
-					provider: "google",
-					callbackURL: ROUTES.PRODUCTS,
+		await signIn.social(
+			{
+				provider: "google",
+				callbackURL: ROUTES.PRODUCTS,
+			},
+			{
+				onError: (ctx) => {
+					const message =
+						ctx.error.message || "Falha ao fazer login com Google";
+					toast.error(message);
 				},
-				{
-					onSuccess: () => {
-						const message = "Bem-vindo de volta!";
-						if (globalToastTracker.canShowToast(message)) {
-							toast.success(message);
-						}
-					},
-					onError: (ctx) => {
-						const message =
-							ctx.error.message || "Falha ao fazer login com Google";
-						if (globalToastTracker.canShowToast(message)) {
-							toast.error(message);
-						}
-					},
-				},
-			);
-		} catch (_errorrr) {
-			const message = "Ocorreu um erro inesperado";
-			if (globalToastTracker.canShowToast(message)) {
-				toast.error(message);
-			}
-		}
+			},
+		);
 	};
 
 	return (

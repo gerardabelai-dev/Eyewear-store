@@ -21,26 +21,6 @@ import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
 import { signIn, signUp } from "@/lib/auth-client";
 
-// Create a global toast tracker to prevent duplicates across all sign-up attempts
-const globalToastTracker = {
-	lastToast: "",
-	lastToastTime: 0,
-
-	canShowToast(message: string): boolean {
-		const now = Date.now();
-		const timeDiff = now - this.lastToastTime;
-
-		// Prevent same message within 2 seconds
-		if (this.lastToast === message && timeDiff < 2000) {
-			return false;
-		}
-
-		this.lastToast = message;
-		this.lastToastTime = now;
-		return true;
-	},
-};
-
 const signUpSchema = z
 	.object({
 		name: z.string().min(1, "Nome é obrigatório"),
@@ -75,67 +55,38 @@ function SignUp() {
 	});
 
 	const onSubmit = async (values: SignUpValues) => {
-		try {
-			await signUp.email(
-				{
-					email: values.email,
-					password: values.password,
-					name: values.name,
-					callbackURL: ROUTES.PRODUCTS,
+		await signUp.email(
+			{
+				email: values.email,
+				password: values.password,
+				name: values.name,
+			},
+			{
+				onSuccess: () => {
+					router.push(ROUTES.PRODUCTS);
 				},
-				{
-					onSuccess: () => {
-						const message = "Conta criada com sucesso!";
-						if (globalToastTracker.canShowToast(message)) {
-							toast.success(message);
-							router.push("/");
-						}
-					},
-					onError: (ctx) => {
-						const message = ctx.error.message || "Falha ao criar conta";
-						if (globalToastTracker.canShowToast(message)) {
-							toast.error(message);
-						}
-					},
+				onError: (ctx) => {
+					const message = ctx.error.message || "Falha ao criar conta";
+					toast.error(message);
 				},
-			);
-		} catch (_errorrr) {
-			const message = "Ocorreu um erro inesperado";
-			if (globalToastTracker.canShowToast(message)) {
-				toast.error(message);
-			}
-		}
+			},
+		);
 	};
 
 	const handleGoogleSignUp = async () => {
-		try {
-			await signIn.social(
-				{
-					provider: "google",
-					callbackURL: ROUTES.PRODUCTS,
+		await signIn.social(
+			{
+				provider: "google",
+				callbackURL: ROUTES.PRODUCTS,
+			},
+			{
+				onError: (ctx) => {
+					const message =
+						ctx.error.message || "Falha ao criar conta com Google";
+					toast.error(message);
 				},
-				{
-					onSuccess: () => {
-						const message = "Conta criada com sucesso!";
-						if (globalToastTracker.canShowToast(message)) {
-							toast.success(message);
-						}
-					},
-					onError: (ctx) => {
-						const message =
-							ctx.error.message || "Falha ao criar conta com Google";
-						if (globalToastTracker.canShowToast(message)) {
-							toast.error(message);
-						}
-					},
-				},
-			);
-		} catch (_errorrr) {
-			const message = "Ocorreu um erro inesperado";
-			if (globalToastTracker.canShowToast(message)) {
-				toast.error(message);
-			}
-		}
+			},
+		);
 	};
 
 	return (

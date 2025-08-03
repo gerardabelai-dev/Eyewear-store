@@ -18,8 +18,7 @@
 		"db:studio": "drizzle-kit studio",
 		"db:drop": "tsx scripts/reset-db.ts",
 		"db:seed": "tsx scripts/seed.ts",
-		"db:reset": "pnpm db:drop && pnpm db:push && pnpm db:seed",
-		"db:fresh": "pnpm db:reset"
+		"db:reset": "pnpm db:drop && pnpm db:push && pnpm db:seed"
 	},
 	"dependencies": {
 		"@faker-js/faker": "^9.9.0",
