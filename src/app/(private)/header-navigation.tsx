@@ -109,7 +109,7 @@ export function PrivateHeaderNavigation({
 				<div className="flex h-14 items-center justify-between">
 					{/* Logo and Navigation */}
 					<div className="flex items-center space-x-4 sm:space-x-8">
-						<Link href="/" className="flex items-center space-x-2">
+						<Link href="/" className="w-28">
 							<AppLogo showText={true} />
 						</Link>
 
@@ -144,7 +144,7 @@ export function PrivateHeaderNavigation({
 							</SheetTrigger>
 							<SheetContent side="left" className="w-[240px] sm:w-[280px]">
 								<div className="mb-6">
-									<Link href="/">
+									<Link href="/" className="w-28">
 										<AppLogo showText={true} />
 									</Link>
 								</div>

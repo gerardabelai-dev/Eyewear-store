@@ -57,11 +57,7 @@ export function AppLogo({
 					alt="Dr. Vista"
 					width={32}
 					height={32}
-					className="object-contain"
-					style={{
-						width: 32,
-						height: 32,
-					}}
+					className="object-contain size-8"
 				/>
 			</div>
 		);
