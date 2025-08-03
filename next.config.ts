@@ -9,6 +9,14 @@ const nextConfig: NextConfig = {
 		// Extend resolve extensions to match your project structure
 		resolveExtensions: [".tsx", ".ts", ".jsx", ".js", ".mjs", ".json"],
 	},
+	images: {
+		remotePatterns: [
+			{
+				protocol: "https",
+				hostname: "s.ygstatic.com",
+			},
+		],
+	},
 };
 
 export default nextConfig;

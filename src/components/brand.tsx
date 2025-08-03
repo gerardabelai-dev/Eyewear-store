@@ -76,11 +76,7 @@ export function AppLogo({
 				alt="Dr. Vista"
 				width={140}
 				height={32}
-				className="object-contain dark:hidden"
-				style={{
-					width: 140,
-					height: 32,
-				}}
+				className="object-contain w-28 dark:hidden"
 			/>
 			{/* Dark theme logo - hidden in light mode */}
 			<Image
@@ -88,11 +84,7 @@ export function AppLogo({
 				alt="Dr. Vista"
 				width={140}
 				height={32}
-				className="object-contain hidden dark:block"
-				style={{
-					width: 140,
-					height: 32,
-				}}
+				className="object-contain w-fit hidden dark:block"
 			/>
 		</div>
 	);
