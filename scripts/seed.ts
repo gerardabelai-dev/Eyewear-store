@@ -168,13 +168,15 @@ async function seedCustomer(userId: string) {
 	return customer;
 }
 
-async function seedCustomerAddress(userId: string) {
-	console.info(`🏠 Creating customer address for customer ID: ${userId}...`);
+async function seedCustomerAddress(customerId: string, userId: string) {
+	console.info(
+		`🏠 Creating customer address for customer ID: ${customerId}...`,
+	);
 
 	const [customerAddress] = await seedDb
 		.insert(schema.customerAddress)
 		.values({
-			customerId: userId,
+			customerId: customerId,
 			street: faker.location.streetAddress(),
 			number: faker.location.buildingNumber(),
 			complement: faker.location.secondaryAddress(),
@@ -195,7 +197,7 @@ async function seedCustomerAddress(userId: string) {
 		type: "customerAddress.created",
 		actorId: userId,
 		actorType: "user",
-		customerId: userId,
+		customerId: customerId,
 		metadata: {
 			content: customerAddress,
 		},
@@ -204,7 +206,7 @@ async function seedCustomerAddress(userId: string) {
 	const [secondaryAddress] = await seedDb
 		.insert(schema.customerAddress)
 		.values({
-			customerId: userId,
+			customerId: customerId,
 			street: faker.location.streetAddress(),
 			number: faker.location.buildingNumber(),
 			complement: faker.location.secondaryAddress(),
@@ -225,7 +227,7 @@ async function seedCustomerAddress(userId: string) {
 		type: "customerAddress.created",
 		actorId: userId,
 		actorType: "user",
-		customerId: userId,
+		customerId: customerId,
 		metadata: {
 			content: secondaryAddress,
 		},
@@ -396,10 +398,12 @@ async function seedOrder({
 	customerId,
 	customerAddressId,
 	totalPriceInCents,
+	userId,
 }: {
 	customerId: string;
 	customerAddressId: string;
 	totalPriceInCents: number;
+	userId: string;
 }) {
 	console.info(
 		`🛒 Creating order for customer ID: ${customerId}, address ID: ${customerAddressId}, total: ${totalPriceInCents} cents...`,
@@ -418,8 +422,8 @@ async function seedOrder({
 
 	await seedActivity({
 		type: "order.created",
-		actorId: customerId,
-		actorType: "customer",
+		actorId: userId,
+		actorType: "user",
 		customerId,
 		metadata: {
 			content: order,
@@ -569,7 +573,7 @@ async function seed() {
 			await seedAccounts(user.id);
 
 			const customer = await seedCustomer(user.id);
-			const customerAddress = await seedCustomerAddress(customer.id);
+			const customerAddress = await seedCustomerAddress(customer.id, user.id);
 			const product = await seedProduct();
 			await seedProductImage(product.id);
 			const productPrice = await seedProductPrice(product.id);
@@ -580,6 +584,7 @@ async function seed() {
 				customerId: customer.id,
 				customerAddressId: customerAddress.id,
 				totalPriceInCents: productPrice.priceInCents * randomProductQuantity,
+				userId: user.id,
 			});
 			await seedOrderProduct({
 				orderId: order.id,

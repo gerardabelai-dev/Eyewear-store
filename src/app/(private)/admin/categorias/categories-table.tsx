@@ -6,6 +6,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { CategoryDeleteDialog } from "@/components/ui/category-delete-dialog";
 import { Drawer } from "@/components/ui/drawer";
 import {
@@ -134,87 +135,91 @@ export function CategoriesTable({
 
 	return (
 		<>
-			<div className="rounded-md border">
-				<Table>
-					<TableHeader>
-						<TableRow>
-							<TableHead>Nome</TableHead>
-							<TableHead>Descrição</TableHead>
-							<TableHead className="text-center">Produtos</TableHead>
-							<TableHead className="text-center">Subcategorias</TableHead>
-							<TableHead>Criada em</TableHead>
-							<TableHead className="text-right">Ações</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{categories.map((category) => (
-							<TableRow
-								key={category.id}
-								className="cursor-pointer hover:bg-muted/50"
-								onClick={() => handleEditCategory(category)}
-							>
-								<TableCell className="font-medium">{category.name}</TableCell>
-								<TableCell>
-									{category.description || (
-										<span className="text-muted-foreground">Sem descrição</span>
-									)}
-								</TableCell>
-								<TableCell className="text-center">
-									<Badge variant="secondary" className="font-mono text-xs">
-										{category.productsCount}
-									</Badge>
-								</TableCell>
-								<TableCell className="text-center">
-									<Badge variant="secondary" className="font-mono text-xs">
-										{category.subcategoriesCount}
-									</Badge>
-								</TableCell>
-								<TableCell>
-									{new Date(category.createdAt).toLocaleDateString("pt-BR")}
-								</TableCell>
-								<TableCell className="text-right">
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<Button
-												variant="ghost"
-												className="h-8 w-8 p-0"
-												onClick={(e) => e.stopPropagation()}
-											>
-												<span className="sr-only">Abrir menu</span>
-												<MoreHorizontal className="h-4 w-4" />
-											</Button>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent align="end">
-											<DropdownMenuLabel>Ações</DropdownMenuLabel>
-											<DropdownMenuSeparator />
-											<DropdownMenuItem
-												onClick={(e) => {
-													e.stopPropagation();
-													handleEditCategory(category);
-												}}
-												className="cursor-pointer"
-											>
-												<Edit className="mr-2 h-4 w-4" />
-												Editar
-											</DropdownMenuItem>
-											<DropdownMenuItem
-												onClick={(e) => {
-													e.stopPropagation();
-													handleDeleteCategory(category);
-												}}
-												className="cursor-pointer"
-											>
-												<Trash2 className="mr-2 h-4 w-4" />
-												Deletar
-											</DropdownMenuItem>
-										</DropdownMenuContent>
-									</DropdownMenu>
-								</TableCell>
+			<Card>
+				<CardContent className="p-0">
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableHead>Nome</TableHead>
+								<TableHead>Descrição</TableHead>
+								<TableHead className="text-center">Produtos</TableHead>
+								<TableHead className="text-center">Subcategorias</TableHead>
+								<TableHead>Criada em</TableHead>
+								<TableHead className="text-right">Ações</TableHead>
 							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			</div>
+						</TableHeader>
+						<TableBody>
+							{categories.map((category) => (
+								<TableRow
+									key={category.id}
+									className="cursor-pointer hover:bg-muted/50"
+									onClick={() => handleEditCategory(category)}
+								>
+									<TableCell className="font-medium">{category.name}</TableCell>
+									<TableCell>
+										{category.description || (
+											<span className="text-muted-foreground">
+												Sem descrição
+											</span>
+										)}
+									</TableCell>
+									<TableCell className="text-center">
+										<Badge variant="secondary" className="font-mono text-xs">
+											{category.productsCount}
+										</Badge>
+									</TableCell>
+									<TableCell className="text-center">
+										<Badge variant="secondary" className="font-mono text-xs">
+											{category.subcategoriesCount}
+										</Badge>
+									</TableCell>
+									<TableCell>
+										{new Date(category.createdAt).toLocaleDateString("pt-BR")}
+									</TableCell>
+									<TableCell className="text-right">
+										<DropdownMenu>
+											<DropdownMenuTrigger asChild>
+												<Button
+													variant="ghost"
+													className="h-8 w-8 p-0"
+													onClick={(e) => e.stopPropagation()}
+												>
+													<span className="sr-only">Abrir menu</span>
+													<MoreHorizontal className="h-4 w-4" />
+												</Button>
+											</DropdownMenuTrigger>
+											<DropdownMenuContent align="end">
+												<DropdownMenuLabel>Ações</DropdownMenuLabel>
+												<DropdownMenuSeparator />
+												<DropdownMenuItem
+													onClick={(e) => {
+														e.stopPropagation();
+														handleEditCategory(category);
+													}}
+													className="cursor-pointer"
+												>
+													<Edit className="mr-2 h-4 w-4" />
+													Editar
+												</DropdownMenuItem>
+												<DropdownMenuItem
+													onClick={(e) => {
+														e.stopPropagation();
+														handleDeleteCategory(category);
+													}}
+													className="cursor-pointer"
+												>
+													<Trash2 className="mr-2 h-4 w-4" />
+													Deletar
+												</DropdownMenuItem>
+											</DropdownMenuContent>
+										</DropdownMenu>
+									</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				</CardContent>
+			</Card>
 
 			{/* Edit Category Drawer */}
 			<Drawer

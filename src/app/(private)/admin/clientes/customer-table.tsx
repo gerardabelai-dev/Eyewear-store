@@ -4,6 +4,7 @@ import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Drawer } from "@/components/ui/drawer";
 import {
 	DropdownMenu,
@@ -26,27 +27,29 @@ import type { Customer } from "@/lib/db/schema";
 import { CustomerForm } from "./customer-form";
 
 // Mock customers data - in a real app this would come from props or server action
-const getMockCustomers = (): Customer[] => [
+const getMockCustomers = (): (Customer & { email?: string })[] => [
 	{
-		id: "1",
+		id: "customer_1",
 		userId: "user_1",
 		firstName: "John",
 		lastName: "Doe",
+		email: "john.doe@example.com",
 		createdAt: new Date("2024-01-15"),
 		updatedAt: new Date("2024-01-15"),
 	},
 	{
-		id: "2",
+		id: "customer_2",
 		userId: "user_2",
 		firstName: "Jane",
 		lastName: "Smith",
+		email: "jane.smith@example.com",
 		createdAt: new Date("2024-01-10"),
 		updatedAt: new Date("2024-01-10"),
 	},
 ];
 
 interface CustomersTableProps {
-	customers?: Customer[];
+	customers?: (Customer & { email?: string })[];
 }
 
 export function CustomersTable({
@@ -87,67 +90,79 @@ export function CustomersTable({
 
 	return (
 		<>
-			<div className="rounded-md border">
-				<Table>
-					<TableHeader>
-						<TableRow>
-							<TableHead>Nome</TableHead>
-							<TableHead className="w-[100px]">Ações</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{customers.map((customer) => (
-							<TableRow
-								key={customer.id}
-								className="cursor-pointer hover:bg-muted/50"
-								onClick={() => handleEditCustomer(customer)}
-							>
-								<TableCell className="font-medium">
-									{customer.firstName} {customer.lastName}
-								</TableCell>
-								<TableCell className="text-right">
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<Button
-												variant="ghost"
-												className="h-8 w-8 p-0"
-												onClick={(e) => e.stopPropagation()}
-											>
-												<span className="sr-only">Abrir menu</span>
-												<MoreHorizontal className="h-4 w-4" />
-											</Button>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent align="end">
-											<DropdownMenuLabel>Ações</DropdownMenuLabel>
-											<DropdownMenuSeparator />
-											<DropdownMenuItem
-												onClick={(e) => {
-													e.stopPropagation();
-													handleEditCustomer(customer);
-												}}
-												className="cursor-pointer"
-											>
-												<Edit className="mr-2 h-4 w-4" />
-												Editar
-											</DropdownMenuItem>
-											<DropdownMenuItem
-												onClick={(e) => {
-													e.stopPropagation();
-													handleDeleteCustomer(customer);
-												}}
-												className="cursor-pointer"
-											>
-												<Trash2 className="mr-2 h-4 w-4" />
-												Deletar
-											</DropdownMenuItem>
-										</DropdownMenuContent>
-									</DropdownMenu>
-								</TableCell>
+			<Card>
+				<CardContent className="p-0">
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableHead>ID</TableHead>
+								<TableHead>Nome</TableHead>
+								<TableHead>Email</TableHead>
+								<TableHead>Data de Criação</TableHead>
+								<TableHead className="w-[100px]">Ações</TableHead>
 							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			</div>
+						</TableHeader>
+						<TableBody>
+							{customers.map((customer) => (
+								<TableRow
+									key={customer.id}
+									className="cursor-pointer hover:bg-muted/50"
+									onClick={() => handleEditCustomer(customer)}
+								>
+									<TableCell className="font-mono text-sm text-muted-foreground">
+										{customer.id}
+									</TableCell>
+									<TableCell className="font-medium">
+										{customer.firstName} {customer.lastName}
+									</TableCell>
+									<TableCell>{customer.email || "—"}</TableCell>
+									<TableCell className="text-sm text-muted-foreground">
+										{customer.createdAt.toLocaleDateString("pt-BR")}
+									</TableCell>
+									<TableCell className="text-right">
+										<DropdownMenu>
+											<DropdownMenuTrigger asChild>
+												<Button
+													variant="ghost"
+													className="h-8 w-8 p-0"
+													onClick={(e) => e.stopPropagation()}
+												>
+													<span className="sr-only">Abrir menu</span>
+													<MoreHorizontal className="h-4 w-4" />
+												</Button>
+											</DropdownMenuTrigger>
+											<DropdownMenuContent align="end">
+												<DropdownMenuLabel>Ações</DropdownMenuLabel>
+												<DropdownMenuSeparator />
+												<DropdownMenuItem
+													onClick={(e) => {
+														e.stopPropagation();
+														handleEditCustomer(customer);
+													}}
+													className="cursor-pointer"
+												>
+													<Edit className="mr-2 h-4 w-4" />
+													Editar
+												</DropdownMenuItem>
+												<DropdownMenuItem
+													onClick={(e) => {
+														e.stopPropagation();
+														handleDeleteCustomer(customer);
+													}}
+													className="cursor-pointer"
+												>
+													<Trash2 className="mr-2 h-4 w-4" />
+													Deletar
+												</DropdownMenuItem>
+											</DropdownMenuContent>
+										</DropdownMenu>
+									</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				</CardContent>
+			</Card>
 
 			{/* Edit Product Drawer */}
 			<Drawer

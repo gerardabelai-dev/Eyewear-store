@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Drawer } from "@/components/ui/drawer";
 import {
 	DropdownMenu,
@@ -149,73 +150,75 @@ export function ProductsTable({ products: productsProp }: ProductsTableProps) {
 
 	return (
 		<>
-			<div className="rounded-md border">
-				<Table>
-					<TableHeader>
-						<TableRow>
-							<TableHead>Nome</TableHead>
-							<TableHead>Categoria</TableHead>
-							<TableHead>Preço</TableHead>
-							<TableHead>Estoque</TableHead>
-							<TableHead>Status</TableHead>
-							<TableHead className="w-[100px]">Ações</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{products.map((product) => (
-							<TableRow
-								key={product.id}
-								className="cursor-pointer hover:bg-muted/50"
-								onClick={() => handleEditProduct(product)}
-							>
-								<TableCell className="font-medium">{product.name}</TableCell>
-								<TableCell>{product.categoryName}</TableCell>
-								<TableCell>{formatCurrency(product.price || "0")}</TableCell>
-								<TableCell>{product.stock}</TableCell>
-								<TableCell>{getStatusBadge(product.status)}</TableCell>
-								<TableCell className="text-right">
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<Button
-												variant="ghost"
-												className="h-8 w-8 p-0"
-												onClick={(e) => e.stopPropagation()}
-											>
-												<span className="sr-only">Abrir menu</span>
-												<MoreHorizontal className="h-4 w-4" />
-											</Button>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent align="end">
-											<DropdownMenuLabel>Ações</DropdownMenuLabel>
-											<DropdownMenuSeparator />
-											<DropdownMenuItem
-												onClick={(e) => {
-													e.stopPropagation();
-													handleEditProduct(product);
-												}}
-												className="cursor-pointer"
-											>
-												<Edit className="mr-2 h-4 w-4" />
-												Editar
-											</DropdownMenuItem>
-											<DropdownMenuItem
-												onClick={(e) => {
-													e.stopPropagation();
-													handleDeleteProduct(product);
-												}}
-												className="cursor-pointer"
-											>
-												<Trash2 className="mr-2 h-4 w-4" />
-												Deletar
-											</DropdownMenuItem>
-										</DropdownMenuContent>
-									</DropdownMenu>
-								</TableCell>
+			<Card>
+				<CardContent className="p-0">
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableHead>Nome</TableHead>
+								<TableHead>Categoria</TableHead>
+								<TableHead>Preço</TableHead>
+								<TableHead>Estoque</TableHead>
+								<TableHead>Status</TableHead>
+								<TableHead className="w-[100px]">Ações</TableHead>
 							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			</div>
+						</TableHeader>
+						<TableBody>
+							{products.map((product) => (
+								<TableRow
+									key={product.id}
+									className="cursor-pointer hover:bg-muted/50"
+									onClick={() => handleEditProduct(product)}
+								>
+									<TableCell className="font-medium">{product.name}</TableCell>
+									<TableCell>{product.categoryName}</TableCell>
+									<TableCell>{formatCurrency(product.price || "0")}</TableCell>
+									<TableCell>{product.stock}</TableCell>
+									<TableCell>{getStatusBadge(product.status)}</TableCell>
+									<TableCell className="text-right">
+										<DropdownMenu>
+											<DropdownMenuTrigger asChild>
+												<Button
+													variant="ghost"
+													className="h-8 w-8 p-0"
+													onClick={(e) => e.stopPropagation()}
+												>
+													<span className="sr-only">Abrir menu</span>
+													<MoreHorizontal className="h-4 w-4" />
+												</Button>
+											</DropdownMenuTrigger>
+											<DropdownMenuContent align="end">
+												<DropdownMenuLabel>Ações</DropdownMenuLabel>
+												<DropdownMenuSeparator />
+												<DropdownMenuItem
+													onClick={(e) => {
+														e.stopPropagation();
+														handleEditProduct(product);
+													}}
+													className="cursor-pointer"
+												>
+													<Edit className="mr-2 h-4 w-4" />
+													Editar
+												</DropdownMenuItem>
+												<DropdownMenuItem
+													onClick={(e) => {
+														e.stopPropagation();
+														handleDeleteProduct(product);
+													}}
+													className="cursor-pointer"
+												>
+													<Trash2 className="mr-2 h-4 w-4" />
+													Deletar
+												</DropdownMenuItem>
+											</DropdownMenuContent>
+										</DropdownMenu>
+									</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				</CardContent>
+			</Card>
 
 			{/* Edit Product Drawer */}
 			<Drawer

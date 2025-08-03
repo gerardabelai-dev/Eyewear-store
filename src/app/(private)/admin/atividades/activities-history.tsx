@@ -14,7 +14,6 @@ import {
 	TruckIcon,
 	UserIcon,
 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -22,24 +21,31 @@ import {
 	TimelineContent,
 	TimelineItem,
 } from "@/components/ui/timeline";
+import {
+	getContextualActionText,
+	parseActivityType,
+} from "@/constants/activities";
 import { ROUTES } from "@/constants/routes";
 
-// Mock data - replace with real database queries
+// Mock data - demonstrating real data structure from seed
 const mockActivities = [
 	{
 		id: "act_1",
 		type: "customer.created",
-		actorId: "user_123",
-		actorType: "user",
-		actorName: "João Silva",
-		actorImage: "/avatar-40-02.jpg",
-		customerId: "customer_456",
+		actorId: "cus_vhfb88",
+		actorType: "customer",
+		actorName: "Maria Santos",
+		customerId: "cus_vhfb88",
 		customerName: "Maria Santos",
 		metadata: {
 			content: {
-				id: "customer_456",
+				id: "cus_vhfb88",
+				userId: "usr_3ydcuq",
 				firstName: "Maria",
 				lastName: "Santos",
+				email: "mariasantos@example.com",
+				createdAt: "2025-08-03T18:15:18.089Z",
+				updatedAt: "2025-08-03T18:15:18.089Z",
 			},
 		},
 		createdAt: new Date(Date.now() - 59000), // 59 seconds ago
@@ -47,61 +53,198 @@ const mockActivities = [
 	{
 		id: "act_2",
 		type: "order.created",
-		actorId: "user_123",
-		actorType: "user",
-		actorName: "João Silva",
-		actorImage: "/avatar-40-02.jpg",
-		customerId: "customer_789",
-		customerName: "Pedro Costa",
+		actorId: "cus_vhfb88",
+		actorType: "customer",
+		actorName: "Maria Santos",
+		customerId: "cus_vhfb88",
+		customerName: "Maria Santos",
 		metadata: {
 			content: {
-				id: "order_123",
-				totalPriceInCents: 15000,
+				id: "ord_dsbs43",
+				customerId: "cus_vhfb88",
+				customerAddressId: "adr_4agu8y",
+				totalPriceInCents: 40270,
+				createdAt: "2025-08-03T18:15:18.447Z",
+				updatedAt: "2025-08-03T18:15:18.447Z",
+			},
+		},
+		createdAt: new Date(Date.now() - 120000), // 2 minutes ago
+	},
+	{
+		id: "act_3",
+		type: "orderPayment.created",
+		actorId: "cus_vhfb88",
+		actorType: "customer",
+		actorName: "Maria Santos",
+		customerId: "cus_vhfb88",
+		customerName: "Maria Santos",
+		metadata: {
+			content: {
+				id: "pay_abc123",
+				orderId: "ord_dsbs43",
+				customerId: "cus_vhfb88",
+				amountInCents: 40270,
+				status: "completed",
+				paymentMethod: "credit_card",
+				createdAt: "2025-08-03T18:15:18.500Z",
+				updatedAt: "2025-08-03T18:15:18.500Z",
 			},
 		},
 		createdAt: new Date(Date.now() - 180000), // 3 minutes ago
 	},
 	{
-		id: "act_3",
+		id: "act_4",
+		type: "order.created",
+		actorId: "cus_2nf9xy",
+		actorType: "customer",
+		actorName: "Ana Paula",
+		customerId: "cus_2nf9xy",
+		customerName: "Ana Paula",
+		metadata: {
+			content: {
+				id: "ord_xyz789",
+				customerId: "cus_2nf9xy",
+				customerAddressId: "adr_4agu8y",
+				totalPriceInCents: 15990,
+				createdAt: "2025-08-03T18:15:18.600Z",
+				updatedAt: "2025-08-03T18:15:18.600Z",
+			},
+		},
+		createdAt: new Date(Date.now() - 240000), // 4 minutes ago
+	},
+	{
+		id: "act_5",
 		type: "product.created",
-		actorId: "user_123",
-		actorType: "user",
-		actorName: "João Silva",
-		actorImage: "/avatar-40-02.jpg",
+		actorId: "system",
+		actorType: "system",
+		actorName: "Sistema",
 		customerId: null,
 		customerName: null,
 		metadata: {
 			content: {
-				id: "product_456",
-				name: "Tênis Nike Air Max",
+				id: "pro_fq7of2",
+				name: "Fresh Bamboo Fish",
+				description: null,
+				stock: 42,
+				status: "active",
+				createdAt: "2025-08-03T18:15:18.261Z",
+				updatedAt: "2025-08-03T18:15:18.261Z",
 			},
 		},
 		createdAt: new Date(Date.now() - 300000), // 5 minutes ago
 	},
 	{
-		id: "act_4",
+		id: "act_7",
+		type: "orderPayment.created",
+		actorId: "cus_2nf9xy",
+		actorType: "customer",
+		actorName: "Ana Paula",
+		customerId: "cus_2nf9xy",
+		customerName: "Ana Paula",
+		metadata: {
+			content: {
+				id: "pay_xyz456",
+				orderId: "ord_xyz789",
+				customerId: "cus_2nf9xy",
+				amountInCents: 15990,
+				status: "completed",
+				paymentMethod: "pix",
+				createdAt: "2025-08-03T18:15:18.750Z",
+				updatedAt: "2025-08-03T18:15:18.750Z",
+			},
+		},
+		createdAt: new Date(Date.now() - 420000), // 7 minutes ago
+	},
+	{
+		id: "act_8",
 		type: "category.created",
-		actorId: "user_123",
-		actorType: "user",
-		actorName: "João Silva",
-		actorImage: "/avatar-40-02.jpg",
+		actorId: "system",
+		actorType: "system",
+		actorName: "Sistema",
 		customerId: null,
 		customerName: null,
 		metadata: {
 			content: {
-				id: "category_789",
-				name: "Sapatos Masculinos",
+				id: "cat_c7iwtz",
+				name: "Rubber",
+				slug: null,
+				description: null,
+				createdAt: "2025-08-03T18:15:18.381Z",
+				updatedAt: "2025-08-03T18:15:18.381Z",
+			},
+		},
+		createdAt: new Date(Date.now() - 480000), // 8 minutes ago
+	},
+	{
+		id: "act_9",
+		type: "order.created",
+		actorId: "cus_def789",
+		actorType: "customer",
+		actorName: "Carlos Eduardo",
+		customerId: "cus_def789",
+		customerName: "Carlos Eduardo",
+		metadata: {
+			content: {
+				id: "ord_def456",
+				customerId: "cus_def789",
+				customerAddressId: "adr_def123",
+				totalPriceInCents: 89900,
+				createdAt: "2025-08-03T18:15:18.800Z",
+				updatedAt: "2025-08-03T18:15:18.800Z",
+			},
+		},
+		createdAt: new Date(Date.now() - 540000), // 9 minutes ago
+	},
+	{
+		id: "act_10",
+		type: "orderPayment.created",
+		actorId: "cus_def789",
+		actorType: "customer",
+		actorName: "Carlos Eduardo",
+		customerId: "cus_def789",
+		customerName: "Carlos Eduardo",
+		metadata: {
+			content: {
+				id: "pay_def123",
+				orderId: "ord_def456",
+				customerId: "cus_def789",
+				amountInCents: 89900,
+				status: "completed",
+				paymentMethod: "debit_card",
+				createdAt: "2025-08-03T18:15:18.850Z",
+				updatedAt: "2025-08-03T18:15:18.850Z",
 			},
 		},
 		createdAt: new Date(Date.now() - 600000), // 10 minutes ago
 	},
+	{
+		id: "act_11",
+		type: "customerAddress.created",
+		actorId: "cus_2nf9xy",
+		actorType: "customer",
+		actorName: "Ana Paula",
+		customerId: "cus_2nf9xy",
+		customerName: "Ana Paula",
+		metadata: {
+			content: {
+				id: "adr_4agu8y",
+				customerId: "cus_2nf9xy",
+				street: "123 Main Street",
+				number: "456",
+				complement: "Apt 7B",
+				neighborhood: "Downtown",
+				city: "São Paulo",
+				state: "SP",
+				zipCode: "01234-567",
+				country: "Brazil",
+				isDefault: true,
+				createdAt: "2025-08-03T18:15:18.137Z",
+				updatedAt: "2025-08-03T18:15:18.137Z",
+			},
+		},
+		createdAt: new Date(Date.now() - 720000), // 12 minutes ago
+	},
 ];
-
-// Parse entity and action from activity type
-function parseActivityType(type: string): { entity: string; action: string } {
-	const [entity, action] = type.split(".");
-	return { entity: entity || "unknown", action: action || "unknown" };
-}
 
 // Get icon based on entity type
 function getEntityIcon(entity: string): LucideIcon {
@@ -124,7 +267,6 @@ function getEntityIcon(entity: string): LucideIcon {
 function getEntityLinkUrl(entityType: string, entityId: string): string {
 	const linkMap: Record<string, (id: string) => string> = {
 		customer: (id) => `${ROUTES.ADMIN_CUSTOMERS}?customerId=${id}`,
-		user: (id) => `${ROUTES.ADMIN_CUSTOMERS}?userId=${id}`, // Users don't have dedicated page, redirect to customers
 		order: (id) => `${ROUTES.ADMIN_ORDERS}?orderId=${id}`,
 		product: (id) => `${ROUTES.ADMIN_PRODUCTS}?productId=${id}`,
 		category: (id) => `${ROUTES.ADMIN_CATEGORIES}?categoryId=${id}`,
@@ -146,8 +288,8 @@ function getActivityInfo(
 	_actorType: string,
 	_actorId: string,
 	metadata?: any,
-	customerName?: string | null,
-	customerId?: string | null,
+	_customerName?: string | null,
+	_customerId?: string | null,
 ): {
 	text: string;
 	relatedEntity?: {
@@ -164,31 +306,7 @@ function getActivityInfo(
 } {
 	const { entity, action } = parseActivityType(type);
 
-	// Map entity names to Portuguese
-	const entityNames: Record<string, string> = {
-		customer: "cliente",
-		order: "pedido",
-		product: "produto",
-		category: "categoria",
-		orderDelivery: "entrega",
-		orderPayment: "pagamento",
-		customerAddress: "endereço",
-		productImage: "imagem de produto",
-		productPrice: "preço",
-		categorySecondary: "subcategoria",
-	};
-
-	// Map actions to Portuguese
-	const actionTexts: Record<string, string> = {
-		created: "criou",
-		updated: "atualizou",
-		deleted: "removeu",
-	};
-
-	const entityName = entityNames[entity] || entity;
-	const actionText = actionTexts[action] || action;
-
-	let text = `${actionText} ${entityName === "cliente" ? "um novo" : "uma nova"} ${entityName}`;
+	const text = getContextualActionText(entity, action);
 	let relatedEntity: any;
 	let customerInfo: any;
 
@@ -198,10 +316,10 @@ function getActivityInfo(
 
 		switch (entity) {
 			case "customer":
-				if (content.firstName && content.lastName) {
-					text = `${actionText} o cliente`;
+				// For customer self-registration, show email as part of the action text
+				if (content.email) {
 					relatedEntity = {
-						name: `${content.firstName} ${content.lastName}`,
+						name: content.email,
 						id: content.id,
 						type: "customer",
 						url: getEntityLinkUrl("customer", content.id),
@@ -210,7 +328,6 @@ function getActivityInfo(
 				break;
 			case "category":
 				if (content.name) {
-					text = `${actionText} a categoria`;
 					relatedEntity = {
 						name: `"${content.name}"`,
 						id: content.id,
@@ -221,7 +338,6 @@ function getActivityInfo(
 				break;
 			case "product":
 				if (content.name) {
-					text = `${actionText} o produto`;
 					relatedEntity = {
 						name: `"${content.name}"`,
 						id: content.id,
@@ -231,32 +347,125 @@ function getActivityInfo(
 				}
 				break;
 			case "order":
-				if (customerName && customerId) {
-					text = `${actionText} um pedido para`;
-					customerInfo = {
-						name: customerName,
-						id: customerId,
-						url: getEntityLinkUrl("customer", customerId),
+				if (content.id) {
+					relatedEntity = {
+						name: `#${content.id}`,
+						id: content.id,
+						type: "order",
+						url: getEntityLinkUrl("order", content.id),
+					};
+				}
+				break;
+			case "orderPayment":
+				if (content.id && content.amountInCents) {
+					const formattedAmount = new Intl.NumberFormat("pt-BR", {
+						style: "currency",
+						currency: "BRL",
+					}).format(content.amountInCents / 100);
+
+					relatedEntity = {
+						name: formattedAmount,
+						id: content.id,
+						type: "orderPayment",
+						url: getEntityLinkUrl(
+							"orderPayment",
+							content.orderId || content.id,
+						),
+					};
+				}
+				break;
+			case "customerAddress":
+				if (content.id && content.street && content.city && content.state) {
+					const addressDisplay = `${content.street}${content.number ? `, ${content.number}` : ""} - ${content.city}, ${content.state}`;
+
+					relatedEntity = {
+						name: addressDisplay,
+						id: content.id,
+						type: "customerAddress",
+						url: getEntityLinkUrl(
+							"customerAddress",
+							content.customerId || content.id,
+						),
+					};
+				}
+				break;
+			case "orderDelivery":
+				if (content.id) {
+					relatedEntity = {
+						name: `#${content.id}`,
+						id: content.id,
+						type: "orderDelivery",
+						url: getEntityLinkUrl(
+							"orderDelivery",
+							content.orderId || content.id,
+						),
+					};
+				}
+				break;
+			case "productImage":
+				if (content.id && content.imageUrl) {
+					const imageName = content.imageUrl.split("/").pop() || content.id;
+
+					relatedEntity = {
+						name: imageName,
+						id: content.id,
+						type: "productImage",
+						url: getEntityLinkUrl(
+							"productImage",
+							content.productId || content.id,
+						),
+					};
+				}
+				break;
+			case "productPrice":
+				if (content.id && content.priceInCents) {
+					const formattedPrice = new Intl.NumberFormat("pt-BR", {
+						style: "currency",
+						currency: "BRL",
+					}).format(content.priceInCents / 100);
+
+					relatedEntity = {
+						name: formattedPrice,
+						id: content.id,
+						type: "productPrice",
+						url: getEntityLinkUrl(
+							"productPrice",
+							content.productId || content.id,
+						),
+					};
+				}
+				break;
+			case "categorySecondary":
+				if (content.name) {
+					relatedEntity = {
+						name: `"${content.name}"`,
+						id: content.id,
+						type: "categorySecondary",
+						url: getEntityLinkUrl(
+							"categorySecondary",
+							content.categoryId || content.id,
+						),
+					};
+				}
+				break;
+			case "orderProduct":
+				if (content.id && content.quantity) {
+					relatedEntity = {
+						name: `${content.quantity}x produto`,
+						id: content.id,
+						type: "orderProduct",
+						url: getEntityLinkUrl(
+							"orderProduct",
+							content.orderId || content.id,
+						),
 					};
 				}
 				break;
 		}
 	}
 
-	// Add customer context for certain entities
-	if (
-		customerName &&
-		customerId &&
-		["orderDelivery", "orderPayment", "customerAddress"].includes(entity) &&
-		!customerInfo
-	) {
-		text += " para";
-		customerInfo = {
-			name: customerName,
-			id: customerId,
-			url: getEntityLinkUrl("customer", customerId),
-		};
-	}
+	// Add customer context for certain entities (if no specific case handled them)
+	// Note: Most entities now have specific cases above, this is mainly for fallback
 
 	return { text, relatedEntity, customerInfo };
 }
@@ -283,7 +492,7 @@ export function ActivitiesHistory() {
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2">
 					<BookOpenIcon className="h-5 w-5" />
-					Atividades Recentes
+					Atividades recentes
 				</CardTitle>
 			</CardHeader>
 			<CardContent>
@@ -306,19 +515,6 @@ export function ActivitiesHistory() {
 
 								<TimelineContent className="flex flex-1 items-center justify-between">
 									<div className="flex items-center gap-3">
-										<Avatar className="h-6 w-6">
-											<AvatarImage
-												src={activity.actorImage}
-												alt={activity.actorName}
-											/>
-											<AvatarFallback className="text-xs">
-												{activity.actorName
-													.split(" ")
-													.map((n) => n[0])
-													.join("")}
-											</AvatarFallback>
-										</Avatar>
-
 										<div className="flex flex-col">
 											<div className="flex items-center gap-2 flex-wrap">
 												{(() => {
@@ -342,7 +538,7 @@ export function ActivitiesHistory() {
 																href={actorUrl}
 																className="font-medium text-sm text-primary hover:underline"
 															>
-																{activity.actorName}
+																{activity.actorName || "Sistema"}
 															</a>
 															<span className="text-sm text-muted-foreground">
 																{activityInfo.text}
