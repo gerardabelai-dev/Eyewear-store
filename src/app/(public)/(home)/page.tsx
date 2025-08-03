@@ -1,6 +1,8 @@
 import { BadgeCheck, Glasses, ShieldCheck, Truck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { BlurFade } from "@/components/magicui/blur-fade";
+import { TextAnimate } from "@/components/magicui/text-animate";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -29,30 +31,65 @@ export default async function HomePage() {
 				<div className="absolute inset-0 flex flex-col md:flex-row">
 					<div className="hidden md:block md:w-1/2" />
 					<div className="flex-1 md:w-1/2 flex flex-col md:justify-center items-center px-4 md:px-8 text-center text-white">
-						<h1 className="text-3xl md:text-6xl font-black mb-4 mt-10 md:mt-0 text-[#EAFF00]">
+						<TextAnimate
+							animation="blurInUp"
+							by="word"
+							once
+							as="h1"
+							className="text-3xl md:text-6xl font-black mt-10 md:mt-0 text-[#EAFF00] whitespace-nowrap"
+						>
 							COMPRE 1 LEVE 2
-							<br />+ EXTRA 10% OFF
-						</h1>
-						<p className="hidden md:block mb-6 text-sm md:text-md font-medium">
+						</TextAnimate>
+						<TextAnimate
+							animation="blurInUp"
+							by="word"
+							delay={0.3}
+							once
+							as="h2"
+							className="text-3xl md:text-6xl font-black mb-4 text-[#EAFF00] whitespace-nowrap"
+						>
+							+ EXTRA 10% OFF
+						</TextAnimate>
+						<TextAnimate
+							className="hidden md:block text-sm md:text-md font-medium"
+							animation="blurInUp"
+							by="word"
+							delay={0.6}
+							once
+						>
 							Mochilas prontas. Óculos postos. Vamos dominar este ano.
-							<br />
+						</TextAnimate>
+						<TextAnimate
+							className="hidden md:block mb-6 text-sm md:text-md font-medium"
+							animation="blurInUp"
+							by="word"
+							delay={0.7}
+							once
+						>
 							Faça a primeira impressão valer a pena com novas armações ousadas.
-						</p>
-						<div className="hidden md:flex flex-row gap-3 mb-4">
-							<Button className="bg-[#F80178] hover:bg-[#d10065] cursor-pointer text-white">
-								<Link href="#">Comprar Óculos de Grau</Link>
-							</Button>
-							<Button className="bg-[#F80178] hover:bg-[#d10065] cursor-pointer text-white">
-								<Link href="#">Comprar Óculos de Sol</Link>
-							</Button>
+						</TextAnimate>
+
+						<div className="hidden flex-col md:flex lg:flex-row md:fl gap-3 mb-4">
+							<BlurFade delay={1} inView>
+								<Button className="bg-[#F80178] hover:bg-[#d10065] cursor-pointer text-white">
+									<Link href="#">Comprar Óculos de Grau</Link>
+								</Button>
+							</BlurFade>
+							<BlurFade delay={1.2} inView>
+								<Button className="bg-[#F80178] hover:bg-[#d10065] cursor-pointer text-white">
+									<Link href="#">Comprar Óculos de Sol</Link>
+								</Button>
+							</BlurFade>
 						</div>
+
 						<h3 className="text-md md:text-xl font-medium">
-							CUPOM: DRVISTA2025
+							<TextAnimate animation="blurInUp" by="word" delay={1.3} once>
+								CUPOM: DRVISTA2025
+							</TextAnimate>
 						</h3>
 					</div>
 				</div>
 			</section>
-			{/* Benefits Section */}
 			<section>
 				<ul className="flex flex-row overflow-x-scroll w-full gap-2 lg:justify-center font-medium text-xs bg-muted p-4 rounded-lg">
 					<li className="flex items-center gap-2">
@@ -91,6 +128,17 @@ export default async function HomePage() {
 					</li>
 				</ul>
 			</section>
+			;
+			<section className="p-2 mt-4 flex flex-col gap-4">
+				<h2 className="text-lg md:text-3xl text-center font-bold">
+					Compre Óculos de Grau Online
+				</h2>
+				<p className="text-xs md:text-sm text-center">
+					Compre óculos de grau e de sol por estilo e personalize de acordo com
+					sua receita.
+				</p>
+			</section>
+			;
 		</>
 	);
 }
