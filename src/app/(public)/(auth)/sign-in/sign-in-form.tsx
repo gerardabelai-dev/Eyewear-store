@@ -64,7 +64,7 @@ function SignIn() {
 			},
 			{
 				onSuccess: () => {
-					router.push(ROUTES.ADMIN_PRODUCTS);
+					router.push(ROUTES.CUSTOMER_PROFILE);
 				},
 				onError: (ctx) => {
 					const message = ctx.error.message || "Falha ao fazer login";
@@ -78,7 +78,7 @@ function SignIn() {
 		await signIn.social(
 			{
 				provider: "google",
-				callbackURL: ROUTES.ADMIN_PRODUCTS,
+				callbackURL: ROUTES.CUSTOMER_PROFILE,
 			},
 			{
 				onError: (ctx) => {

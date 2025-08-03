@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { Footer } from "@/components/footer";
 import { ROUTES } from "@/constants/routes";
 import { getCurrentUser } from "@/lib/auth-server";
 
@@ -24,14 +23,5 @@ export default async function AdminLayout({
 		redirect(ROUTES.CUSTOMER_PROFILE);
 	}
 
-	return (
-		<div className="min-h-screen flex flex-col">
-			<main className="flex-1 space-y-6 p-6">
-				<div className="flex flex-col max-w-7xl p-6 mx-auto gap-6 w-full">
-					{children}
-				</div>
-			</main>
-			<Footer />
-		</div>
-	);
+	return children;
 }

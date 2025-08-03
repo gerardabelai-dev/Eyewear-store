@@ -168,7 +168,7 @@ export function CustomersTable({
 					onSuccess={() => {
 						setIsEditDrawerOpen(false);
 						setEditingCustomer(null);
-						toast.success("Cliente atualizado com sucesso!");
+						// Removed duplicate toast - the form already shows its own success toast
 					}}
 				/>
 			</Drawer>

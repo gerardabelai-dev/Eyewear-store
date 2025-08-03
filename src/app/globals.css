@@ -292,10 +292,10 @@
 /* Toast responsive positioning - simplified */
 @media (max-width: 767px) {
 	[data-sonner-toaster] {
-		top: 1rem;
+		top: auto;
 		left: 50%;
 		right: auto;
-		bottom: auto;
+		bottom: 1rem;
 		transform: translateX(-50%);
 		width: calc(100vw - 2rem);
 		max-width: 400px;
@@ -312,4 +312,25 @@
 		width: auto;
 		max-width: 400px;
 	}
+}
+
+/* Toast custom styling */
+[data-sonner-toast][data-type="success"] {
+	background-color: var(--primary) !important;
+	border-color: var(--primary) !important;
+	color: var(--primary-foreground) !important;
+}
+
+[data-sonner-toast][data-type="success"] [data-icon] {
+	color: var(--primary-foreground) !important;
+}
+
+[data-sonner-toast][data-type="error"] {
+	background-color: var(--destructive) !important;
+	border-color: var(--destructive) !important;
+	color: var(--destructive-foreground) !important;
+}
+
+[data-sonner-toast][data-type="error"] [data-icon] {
+	color: var(--destructive-foreground) !important;
 }

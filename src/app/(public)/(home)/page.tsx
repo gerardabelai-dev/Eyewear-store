@@ -1,6 +1,5 @@
 import { ArrowRight, Shield, Users, Zap } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -10,17 +9,8 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { ROUTES } from "@/constants/routes";
-import { getCurrentUser } from "@/lib/auth-server";
 
-// Fast Refresh Test - updated comment to test refresh functionality
 export default async function HomePage() {
-	// Redirect authenticated users to products page
-	const user = await getCurrentUser();
-	if (user) {
-		redirect(ROUTES.ADMIN_PRODUCTS);
-	}
-	// Test Fast Refresh - Change this text to see if it updates
-	// Current time: 2024-01-15 10:30 AM
 	return (
 		<>
 			{/* Hero Section */}

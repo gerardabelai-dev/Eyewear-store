@@ -63,7 +63,7 @@ function SignUp() {
 			},
 			{
 				onSuccess: () => {
-					router.push(ROUTES.ADMIN_PRODUCTS);
+					router.push(ROUTES.CUSTOMER_PROFILE);
 				},
 				onError: (ctx) => {
 					const message = ctx.error.message || "Falha ao criar conta";
@@ -77,7 +77,7 @@ function SignUp() {
 		await signIn.social(
 			{
 				provider: "google",
-				callbackURL: ROUTES.ADMIN_PRODUCTS,
+				callbackURL: ROUTES.CUSTOMER_PROFILE,
 			},
 			{
 				onError: (ctx) => {

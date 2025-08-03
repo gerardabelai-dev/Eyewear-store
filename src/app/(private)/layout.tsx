@@ -40,8 +40,8 @@ export default async function RootLayout({
 			<Suspense fallback={<UserHeaderSkeleton />}>
 				<PrivateHeaderWrapper />
 			</Suspense>
-			<main className="flex-1 space-y-6 p-6">
-				<div className="flex flex-col max-w-7xl p-6 mx-auto gap-6 w-full">
+			<main className="flex-1 space-y-6 p-2 sm:p-6">
+				<div className="flex flex-col max-w-7xl p-2 sm:p-6 mx-auto gap-6 w-full">
 					{children}
 				</div>
 			</main>
