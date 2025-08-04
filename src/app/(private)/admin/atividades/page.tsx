@@ -3,6 +3,9 @@ import { PageHeader } from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ActivitiesHistory } from "./activities-history";
 
+// Force dynamic rendering for this page since it shows real-time activity data
+export const dynamic = "force-dynamic";
+
 export default function ActivitiesPage() {
 	return (
 		<>

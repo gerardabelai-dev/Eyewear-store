@@ -7,8 +7,8 @@ import { ROUTES } from "@/constants/routes";
 import { getCurrentUser } from "@/lib/auth-server";
 import { PrivateHeaderNavigation } from "./header-navigation";
 
-// Remove force-dynamic to allow caching of auth check
-// export const dynamic = "force-dynamic";
+// Force dynamic rendering for authenticated routes
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
 	title: "Dr. Vista - Plataforma de Autenticação Segura",
