@@ -159,9 +159,9 @@ export default async function HomePage() {
 						com sua receita.
 					</p>
 				</div>
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-fit mx-auto">
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full md:w-fit mx-auto">
 					<div className="flex flex-col items-center gap-2">
-						<div className="relative h-32 w-full aspect-video rounded">
+						<div className="relative h-48 md:h-32 w-full aspect-video rounded">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp"
 								alt="Óculos de grau"
@@ -174,7 +174,7 @@ export default async function HomePage() {
 					</div>
 
 					<div className="flex flex-col items-center gap-2">
-						<div className="relative h-32 w-full aspect-video">
+						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp"
 								alt="Óculos de grau"
@@ -187,7 +187,7 @@ export default async function HomePage() {
 					</div>
 
 					<div className="flex flex-col items-center gap-2">
-						<div className="relative h-32 w-full aspect-video">
+						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp"
 								alt="Óculos de grau"
@@ -200,7 +200,7 @@ export default async function HomePage() {
 					</div>
 
 					<div className="flex flex-col items-center gap-2">
-						<div className="relative h-32 w-full aspect-video">
+						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp"
 								alt="Óculos de grau"
@@ -232,9 +232,9 @@ export default async function HomePage() {
 						<Button variant="secondary">Wide</Button>
 					</div>
 				</div>
-				<div className="grid items-center justify-items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-fit mx-auto">
+				<div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-full md:w-fit mx-auto">
 					<div className="flex flex-col items-center gap-2">
-						<div className="relative h-44 w-full aspect-video">
+						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
 								alt="Óculos de grau"
@@ -250,7 +250,7 @@ export default async function HomePage() {
 					</div>
 
 					<div className="flex flex-col items-center gap-2">
-						<div className="relative h-44 w-full aspect-video">
+						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
 								alt="Óculos de grau"
@@ -266,7 +266,7 @@ export default async function HomePage() {
 					</div>
 
 					<div className="flex flex-col items-center gap-2">
-						<div className="relative h-44 w-full aspect-video">
+						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
 								alt="Óculos de grau"
@@ -282,7 +282,7 @@ export default async function HomePage() {
 					</div>
 
 					<div className="flex flex-col items-center gap-2">
-						<div className="relative h-44 w-full aspect-video">
+						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
 								alt="Óculos de grau"
@@ -298,7 +298,7 @@ export default async function HomePage() {
 					</div>
 
 					<div className="flex flex-col items-center gap-2">
-						<div className="relative h-44 w-full aspect-video">
+						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
 								alt="Óculos de grau"
@@ -314,7 +314,7 @@ export default async function HomePage() {
 					</div>
 
 					<div className="flex flex-col items-center gap-2">
-						<div className="relative h-44 w-full aspect-video">
+						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
 								alt="Óculos de grau"
@@ -330,7 +330,7 @@ export default async function HomePage() {
 					</div>
 
 					<div className="flex flex-col items-center gap-2">
-						<div className="relative h-44 w-full aspect-video">
+						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
 								alt="Óculos de grau"
@@ -346,7 +346,7 @@ export default async function HomePage() {
 					</div>
 
 					<div className="flex flex-col items-center gap-2">
-						<div className="relative h-44 w-full aspect-video">
+						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
 								alt="Óculos de grau"
@@ -385,9 +385,9 @@ export default async function HomePage() {
 						<p className="text-xs md:text-sm text-center mb-8">
 							Lentes de alto índice 1,61 grátis com 100% de proteção UV
 						</p>
-						<div className="grid items-center justify-items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-fit mx-auto">
+						<div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-full md:w-fit mx-auto">
 							<div className="flex flex-col items-center gap-2">
-								<div className="relative h-44 w-full aspect-video">
+								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
 										alt="Óculos de grau"
@@ -403,7 +403,7 @@ export default async function HomePage() {
 							</div>
 
 							<div className="flex flex-col items-center gap-2">
-								<div className="relative h-44 w-full aspect-video">
+								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
 										alt="Óculos de grau"
@@ -419,7 +419,7 @@ export default async function HomePage() {
 							</div>
 
 							<div className="flex flex-col items-center gap-2">
-								<div className="relative h-44 w-full aspect-video">
+								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
 										alt="Óculos de grau"
@@ -435,7 +435,7 @@ export default async function HomePage() {
 							</div>
 
 							<div className="flex flex-col items-center gap-2">
-								<div className="relative h-44 w-full aspect-video">
+								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
 										alt="Óculos de grau"
@@ -451,7 +451,7 @@ export default async function HomePage() {
 							</div>
 
 							<div className="flex flex-col items-center gap-2">
-								<div className="relative h-44 w-full aspect-video">
+								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
 										alt="Óculos de grau"
@@ -467,7 +467,7 @@ export default async function HomePage() {
 							</div>
 
 							<div className="flex flex-col items-center gap-2">
-								<div className="relative h-44 w-full aspect-video">
+								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
 										alt="Óculos de grau"
@@ -483,7 +483,7 @@ export default async function HomePage() {
 							</div>
 
 							<div className="flex flex-col items-center gap-2">
-								<div className="relative h-44 w-full aspect-video">
+								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
 										alt="Óculos de grau"
@@ -499,7 +499,7 @@ export default async function HomePage() {
 							</div>
 
 							<div className="flex flex-col items-center gap-2">
-								<div className="relative h-44 w-full aspect-video">
+								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
 										alt="Óculos de grau"
@@ -521,9 +521,9 @@ export default async function HomePage() {
 							Revestimentos antirriscos e antirreflexos gratuitos, com 100% de
 							proteção UV
 						</p>
-						<div className="grid items-center justify-items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-fit mx-auto">
+						<div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-full md:w-fit mx-auto">
 							<div className="flex flex-col items-center gap-2">
-								<div className="relative h-44 w-full aspect-video">
+								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
 										alt="Óculos de sol"
@@ -539,7 +539,7 @@ export default async function HomePage() {
 							</div>
 
 							<div className="flex flex-col items-center gap-2">
-								<div className="relative h-44 w-full aspect-video">
+								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
 										alt="Óculos de sol"
@@ -555,7 +555,7 @@ export default async function HomePage() {
 							</div>
 
 							<div className="flex flex-col items-center gap-2">
-								<div className="relative h-44 w-full aspect-video">
+								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
 										alt="Óculos de sol"
@@ -571,7 +571,7 @@ export default async function HomePage() {
 							</div>
 
 							<div className="flex flex-col items-center gap-2">
-								<div className="relative h-44 w-full aspect-video">
+								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
 										alt="Óculos de sol"
@@ -587,7 +587,7 @@ export default async function HomePage() {
 							</div>
 
 							<div className="flex flex-col items-center gap-2">
-								<div className="relative h-44 w-full aspect-video">
+								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
 										alt="Óculos de sol"
@@ -603,7 +603,7 @@ export default async function HomePage() {
 							</div>
 
 							<div className="flex flex-col items-center gap-2">
-								<div className="relative h-44 w-full aspect-video">
+								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
 										alt="Óculos de sol"
@@ -619,7 +619,7 @@ export default async function HomePage() {
 							</div>
 
 							<div className="flex flex-col items-center gap-2">
-								<div className="relative h-44 w-full aspect-video">
+								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
 										alt="Óculos de sol"
