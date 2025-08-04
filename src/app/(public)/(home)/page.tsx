@@ -160,7 +160,7 @@ export default async function HomePage() {
 					</p>
 				</div>
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full md:w-fit mx-auto">
-					<div className="flex flex-col items-center gap-2">
+					<Link href="/cart" className="flex flex-col items-center gap-2">
 						<div className="relative h-48 md:h-32 w-full aspect-video rounded">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp"
@@ -171,9 +171,9 @@ export default async function HomePage() {
 							/>
 						</div>
 						<h3>Óculos de Grau</h3>
-					</div>
+					</Link>
 
-					<div className="flex flex-col items-center gap-2">
+					<Link href="/cart" className="flex flex-col items-center gap-2">
 						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp"
@@ -184,9 +184,9 @@ export default async function HomePage() {
 							/>
 						</div>
 						<h3>Óculos de Sol</h3>
-					</div>
+					</Link>
 
-					<div className="flex flex-col items-center gap-2">
+					<Link href="/cart" className="flex flex-col items-center gap-2">
 						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp"
@@ -197,9 +197,9 @@ export default async function HomePage() {
 							/>
 						</div>
 						<h3>Óculos Luz Azul</h3>
-					</div>
+					</Link>
 
-					<div className="flex flex-col items-center gap-2">
+					<Link href="/cart" className="flex flex-col items-center gap-2">
 						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp"
@@ -210,7 +210,7 @@ export default async function HomePage() {
 							/>
 						</div>
 						<h3>Óculos de Leitura</h3>
-					</div>
+					</Link>
 				</div>
 			</section>
 
@@ -233,7 +233,7 @@ export default async function HomePage() {
 					</div>
 				</div>
 				<div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-full md:w-fit mx-auto">
-					<div className="flex flex-col items-center gap-2">
+					<Link href="/cart" className="flex flex-col items-center gap-2">
 						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
@@ -247,9 +247,9 @@ export default async function HomePage() {
 							<strong>Ubell</strong>
 							<span>$39</span>
 						</div>
-					</div>
+					</Link>
 
-					<div className="flex flex-col items-center gap-2">
+					<Link href="/cart" className="flex flex-col items-center gap-2">
 						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
@@ -263,9 +263,9 @@ export default async function HomePage() {
 							<strong>Ubell</strong>
 							<span>$39</span>
 						</div>
-					</div>
+					</Link>
 
-					<div className="flex flex-col items-center gap-2">
+					<Link href="/cart" className="flex flex-col items-center gap-2">
 						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
@@ -279,9 +279,9 @@ export default async function HomePage() {
 							<strong>Ubell</strong>
 							<span>$39</span>
 						</div>
-					</div>
+					</Link>
 
-					<div className="flex flex-col items-center gap-2">
+					<Link href="/cart" className="flex flex-col items-center gap-2">
 						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
@@ -295,9 +295,9 @@ export default async function HomePage() {
 							<strong>Ubell</strong>
 							<span>$39</span>
 						</div>
-					</div>
+					</Link>
 
-					<div className="flex flex-col items-center gap-2">
+					<Link href="/cart" className="flex flex-col items-center gap-2">
 						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
@@ -311,9 +311,9 @@ export default async function HomePage() {
 							<strong>Ubell</strong>
 							<span>$39</span>
 						</div>
-					</div>
+					</Link>
 
-					<div className="flex flex-col items-center gap-2">
+					<Link href="/cart" className="flex flex-col items-center gap-2">
 						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
@@ -327,9 +327,9 @@ export default async function HomePage() {
 							<strong>Ubell</strong>
 							<span>$39</span>
 						</div>
-					</div>
+					</Link>
 
-					<div className="flex flex-col items-center gap-2">
+					<Link href="/cart" className="flex flex-col items-center gap-2">
 						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
@@ -343,9 +343,9 @@ export default async function HomePage() {
 							<strong>Ubell</strong>
 							<span>$39</span>
 						</div>
-					</div>
+					</Link>
 
-					<div className="flex flex-col items-center gap-2">
+					<Link href="/cart" className="flex flex-col items-center gap-2">
 						<div className="relative h-48 md:h-32 w-full aspect-video">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
@@ -359,7 +359,7 @@ export default async function HomePage() {
 							<strong>Ubell</strong>
 							<span>$39</span>
 						</div>
-					</div>
+					</Link>
 				</div>
 				<div className="flex flex-col md:flex-row gap-2">
 					<Button variant="outline">Mais Óculos de Grau</Button>
@@ -386,7 +386,7 @@ export default async function HomePage() {
 							Lentes de alto índice 1,61 grátis com 100% de proteção UV
 						</p>
 						<div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-full md:w-fit mx-auto">
-							<div className="flex flex-col items-center gap-2">
+							<Link href="/cart" className="flex flex-col items-center gap-2">
 								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
@@ -400,9 +400,9 @@ export default async function HomePage() {
 									<strong>Ubell</strong>
 									<span>$39</span>
 								</div>
-							</div>
+							</Link>
 
-							<div className="flex flex-col items-center gap-2">
+							<Link href="/cart" className="flex flex-col items-center gap-2">
 								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
@@ -416,9 +416,9 @@ export default async function HomePage() {
 									<strong>Ubell</strong>
 									<span>$39</span>
 								</div>
-							</div>
+							</Link>
 
-							<div className="flex flex-col items-center gap-2">
+							<Link href="/cart" className="flex flex-col items-center gap-2">
 								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
@@ -432,9 +432,9 @@ export default async function HomePage() {
 									<strong>Ubell</strong>
 									<span>$39</span>
 								</div>
-							</div>
+							</Link>
 
-							<div className="flex flex-col items-center gap-2">
+							<Link href="/cart" className="flex flex-col items-center gap-2">
 								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
@@ -448,9 +448,9 @@ export default async function HomePage() {
 									<strong>Ubell</strong>
 									<span>$39</span>
 								</div>
-							</div>
+							</Link>
 
-							<div className="flex flex-col items-center gap-2">
+							<Link href="/cart" className="flex flex-col items-center gap-2">
 								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
@@ -464,9 +464,9 @@ export default async function HomePage() {
 									<strong>Ubell</strong>
 									<span>$39</span>
 								</div>
-							</div>
+							</Link>
 
-							<div className="flex flex-col items-center gap-2">
+							<Link href="/cart" className="flex flex-col items-center gap-2">
 								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
@@ -480,9 +480,9 @@ export default async function HomePage() {
 									<strong>Ubell</strong>
 									<span>$39</span>
 								</div>
-							</div>
+							</Link>
 
-							<div className="flex flex-col items-center gap-2">
+							<Link href="/cart" className="flex flex-col items-center gap-2">
 								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
@@ -496,9 +496,9 @@ export default async function HomePage() {
 									<strong>Ubell</strong>
 									<span>$39</span>
 								</div>
-							</div>
+							</Link>
 
-							<div className="flex flex-col items-center gap-2">
+							<Link href="/cart" className="flex flex-col items-center gap-2">
 								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
@@ -512,7 +512,7 @@ export default async function HomePage() {
 									<strong>Ubell</strong>
 									<span>$39</span>
 								</div>
-							</div>
+							</Link>
 						</div>
 					</TabsContent>
 
@@ -522,7 +522,7 @@ export default async function HomePage() {
 							proteção UV
 						</p>
 						<div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-full md:w-fit mx-auto">
-							<div className="flex flex-col items-center gap-2">
+							<Link href="/cart" className="flex flex-col items-center gap-2">
 								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
@@ -536,9 +536,9 @@ export default async function HomePage() {
 									<strong>Ray-Ban</strong>
 									<span>$89</span>
 								</div>
-							</div>
+							</Link>
 
-							<div className="flex flex-col items-center gap-2">
+							<Link href="/cart" className="flex flex-col items-center gap-2">
 								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
@@ -552,9 +552,9 @@ export default async function HomePage() {
 									<strong>Oakley</strong>
 									<span>$99</span>
 								</div>
-							</div>
+							</Link>
 
-							<div className="flex flex-col items-center gap-2">
+							<Link href="/cart" className="flex flex-col items-center gap-2">
 								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
@@ -568,9 +568,9 @@ export default async function HomePage() {
 									<strong>Persol</strong>
 									<span>$79</span>
 								</div>
-							</div>
+							</Link>
 
-							<div className="flex flex-col items-center gap-2">
+							<Link href="/cart" className="flex flex-col items-center gap-2">
 								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
@@ -584,9 +584,9 @@ export default async function HomePage() {
 									<strong>Maui Jim</strong>
 									<span>$109</span>
 								</div>
-							</div>
+							</Link>
 
-							<div className="flex flex-col items-center gap-2">
+							<Link href="/cart" className="flex flex-col items-center gap-2">
 								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
@@ -600,9 +600,9 @@ export default async function HomePage() {
 									<strong>Gucci</strong>
 									<span>$199</span>
 								</div>
-							</div>
+							</Link>
 
-							<div className="flex flex-col items-center gap-2">
+							<Link href="/cart" className="flex flex-col items-center gap-2">
 								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
@@ -616,9 +616,9 @@ export default async function HomePage() {
 									<strong>Prada</strong>
 									<span>$159</span>
 								</div>
-							</div>
+							</Link>
 
-							<div className="flex flex-col items-center gap-2">
+							<Link href="/cart" className="flex flex-col items-center gap-2">
 								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
@@ -632,9 +632,9 @@ export default async function HomePage() {
 									<strong>Versace</strong>
 									<span>$179</span>
 								</div>
-							</div>
+							</Link>
 
-							<div className="flex flex-col items-center gap-2">
+							<Link href="/cart" className="flex flex-col items-center gap-2">
 								<div className="relative h-44 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
@@ -648,7 +648,7 @@ export default async function HomePage() {
 									<strong>Tom Ford</strong>
 									<span>$149</span>
 								</div>
-							</div>
+							</Link>
 						</div>
 					</TabsContent>
 				</Tabs>
@@ -667,7 +667,7 @@ export default async function HomePage() {
 				</div>
 
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-7xl">
-					<div className="flex flex-col items-center gap-2">
+					<Link href="/cart" className="flex flex-col items-center gap-2">
 						<div className="relative h-52 w-full aspect-video overflow-hidden">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
@@ -681,8 +681,8 @@ export default async function HomePage() {
 							Guia de Óculos de Volta às Aulas: Encontrando os Óculos Certos
 							para o Novo Ano Letivo
 						</h3>
-					</div>
-					<div className="flex flex-col items-center gap-2">
+					</Link>
+					<Link href="/cart" className="flex flex-col items-center gap-2">
 						<div className="relative h-52 w-full aspect-video overflow-hidden">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Zyra_1.jpg"
@@ -696,8 +696,8 @@ export default async function HomePage() {
 							Da praia ao brunch: Como usar seus óculos de sol durante todo o
 							verão
 						</h3>
-					</div>
-					<div className="flex flex-col items-center gap-2">
+					</Link>
+					<Link href="/cart" className="flex flex-col items-center gap-2">
 						<div className="relative h-52 w-full aspect-video overflow-hidden">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Quinn_1.jpg"
@@ -710,7 +710,7 @@ export default async function HomePage() {
 						<h3 className="text-lg font-bold">
 							Como limpar sua flanela para óculos da maneira correta
 						</h3>
-					</div>
+					</Link>
 				</div>
 				<div className="flex gap-2">
 					<Button variant="outline">Explore Nosso Blog</Button>

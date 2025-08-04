@@ -1,5 +1,6 @@
 import { Check, Trash2 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,7 +25,10 @@ export default function CartPage() {
 				<ul className="flex flex-col gap-4">
 					{/* Product 1 */}
 					<li className="flex gap-4">
-						<div className="relative w-48 md:w-96 h-full aspect-video">
+						<Link
+							href="/cart"
+							className="relative w-48 md:w-96 h-full aspect-video"
+						>
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
 								alt="Óculos de grau"
@@ -32,7 +36,7 @@ export default function CartPage() {
 								quality={75}
 								fill
 							/>
-						</div>
+						</Link>
 
 						<div className="flex flex-col justify-between gap-2">
 							<div className="flex flex-col gap-2">
@@ -73,7 +77,10 @@ export default function CartPage() {
 
 					{/* Product 2 */}
 					<li className="flex gap-4">
-						<div className="relative w-48 md:w-96 h-full aspect-video">
+						<Link
+							href="/cart"
+							className="relative w-48 md:w-96 h-full aspect-video"
+						>
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
 								alt="Óculos de grau"
@@ -81,7 +88,7 @@ export default function CartPage() {
 								quality={75}
 								fill
 							/>
-						</div>
+						</Link>
 
 						<div className="flex flex-col justify-between gap-2">
 							<div className="flex flex-col gap-2">
@@ -122,7 +129,10 @@ export default function CartPage() {
 
 					{/* Product 3 */}
 					<li className="flex gap-4">
-						<div className="relative w-48 md:w-96 h-full aspect-video">
+						<Link
+							href="/cart"
+							className="relative w-48 md:w-96 h-full aspect-video"
+						>
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
 								alt="Óculos de grau"
@@ -130,7 +140,7 @@ export default function CartPage() {
 								quality={75}
 								fill
 							/>
-						</div>
+						</Link>
 
 						<div className="flex flex-col justify-between gap-2">
 							<div className="flex flex-col gap-2">
@@ -171,7 +181,10 @@ export default function CartPage() {
 
 					{/* Product 4 */}
 					<li className="flex gap-4">
-						<div className="relative w-48 md:w-96 h-full aspect-video">
+						<Link
+							href="/cart"
+							className="relative w-48 md:w-96 h-full aspect-video"
+						>
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
 								alt="Óculos de grau"
@@ -179,7 +192,7 @@ export default function CartPage() {
 								quality={75}
 								fill
 							/>
-						</div>
+						</Link>
 
 						<div className="flex flex-col justify-between gap-2">
 							<div className="flex flex-col gap-2">
