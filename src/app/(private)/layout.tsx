@@ -35,7 +35,7 @@ export default async function RootLayout({
 	}
 
 	return (
-		<div className="min-h-screen flex flex-col">
+		<div className="min-dvh-screen flex flex-col">
 			{/* Stream header with user data */}
 			<Suspense fallback={<UserHeaderSkeleton />}>
 				<PrivateHeaderWrapper />
