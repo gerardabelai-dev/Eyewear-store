@@ -221,7 +221,7 @@ export default async function HomePage() {
 						Coleções de Óculos em Destaque
 					</h2>
 
-					<div className="flex gap-2">
+					<div className="flex flex-row overflow-x-scroll w-full gap-2 lg:justify-center">
 						<Button variant="default">Todos</Button>
 						<Button variant="secondary">Gatinho</Button>
 						<Button variant="secondary">Aviador</Button>
@@ -361,7 +361,7 @@ export default async function HomePage() {
 						</div>
 					</div>
 				</div>
-				<div className="flex gap-2">
+				<div className="flex flex-col md:flex-row gap-2">
 					<Button variant="outline">Mais Óculos de Grau</Button>
 					<Button variant="outline">Mais Óculos de Sol</Button>
 				</div>

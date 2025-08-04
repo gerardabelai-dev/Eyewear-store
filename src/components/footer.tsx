@@ -122,109 +122,101 @@ export function Footer() {
 	return (
 		<footer className="bg-background border-t font-mono">
 			<div className="mx-auto max-w-7xl px-6 pt-16 pb-8 sm:pt-24 lg:px-8 lg:pt-32">
-				<div className="xl:grid xl:grid-cols-4 xl:gap-8">
+				<div className="xl:grid xl:grid-cols-5 xl:gap-8">
 					<div className="flex flex-col items-start">
 						<AppLogo className="w-32" />
 					</div>
-					<div className="mt-16 grid grid-cols-2 gap-8 xl:col-span-3 xl:mt-0">
-						<div className="md:grid md:grid-cols-2 md:gap-8">
-							<div>
-								<h3 className="text-sm font-semibold text-foreground">
-									Solutions
-								</h3>
-								<ul className="mt-6 space-y-4">
-									{navigation.solutions.map((item) => (
-										<li key={item.name}>
-											<Link
-												href={item.href}
-												className="text-sm text-muted-foreground hover:text-foreground"
-											>
-												{item.name}
-											</Link>
-										</li>
-									))}
-								</ul>
-							</div>
-							<div className="mt-10 md:mt-0">
-								<h3 className="text-sm font-semibold text-foreground">
-									Support
-								</h3>
-								<ul className="mt-6 space-y-4">
-									{navigation.support.map((item) => (
-										<li key={item.name}>
-											<Link
-												href={item.href}
-												className="text-sm text-muted-foreground hover:text-foreground"
-											>
-												{item.name}
-											</Link>
-										</li>
-									))}
-								</ul>
-							</div>
+					<div className="mt-16 grid grid-cols-1 sm:grid-cols-2 gap-8 xl:col-span-4 xl:mt-0 xl:grid-cols-4">
+						<div>
+							<h3 className="text-sm font-semibold text-foreground">
+								Solutions
+							</h3>
+							<ul className="mt-6 space-y-4">
+								{navigation.solutions.map((item) => (
+									<li key={item.name}>
+										<Link
+											href={item.href}
+											className="text-sm text-muted-foreground hover:text-foreground"
+										>
+											{item.name}
+										</Link>
+									</li>
+								))}
+							</ul>
 						</div>
-						<div className="md:grid md:grid-cols-2 md:gap-8">
-							<div>
-								<h3 className="text-sm font-semibold text-foreground">
-									Company
-								</h3>
-								<ul className="mt-6 space-y-4">
-									{navigation.company.map((item) => (
-										<li key={item.name}>
-											<Link
-												href={item.href}
-												className="text-sm text-muted-foreground hover:text-foreground"
-											>
-												{item.name}
-											</Link>
-										</li>
-									))}
-								</ul>
-							</div>
-							<div className="mt-10 md:mt-0">
-								<h3 className="text-sm font-semibold text-foreground">Legal</h3>
-								<ul className="mt-6 space-y-4">
-									{navigation.legal.map((item) => (
-										<li key={item.name}>
-											<Link
-												href={item.href}
-												className="text-sm text-muted-foreground hover:text-foreground"
-											>
-												{item.name}
-											</Link>
-										</li>
-									))}
-								</ul>
-							</div>
+						<div>
+							<h3 className="text-sm font-semibold text-foreground">Support</h3>
+							<ul className="mt-6 space-y-4">
+								{navigation.support.map((item) => (
+									<li key={item.name}>
+										<Link
+											href={item.href}
+											className="text-sm text-muted-foreground hover:text-foreground"
+										>
+											{item.name}
+										</Link>
+									</li>
+								))}
+							</ul>
+						</div>
+						<div>
+							<h3 className="text-sm font-semibold text-foreground">Company</h3>
+							<ul className="mt-6 space-y-4">
+								{navigation.company.map((item) => (
+									<li key={item.name}>
+										<Link
+											href={item.href}
+											className="text-sm text-muted-foreground hover:text-foreground"
+										>
+											{item.name}
+										</Link>
+									</li>
+								))}
+							</ul>
+						</div>
+						<div>
+							<h3 className="text-sm font-semibold text-foreground">Legal</h3>
+							<ul className="mt-6 space-y-4">
+								{navigation.legal.map((item) => (
+									<li key={item.name}>
+										<Link
+											href={item.href}
+											className="text-sm text-muted-foreground hover:text-foreground"
+										>
+											{item.name}
+										</Link>
+									</li>
+								))}
+							</ul>
 						</div>
 					</div>
 				</div>
 				<div className="mt-16 border-t border-border pt-8 sm:mt-20 lg:mt-24 lg:flex lg:items-center lg:justify-between">
 					<div>
 						<h3 className="text-sm font-semibold text-foreground">
-							Subscribe to our newsletter
+							Inscreva-se em nossa newsletter
 						</h3>
 						<p className="mt-2 text-sm text-muted-foreground">
-							The latest news, articles, and resources, sent to your inbox
-							weekly.
+							As últimas notícias, artigos e recursos, enviados para sua caixa
+							de entrada semanalmente.
 						</p>
 					</div>
 					<form className="mt-6 sm:flex sm:max-w-md lg:mt-0">
 						<label htmlFor="email-address" className="sr-only">
-							Email address
+							Endereço de email
 						</label>
 						<Input
 							id="email-address"
 							name="email-address"
 							type="email"
 							required
-							placeholder="Enter your email"
+							placeholder="Digite seu email"
 							autoComplete="email"
 							className="w-full sm:w-56"
 						/>
 						<div className="mt-4 sm:mt-0 sm:ml-4 sm:shrink-0">
 							<Button type="submit" className="w-full">
-								Subscribe
+								Inscrever-se
 							</Button>
 						</div>
 					</form>
