@@ -1,8 +1,26 @@
-import { BadgeCheck, Glasses, ShieldCheck, Truck } from "lucide-react";
+import {
+	BadgeCheck,
+	ChevronDown,
+	ChevronRight,
+	Glasses,
+	HeadphonesIcon,
+	RotateCcw,
+	Shield,
+	ShieldCheck,
+	ShoppingCart,
+	Truck,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { Accordion as AccordionPrimitive } from "radix-ui";
 import { BlurFade } from "@/components/magicui/blur-fade";
+import { Marquee } from "@/components/magicui/marquee";
 import { TextAnimate } from "@/components/magicui/text-animate";
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -696,6 +714,246 @@ export default async function HomePage() {
 				</div>
 				<div className="flex gap-2">
 					<Button variant="outline">Explore Nosso Blog</Button>
+				</div>
+			</section>
+
+			{/* Blog Section */}
+			<section className="p-2 py-20 mt-4 grid items-center justify-items-center gap-8 mx-auto">
+				<div className="grid gap-4">
+					<h2 className="text-lg md:text-3xl text-center font-bold">
+						Avaliações dos Clientes
+					</h2>
+				</div>
+
+				<div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
+					<Marquee pauseOnHover className="[--duration:40s]">
+						{Array.from({ length: 10 }).map((_, index) => (
+							<div key={index} className="relative w-52 h-72 group">
+								<Image
+									src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Chogath_5.jpg"
+									alt="Óculos de sol"
+									className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
+									quality={75}
+									fill
+								/>
+
+								<div className="flex items-center gap-2 absolute bottom-2 left-2 transition-transform duration-300 hover:scale-105">
+									<span className="text-white font-medium text-sm drop-shadow-xs">
+										John Doe
+									</span>
+									<ChevronRight className="size-4 text-white" />
+								</div>
+							</div>
+						))}
+					</Marquee>
+					<Marquee reverse pauseOnHover className="[--duration:40s]">
+						{Array.from({ length: 10 }).map((_, index) => (
+							<div key={index} className="relative w-52 h-72 group">
+								<Image
+									src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Kennen_2.jpg"
+									alt="Óculos de sol"
+									className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
+									quality={75}
+									fill
+								/>
+
+								<div className="flex items-center gap-2 absolute bottom-2 left-2 transition-transform duration-300 hover:scale-105">
+									<span className="text-white font-medium text-sm drop-shadow-xs">
+										Jane Smith
+									</span>
+									<ChevronRight className="size-4 text-white" />
+								</div>
+							</div>
+						))}
+					</Marquee>
+					<div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background"></div>
+					<div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-background"></div>
+				</div>
+
+				<div className="flex gap-2">
+					<Button variant="outline">Ver Mais Avaliações</Button>
+				</div>
+			</section>
+
+			{/* FAQ Section */}
+			<section className="bg-accent p-2 py-20 mt-4 grid items-center justify-items-center gap-8 mx-auto">
+				<div className="grid items-start justify-items-center gap-4 w-full max-w-2xl">
+					<h2 className="text-lg md:text-3xl text-left font-bold">
+						Perguntas Frequentes
+					</h2>
+					<p className="text-xs md:text-sm text-left text-muted-foreground">
+						Tire suas dúvidas sobre nossos produtos e serviços
+					</p>
+				</div>
+
+				<div className="w-full max-w-2xl">
+					<Accordion type="single" collapsible className="w-full">
+						<AccordionItem value="item-1" className="py-2">
+							<AccordionPrimitive.Header className="flex">
+								<AccordionPrimitive.Trigger className="focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-center justify-between rounded-md py-2 text-left text-[15px] leading-6 font-semibold transition-all outline-none focus-visible:ring-[3px] [&[data-state=open]>svg]:rotate-180">
+									<span className="flex items-center gap-3">
+										<span
+											className="flex size-10 shrink-0 items-center justify-center rounded-full border"
+											aria-hidden="true"
+										>
+											<ShoppingCart size={16} className="opacity-60" />
+										</span>
+										<span className="flex flex-col space-y-1">
+											<span>
+												Como faço para escolher o tamanho certo dos óculos?
+											</span>
+											<span className="text-sm font-normal">
+												Guia completo para encontrar o ajuste perfeito
+											</span>
+										</span>
+									</span>
+									<ChevronDown
+										size={16}
+										className="pointer-events-none shrink-0 opacity-60 transition-transform duration-200"
+										aria-hidden="true"
+									/>
+								</AccordionPrimitive.Trigger>
+							</AccordionPrimitive.Header>
+							<AccordionContent className="text-muted-foreground ms-3 ps-10 pb-2">
+								Para escolher o tamanho ideal, verifique as medidas dos seus
+								óculos atuais ou use nossa ferramenta de medição virtual. As
+								principais medidas são: largura da lente, ponte nasal e
+								comprimento das hastes. Também oferecemos um período de teste de
+								30 dias para garantir o ajuste perfeito.
+							</AccordionContent>
+						</AccordionItem>
+
+						<AccordionItem value="item-2" className="py-2">
+							<AccordionPrimitive.Header className="flex">
+								<AccordionPrimitive.Trigger className="focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-center justify-between rounded-md py-2 text-left text-[15px] leading-6 font-semibold transition-all outline-none focus-visible:ring-[3px] [&[data-state=open]>svg]:rotate-180">
+									<span className="flex items-center gap-3">
+										<span
+											className="flex size-10 shrink-0 items-center justify-center rounded-full border"
+											aria-hidden="true"
+										>
+											<Shield size={16} className="opacity-60" />
+										</span>
+										<span className="flex flex-col space-y-1">
+											<span>Qual é a qualidade das lentes oferecidas?</span>
+											<span className="text-sm font-normal">
+												Informações sobre materiais e proteção UV
+											</span>
+										</span>
+									</span>
+									<ChevronDown
+										size={16}
+										className="pointer-events-none shrink-0 opacity-60 transition-transform duration-200"
+										aria-hidden="true"
+									/>
+								</AccordionPrimitive.Trigger>
+							</AccordionPrimitive.Header>
+							<AccordionContent className="text-muted-foreground ms-3 ps-10 pb-2">
+								Todas as nossas lentes possuem proteção UV 100% e são feitas com
+								materiais de alta qualidade. Oferecemos lentes de alto índice
+								1,61 gratuitamente, além de opções premium como antirreflexo,
+								filtro de luz azul e lentes fotossensíveis. Todas vêm com
+								garantia de 1 ano.
+							</AccordionContent>
+						</AccordionItem>
+
+						<AccordionItem value="item-3" className="py-2">
+							<AccordionPrimitive.Header className="flex">
+								<AccordionPrimitive.Trigger className="focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-center justify-between rounded-md py-2 text-left text-[15px] leading-6 font-semibold transition-all outline-none focus-visible:ring-[3px] [&[data-state=open]>svg]:rotate-180">
+									<span className="flex items-center gap-3">
+										<span
+											className="flex size-10 shrink-0 items-center justify-center rounded-full border"
+											aria-hidden="true"
+										>
+											<Truck size={16} className="opacity-60" />
+										</span>
+										<span className="flex flex-col space-y-1">
+											<span>Qual é o prazo de entrega?</span>
+											<span className="text-sm font-normal">
+												Informações sobre frete e prazos
+											</span>
+										</span>
+									</span>
+									<ChevronDown
+										size={16}
+										className="pointer-events-none shrink-0 opacity-60 transition-transform duration-200"
+										aria-hidden="true"
+									/>
+								</AccordionPrimitive.Trigger>
+							</AccordionPrimitive.Header>
+							<AccordionContent className="text-muted-foreground ms-3 ps-10 pb-2">
+								O prazo de entrega varia conforme sua localização: capitais de
+								3-5 dias úteis, interior de 5-8 dias úteis. Oferecemos frete
+								grátis para compras acima de R$ 200. Você receberá o código de
+								rastreamento por email assim que o pedido for despachado.
+							</AccordionContent>
+						</AccordionItem>
+
+						<AccordionItem value="item-4" className="py-2">
+							<AccordionPrimitive.Header className="flex">
+								<AccordionPrimitive.Trigger className="focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-center justify-between rounded-md py-2 text-left text-[15px] leading-6 font-semibold transition-all outline-none focus-visible:ring-[3px] [&[data-state=open]>svg]:rotate-180">
+									<span className="flex items-center gap-3">
+										<span
+											className="flex size-10 shrink-0 items-center justify-center rounded-full border"
+											aria-hidden="true"
+										>
+											<RotateCcw size={16} className="opacity-60" />
+										</span>
+										<span className="flex flex-col space-y-1">
+											<span>Posso trocar ou devolver meus óculos?</span>
+											<span className="text-sm font-normal">
+												Política de trocas e devoluções
+											</span>
+										</span>
+									</span>
+									<ChevronDown
+										size={16}
+										className="pointer-events-none shrink-0 opacity-60 transition-transform duration-200"
+										aria-hidden="true"
+									/>
+								</AccordionPrimitive.Trigger>
+							</AccordionPrimitive.Header>
+							<AccordionContent className="text-muted-foreground ms-3 ps-10 pb-2">
+								Sim! Oferecemos 30 dias para trocas e devoluções sem custo
+								adicional. Os óculos devem estar em perfeito estado, com
+								embalagem original. Para óculos graduados, aceitamos trocas por
+								problemas de adaptação mediante avaliação. O processo de troca é
+								simples através do nosso site.
+							</AccordionContent>
+						</AccordionItem>
+
+						<AccordionItem value="item-5" className="py-2">
+							<AccordionPrimitive.Header className="flex">
+								<AccordionPrimitive.Trigger className="focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-center justify-between rounded-md py-2 text-left text-[15px] leading-6 font-semibold transition-all outline-none focus-visible:ring-[3px] [&[data-state=open]>svg]:rotate-180">
+									<span className="flex items-center gap-3">
+										<span
+											className="flex size-10 shrink-0 items-center justify-center rounded-full border"
+											aria-hidden="true"
+										>
+											<HeadphonesIcon size={16} className="opacity-60" />
+										</span>
+										<span className="flex flex-col space-y-1">
+											<span>Como posso entrar em contato com o suporte?</span>
+											<span className="text-sm font-normal">
+												Canais de atendimento disponíveis
+											</span>
+										</span>
+									</span>
+									<ChevronDown
+										size={16}
+										className="pointer-events-none shrink-0 opacity-60 transition-transform duration-200"
+										aria-hidden="true"
+									/>
+								</AccordionPrimitive.Trigger>
+							</AccordionPrimitive.Header>
+							<AccordionContent className="text-muted-foreground ms-3 ps-10 pb-2">
+								Nossa equipe está disponível de segunda a sexta, das 8h às 18h.
+								Você pode nos contatar através do chat online no site, WhatsApp,
+								email suporte@ubell.com.br ou telefone 0800-123-4567. Para
+								dúvidas sobre pedidos, tenha em mãos seu número de pedido para
+								agilizar o atendimento.
+							</AccordionContent>
+						</AccordionItem>
+					</Accordion>
 				</div>
 			</section>
 		</>
