@@ -4,7 +4,7 @@ import type * as React from "react";
 import { useEffect } from "react";
 import { z } from "zod";
 
-export function QueryProvider(props: { children: React.ReactNode }) {
+export function ZodProvider(props: { children: React.ReactNode }) {
 	// Initialize Zod with user-friendly Portuguese messages
 	useEffect(() => {
 		try {

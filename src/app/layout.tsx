@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Libre_Baskerville, Lora } from "next/font/google";
-import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import "./globals.css";
 
 import { cn } from "@/lib/utils";
-import { QueryProvider } from "./providers";
+import { Providers } from "./providers";
 
 const libreBaskerville = Libre_Baskerville({
 	weight: ["400", "700"],
@@ -50,21 +49,10 @@ export default function RootLayout({
 					ibmPlexMono.variable,
 				)}
 			>
-				<QueryProvider>
-					<ThemeProvider
-						attribute="class"
-						defaultTheme="system"
-						enableSystem
-						disableTransitionOnChange
-					>
-						{children}
-						<Toaster
-							position="bottom-center"
-							expand={false}
-							closeButton={true}
-						/>
-					</ThemeProvider>
-				</QueryProvider>
+				<Providers>
+					{children}
+					<Toaster position="bottom-center" expand={false} closeButton={true} />
+				</Providers>
 			</body>
 		</html>
 	);

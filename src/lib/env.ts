@@ -6,6 +6,7 @@ const schema = z.object({
 		.enum(["development", "production", "test"])
 		.default("development"),
 	WEB_URL: z.string().url("Invalid WEB_URL"),
+	NEXT_PUBLIC_WEB_URL: z.string().url("Invalid NEXT_PUBLIC_WEB_URL"),
 
 	// Database Configuration
 	DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
