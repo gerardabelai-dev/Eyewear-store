@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { CheckoutCouponForm } from "./checkout-coupon-form";
 import { CheckoutCustomerForm } from "./checkout-customer-form";
 import { CheckoutPaymentMethodForm } from "./checkout-payment-method-form";
 import { CheckoutShippingAddressForm } from "./checkout-shipping-address-form";
@@ -51,6 +52,10 @@ export default function CheckoutPage() {
 						<span>Total</span>
 						<strong>R$ 120,00</strong>
 					</div>
+
+					<Separator />
+
+					<CheckoutCouponForm />
 
 					<Button variant="vibrant" className="w-full" size="lg">
 						Finalizar compra
