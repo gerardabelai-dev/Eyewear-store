@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -57,8 +58,8 @@ export default function CheckoutPage() {
 
 					<CheckoutCouponForm />
 
-					<Button variant="vibrant" className="w-full" size="lg">
-						Finalizar compra
+					<Button asChild variant="vibrant" className="w-full" size="lg">
+						<Link href="/checkout/success">Finalizar compra</Link>
 					</Button>
 				</div>
 			</section>

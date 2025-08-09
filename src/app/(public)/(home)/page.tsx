@@ -110,7 +110,7 @@ export default async function HomePage() {
 				</div>
 			</section>
 			<section>
-				<ul className="flex flex-row overflow-x-scroll w-full gap-2 lg:justify-center font-medium text-xs bg-muted p-4 rounded-lg">
+				<ul className="flex flex-row overflow-x-auto w-full gap-2 lg:justify-center font-medium text-xs bg-muted p-4 rounded-lg">
 					<li className="flex items-center gap-2">
 						<Glasses className="size-4 text-vibrant" />
 						<span className="whitespace-nowrap">
@@ -221,7 +221,7 @@ export default async function HomePage() {
 						Coleções de Óculos em Destaque
 					</h2>
 
-					<div className="flex flex-row overflow-x-scroll w-full gap-2 lg:justify-center">
+					<div className="flex flex-row overflow-x-auto w-full gap-2 lg:justify-center">
 						<Button variant="default">Todos</Button>
 						<Button variant="secondary">Gatinho</Button>
 						<Button variant="secondary">Aviador</Button>
@@ -635,7 +635,7 @@ export default async function HomePage() {
 							</Link>
 
 							<Link href="/cart" className="flex flex-col items-center gap-2">
-								<div className="relative h-44 w-full aspect-video">
+								<div className="relative h-48 md:h-32 w-full aspect-video">
 									<Image
 										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
 										alt="Óculos de sol"
