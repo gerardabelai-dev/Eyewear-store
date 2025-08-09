@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
 	boolean,
 	integer,
@@ -165,6 +166,31 @@ export const categorySecondary = pgTable("categorySecondary", {
 	...timestamps,
 });
 
+// Cart
+export const cart = pgTable("cart", {
+	id: text("id")
+		.primaryKey()
+		.$defaultFn(() => generatePrefixId("cart")),
+	...timestamps,
+});
+
+export const cartProduct = pgTable("cartProduct", {
+	id: text("id")
+		.primaryKey()
+		.$defaultFn(() => generatePrefixId("cartProduct")),
+	cartId: text("cartId")
+		.notNull()
+		.references(() => cart.id, { onDelete: "set null" }),
+	productId: text("productId")
+		.notNull()
+		.references(() => product.id, { onDelete: "set null" }),
+	productPriceId: text("productPriceId")
+		.notNull()
+		.references(() => productPrice.id, { onDelete: "set null" }),
+	quantity: integer("quantity").notNull().default(1),
+	...timestamps,
+});
+
 // Order
 export const order = pgTable("order", {
 	id: text("id")
@@ -292,3 +318,160 @@ export type NewOrderPayment = typeof orderPayment.$inferInsert;
 
 export type Activity = typeof activity.$inferSelect;
 export type NewActivity = typeof activity.$inferInsert;
+
+export type Cart = typeof cart.$inferSelect;
+export type NewCart = typeof cart.$inferInsert;
+
+export type CartProduct = typeof cartProduct.$inferSelect;
+export type NewCartProduct = typeof cartProduct.$inferInsert;
+
+// Relations
+export const userRelations = relations(user, ({ one, many }) => ({
+	sessions: many(session),
+	accounts: many(account),
+	customer: one(customer),
+}));
+
+export const sessionRelations = relations(session, ({ one }) => ({
+	user: one(user, {
+		fields: [session.userId],
+		references: [user.id],
+	}),
+}));
+
+export const accountRelations = relations(account, ({ one }) => ({
+	user: one(user, {
+		fields: [account.userId],
+		references: [user.id],
+	}),
+}));
+
+export const customerRelations = relations(customer, ({ one, many }) => ({
+	user: one(user, {
+		fields: [customer.userId],
+		references: [user.id],
+	}),
+	addresses: many(customerAddress),
+	orders: many(order),
+	activities: many(activity),
+}));
+
+export const customerAddressRelations = relations(
+	customerAddress,
+	({ one, many }) => ({
+		customer: one(customer, {
+			fields: [customerAddress.customerId],
+			references: [customer.id],
+		}),
+		orders: many(order),
+	}),
+);
+
+export const productRelations = relations(product, ({ many }) => ({
+	images: many(productImage),
+	productPrice: many(productPrice),
+	cartProducts: many(cartProduct),
+	orderProducts: many(orderProduct),
+}));
+
+export const productImageRelations = relations(productImage, ({ one }) => ({
+	product: one(product, {
+		fields: [productImage.productId],
+		references: [product.id],
+	}),
+}));
+
+export const productPriceRelations = relations(
+	productPrice,
+	({ one, many }) => ({
+		product: one(product, {
+			fields: [productPrice.productId],
+			references: [product.id],
+		}),
+		cartProducts: many(cartProduct),
+		orderProducts: many(orderProduct),
+	}),
+);
+
+export const categoryRelations = relations(category, ({ many }) => ({
+	subcategories: many(categorySecondary),
+}));
+
+export const categorySecondaryRelations = relations(
+	categorySecondary,
+	({ one }) => ({
+		category: one(category, {
+			fields: [categorySecondary.categoryId],
+			references: [category.id],
+		}),
+	}),
+);
+
+export const cartRelations = relations(cart, ({ many }) => ({
+	cartProducts: many(cartProduct),
+}));
+
+export const cartProductRelations = relations(cartProduct, ({ one }) => ({
+	cart: one(cart, {
+		fields: [cartProduct.cartId],
+		references: [cart.id],
+	}),
+	product: one(product, {
+		fields: [cartProduct.productId],
+		references: [product.id],
+	}),
+	productPrice: one(productPrice, {
+		fields: [cartProduct.productPriceId],
+		references: [productPrice.id],
+	}),
+}));
+
+export const orderRelations = relations(order, ({ one, many }) => ({
+	customer: one(customer, {
+		fields: [order.customerId],
+		references: [customer.id],
+	}),
+	customerAddress: one(customerAddress, {
+		fields: [order.customerAddressId],
+		references: [customerAddress.id],
+	}),
+	orderProducts: many(orderProduct),
+	delivery: one(orderDelivery),
+	payment: one(orderPayment),
+}));
+
+export const orderProductRelations = relations(orderProduct, ({ one }) => ({
+	order: one(order, {
+		fields: [orderProduct.orderId],
+		references: [order.id],
+	}),
+	product: one(product, {
+		fields: [orderProduct.productId],
+		references: [product.id],
+	}),
+	productPrice: one(productPrice, {
+		fields: [orderProduct.productPriceId],
+		references: [productPrice.id],
+	}),
+}));
+
+export const orderDeliveryRelations = relations(orderDelivery, ({ one }) => ({
+	order: one(order, {
+		fields: [orderDelivery.orderId],
+		references: [order.id],
+	}),
+}));
+
+export const orderPaymentRelations = relations(orderPayment, ({ one }) => ({
+	order: one(order, {
+		fields: [orderPayment.orderId],
+		references: [order.id],
+	}),
+}));
+
+export const activityRelations = relations(activity, ({ one }) => ({
+	customer: one(customer, {
+		fields: [activity.customerId],
+		references: [customer.id],
+	}),
+}));

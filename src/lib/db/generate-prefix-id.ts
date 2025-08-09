@@ -17,6 +17,8 @@ const tableNameToPrefix = {
 	orderDelivery: "del",
 	orderPayment: "pay",
 	activity: "act",
+	cart: "crt",
+	cartProduct: "crp",
 };
 
 const nanoid = customAlphabet("0123456789abcdefghijklmnopqrstuvwxyz", 6);

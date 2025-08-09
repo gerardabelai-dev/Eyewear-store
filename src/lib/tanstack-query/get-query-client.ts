@@ -5,10 +5,10 @@ import {
 } from "@tanstack/react-query";
 
 function makeQueryClient() {
-	return new QueryClient({
+	const queryClient = new QueryClient({
 		defaultOptions: {
 			queries: {
-				staleTime: 60 * 1000,
+				staleTime: 1000 * 60 * 5, // 5 minutes
 			},
 			dehydrate: {
 				// include pending queries in dehydration
@@ -18,6 +18,10 @@ function makeQueryClient() {
 			},
 		},
 	});
+
+	// Note: Removed development delay as it was causing JSON parsing issues
+
+	return queryClient;
 }
 
 let browserQueryClient: QueryClient | undefined;
