@@ -1,7 +1,10 @@
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { CheckoutForm } from "./checkout-form";
+import { CheckoutCustomerForm } from "./checkout-customer-form";
+import { CheckoutPaymentMethodForm } from "./checkout-payment-method-form";
+import { CheckoutShippingAddressForm } from "./checkout-shipping-address-form";
+import { CheckoutShippingMethodForm } from "./checkout-shipping-method-form";
 
 export default function CheckoutPage() {
 	return (
@@ -13,7 +16,10 @@ export default function CheckoutPage() {
 
 			<section className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-4">
 				<div className="flex flex-col gap-4">
-					<CheckoutForm />
+					<CheckoutCustomerForm />
+					<CheckoutShippingAddressForm />
+					<CheckoutShippingMethodForm />
+					<CheckoutPaymentMethodForm />
 				</div>
 
 				{/* Order Summary */}
