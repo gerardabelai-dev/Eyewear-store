@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
 	Form,
 	FormControl,
@@ -20,11 +21,14 @@ const formSchema = z.object({
 	address: z.object({
 		street: z.string().min(1),
 		number: z.string().min(1),
+		hasNoNumber: z.boolean().optional(),
 		complement: z.string().optional(),
+		hasNoComplement: z.boolean().optional(),
 		neighborhood: z.string().min(1),
 		city: z.string().min(1),
 		state: z.string().min(1),
-		zip: z.string().min(1),
+		postalCode: z.string().min(1),
+		hasNoPostalCode: z.boolean().optional(),
 	}),
 });
 
@@ -46,11 +50,13 @@ export function CheckoutShippingAddressForm() {
 			address: {
 				street: "",
 				number: "",
+				hasNoNumber: false,
 				complement: "",
+				hasNoComplement: false,
 				neighborhood: "",
 				city: "",
 				state: "",
-				zip: "",
+				postalCode: "",
 			},
 		},
 	});
@@ -62,7 +68,7 @@ export function CheckoutShippingAddressForm() {
 	return (
 		<Card className="p-8 space-y-8">
 			<CardTitle className="flex items-center gap-2">
-				Seu endereço de entrega
+				Onde devemos entregar seu pedido?
 			</CardTitle>
 
 			<Form {...form}>
@@ -76,7 +82,6 @@ export function CheckoutShippingAddressForm() {
 								<FormControl>
 									<Input {...field} placeholder="Rua dos Bobos" />
 								</FormControl>
-								<FormDescription>Digite o nome da sua rua</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -91,8 +96,31 @@ export function CheckoutShippingAddressForm() {
 								<FormControl>
 									<Input {...field} placeholder="123" />
 								</FormControl>
-								<FormDescription>Digite o número da sua casa</FormDescription>
 								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						control={form.control}
+						name="address.hasNoNumber"
+						render={({ field }) => (
+							<FormItem>
+								<FormControl>
+									<div className="flex items-start gap-3">
+										<Checkbox
+											id="hasNoNumber"
+											checked={field.value ?? false}
+											onCheckedChange={field.onChange}
+										/>
+										<div className="grid gap-2">
+											<FormLabel htmlFor="hasNoNumber">Sem número?</FormLabel>
+											<p className="text-muted-foreground text-sm">
+												Caso seu endereço não tenha número, marque esta opção
+											</p>
+										</div>
+									</div>
+								</FormControl>
 							</FormItem>
 						)}
 					/>
@@ -110,6 +138,33 @@ export function CheckoutShippingAddressForm() {
 									Digite o complemento da sua casa
 								</FormDescription>
 								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						control={form.control}
+						name="address.hasNoComplement"
+						render={({ field }) => (
+							<FormItem>
+								<FormControl>
+									<div className="flex items-start gap-3">
+										<Checkbox
+											id="hasNoComplement"
+											checked={field.value ?? false}
+											onCheckedChange={field.onChange}
+										/>
+										<div className="grid gap-2">
+											<FormLabel htmlFor="hasNoComplement">
+												Sem complemento?
+											</FormLabel>
+											<p className="text-muted-foreground text-sm">
+												Caso seu endereço não tenha complemento, marque esta
+												opção
+											</p>
+										</div>
+									</div>
+								</FormControl>
 							</FormItem>
 						)}
 					/>
@@ -161,7 +216,7 @@ export function CheckoutShippingAddressForm() {
 
 					<FormField
 						control={form.control}
-						name="address.zip"
+						name="address.postalCode"
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>CEP</FormLabel>
@@ -170,6 +225,30 @@ export function CheckoutShippingAddressForm() {
 								</FormControl>
 								<FormDescription>Digite o CEP da sua casa</FormDescription>
 								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						control={form.control}
+						name="address.hasNoPostalCode"
+						render={({ field }) => (
+							<FormItem>
+								<FormControl>
+									<div className="flex items-start gap-3">
+										<Checkbox
+											id="hasNoPostalCode"
+											checked={field.value ?? false}
+											onCheckedChange={field.onChange}
+										/>
+										<div className="grid gap-2">
+											<FormLabel htmlFor="hasNoPostalCode">Sem CEP?</FormLabel>
+											<p className="text-muted-foreground text-sm">
+												Caso seu endereço não tenha CEP, marque esta opção
+											</p>
+										</div>
+									</div>
+								</FormControl>
 							</FormItem>
 						)}
 					/>

@@ -14,6 +14,9 @@ export function QueryProvider(props: { children: React.ReactNode }) {
 					switch (issue.code) {
 						case "too_small":
 							if (issue.origin === "string") {
+								if (issue.minimum === 1) {
+									return "Campo obrigatório";
+								}
 								return `Mínimo ${issue.minimum} caracteres`;
 							}
 							if (issue.origin === "number") {

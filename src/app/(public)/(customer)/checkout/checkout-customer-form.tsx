@@ -79,11 +79,11 @@ export function CheckoutCustomerForm() {
 						name="customer.fullName"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Nome Completo</FormLabel>
+								<FormLabel>Seu nome</FormLabel>
 								<FormControl>
 									<Input {...field} placeholder="Victor Nogueira" />
 								</FormControl>
-								<FormDescription>Digite seu nome completo</FormDescription>
+								<FormDescription>Informe seu nome completo</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -94,11 +94,13 @@ export function CheckoutCustomerForm() {
 						name="customer.email"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Email</FormLabel>
+								<FormLabel>Seu melhor e-mail</FormLabel>
 								<FormControl>
 									<Input {...field} placeholder="victor@email.com" />
 								</FormControl>
-								<FormDescription>Digite seu email</FormDescription>
+								<FormDescription>
+									Enviaremos e-mails com atualizações do seu pedido
+								</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -109,11 +111,13 @@ export function CheckoutCustomerForm() {
 						name="customer.phone"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Telefone</FormLabel>
+								<FormLabel>WhatsApp</FormLabel>
 								<FormControl>
 									<Input {...field} placeholder="(11) 99999-9999" />
 								</FormControl>
-								<FormDescription>Digite seu telefone</FormDescription>
+								<FormDescription>
+									Caso algum problema ocorra, entraremos em contato por aqui
+								</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
