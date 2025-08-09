@@ -231,7 +231,7 @@ export default function CartPage() {
 				</ul>
 
 				{/* Order Summary */}
-				<div className="flex flex-col gap-4 bg-muted p-4 rounded h-fit sticky top-14">
+				<div className="flex flex-col gap-4 bg-muted p-8 rounded h-fit sticky top-14">
 					<h2 className="text-lg font-bold">Resumo da compra</h2>
 
 					<div className="flex gap-2 justify-between">
@@ -260,8 +260,8 @@ export default function CartPage() {
 						<strong>R$ 120,00</strong>
 					</div>
 
-					<Button variant="vibrant" className="w-full" size="lg">
-						Finalizar compra
+					<Button asChild variant="vibrant" className="w-full" size="lg">
+						<Link href="/checkout">Finalizar compra</Link>
 					</Button>
 				</div>
 			</section>

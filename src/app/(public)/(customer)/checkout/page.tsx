@@ -1,0 +1,56 @@
+import { PageHeader } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { CheckoutForm } from "./checkout-form";
+
+export default function CheckoutPage() {
+	return (
+		<>
+			<PageHeader
+				title="Checkout"
+				description="Verifique seu pedido e finalize sua compra"
+			/>
+
+			<section className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-4">
+				<div className="flex flex-col gap-4">
+					<CheckoutForm />
+				</div>
+
+				{/* Order Summary */}
+				<div className="flex flex-col gap-4 bg-muted p-8 rounded h-fit sticky top-14">
+					<h2 className="text-lg font-bold">Resumo da compra</h2>
+
+					<div className="flex gap-2 justify-between">
+						<span>Subtotal</span>
+						<strong>R$ 100,00</strong>
+					</div>
+
+					<Separator />
+
+					<div className="flex gap-2 justify-between">
+						<span>Frete</span>
+						<strong>R$ 10,00</strong>
+					</div>
+
+					<Separator />
+
+					<div className="flex gap-2 justify-between">
+						<span>Taxas e impostos</span>
+						<strong>R$ 10,00</strong>
+					</div>
+
+					<Separator />
+
+					<div className="flex gap-2 justify-between">
+						<span>Total</span>
+						<strong>R$ 120,00</strong>
+					</div>
+
+					<Button variant="vibrant" className="w-full" size="lg">
+						Finalizar compra
+					</Button>
+				</div>
+			</section>
+		</>
+	);
+}
