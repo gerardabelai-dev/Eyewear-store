@@ -80,7 +80,7 @@ export function AppLogo({
 				alt="Dr. Vista"
 				width={140}
 				height={32}
-				className="object-contain w-fit hidden dark:block"
+				className="object-contain w-28 hidden dark:block"
 			/>
 		</div>
 	);

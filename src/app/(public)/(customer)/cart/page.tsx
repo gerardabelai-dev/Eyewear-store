@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getQueryClient } from "@/lib/tanstack-query/get-query-client";
 import { CartItems } from "./cart-items";
+import { CartItemsSkeleton } from "./cart-items-skeleton";
 import { getCartQueryOptions } from "./get-cart-query-options";
 
 export default function CartPage() {
@@ -20,7 +21,7 @@ export default function CartPage() {
 			/>
 
 			<section className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-4">
-				<Suspense fallback={<div>Loading...</div>}>
+				<Suspense fallback={<CartItemsSkeleton />}>
 					<CartItems />
 				</Suspense>
 

@@ -84,6 +84,7 @@ export async function GET() {
 					product: {
 						with: {
 							productPrice: true,
+							images: true,
 						},
 					},
 					productPrice: true,

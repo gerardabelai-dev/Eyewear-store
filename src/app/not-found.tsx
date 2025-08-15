@@ -2,7 +2,7 @@ import { AppLogo } from "@/components/brand";
 
 export default function NotFound() {
 	return (
-		<div className="min-h-[400px] flex flex-col items-center justify-center">
+		<div className="min-h-dvh flex flex-col items-center justify-center gap-4">
 			<AppLogo />
 			<div className="text-center ">
 				<h1 className="text-4xl font-bold font-serif">404</h1>
