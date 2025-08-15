@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -8,10 +9,20 @@ import { CartItems } from "./cart-items";
 import { CartItemsSkeleton } from "./cart-items-skeleton";
 import { getCartQueryOptions } from "./get-cart-query-options";
 
-export default function CartPage() {
+export default async function CartPage({
+	params,
+}: {
+	params: Promise<{ cart_id?: string }>;
+}) {
+	const { cart_id } = await params;
+
+	if (!cart_id) {
+		notFound();
+	}
+
 	const queryClient = getQueryClient();
 
-	void queryClient.prefetchQuery(getCartQueryOptions);
+	void queryClient.prefetchQuery(getCartQueryOptions(cart_id));
 
 	return (
 		<>
@@ -22,7 +33,7 @@ export default function CartPage() {
 
 			<section className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-4">
 				<Suspense fallback={<CartItemsSkeleton />}>
-					<CartItems />
+					<CartItems cartId={cart_id} />
 				</Suspense>
 
 				{/* Order Summary */}

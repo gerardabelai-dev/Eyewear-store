@@ -141,8 +141,8 @@ function CartItem({ item }: { item: CartItemData }) {
 	);
 }
 
-export function CartItems() {
-	const { data } = useSuspenseQuery(getCartQueryOptions);
+export function CartItems({ cartId }: { cartId: string }) {
+	const { data } = useSuspenseQuery(getCartQueryOptions(cartId));
 
 	if (!data.items || data.items.length === 0) {
 		return (
