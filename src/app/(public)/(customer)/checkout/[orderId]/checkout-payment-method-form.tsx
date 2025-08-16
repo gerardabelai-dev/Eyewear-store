@@ -1,9 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -42,12 +42,36 @@ interface CheckoutPaymentMethodFormProps {
 export function CheckoutPaymentMethodForm({
 	orderId,
 }: CheckoutPaymentMethodFormProps) {
-	const { data: orderPaymentMethods } = useSuspenseQuery({
+	const form = useForm<z.infer<typeof formSchema>>({
+		resolver: zodResolver(formSchema),
+		defaultValues: {
+			payment: {
+				orderPaymentMethodId: "",
+			},
+		},
+	});
+
+	const { data: order } = useQuery({
+		queryKey: ["order", { id: orderId }],
+		queryFn: async () => {
+			const response = await fetch(`/api/orders/${orderId}/get-order-by-id`);
+
+			if (!response.ok) {
+				console.error(response);
+				throw new Error(ERROR_CODES.FAILED_TO_GET_ORDER_DETAILS);
+			}
+
+			const { order } = await response.json();
+
+			return order;
+		},
+	});
+
+	const { data: orderPaymentMethods = [] } = useQuery({
 		queryKey: ["orderPaymentMethods"],
 		queryFn: async () => {
 			const response = await fetch("/api/order-payment-methods/list-all");
 			const { orderPaymentMethods } = await response.json();
-			console.log(orderPaymentMethods);
 			return orderPaymentMethods as OrderPaymentMethod[];
 		},
 	});
@@ -85,14 +109,26 @@ export function CheckoutPaymentMethodForm({
 		},
 	});
 
-	const form = useForm<z.infer<typeof formSchema>>({
-		resolver: zodResolver(formSchema),
-		defaultValues: {
-			payment: {
-				orderPaymentMethodId: orderPaymentMethods[0].id,
-			},
-		},
-	});
+	useEffect(() => {
+		if (order?.payment?.orderPaymentMethodId) {
+			// If order already has a payment method, use it
+			form.setValue(
+				"payment.orderPaymentMethodId",
+				order.payment.orderPaymentMethodId,
+				{ shouldValidate: true, shouldDirty: true, shouldTouch: true },
+			);
+		} else if (
+			orderPaymentMethods.length > 0 &&
+			!form.getValues("payment.orderPaymentMethodId")
+		) {
+			// If no existing payment method but we have options, set the first one
+			form.setValue("payment.orderPaymentMethodId", orderPaymentMethods[0].id, {
+				shouldValidate: true,
+				shouldDirty: true,
+				shouldTouch: true,
+			});
+		}
+	}, [order, orderPaymentMethods, form]);
 
 	function onSubmit(values: z.infer<typeof formSchema>) {
 		updateOrderPaymentMethod(values);

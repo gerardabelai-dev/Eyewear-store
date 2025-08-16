@@ -1,8 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -35,6 +36,33 @@ interface CheckoutCustomerFormProps {
 }
 
 export function CheckoutCustomerForm({ orderId }: CheckoutCustomerFormProps) {
+	const form = useForm<CustomerFormValues>({
+		resolver: zodResolver(formSchema),
+		defaultValues: {
+			customer: {
+				fullName: "",
+				email: "",
+				phone: "",
+			},
+		},
+	});
+
+	const { data: order } = useQuery({
+		queryKey: ["order", { id: orderId }],
+		queryFn: async () => {
+			const response = await fetch(`/api/orders/${orderId}/get-order-by-id`);
+
+			if (!response.ok) {
+				console.error(response);
+				throw new Error(ERROR_CODES.FAILED_TO_GET_ORDER_DETAILS);
+			}
+
+			const { order } = await response.json();
+
+			return order;
+		},
+	});
+
 	const { mutate: createCustomer, isPending } = useMutation({
 		mutationFn: async (values: CustomerFormValues) => {
 			// Create user and customer
@@ -100,16 +128,16 @@ export function CheckoutCustomerForm({ orderId }: CheckoutCustomerFormProps) {
 		},
 	});
 
-	const form = useForm<CustomerFormValues>({
-		resolver: zodResolver(formSchema),
-		defaultValues: {
-			customer: {
-				fullName: "",
-				email: "",
-				phone: "",
-			},
-		},
-	});
+	useEffect(() => {
+		if (order?.customer) {
+			form.setValue(
+				"customer.fullName",
+				`${order.customer.firstName} ${order.customer.lastName}`,
+			);
+			form.setValue("customer.email", order.customer.user.email);
+			form.setValue("customer.phone", order.customer.phoneNumber);
+		}
+	}, [order, form]);
 
 	function onSubmit(values: CustomerFormValues) {
 		createCustomer(values);
@@ -173,11 +201,7 @@ export function CheckoutCustomerForm({ orderId }: CheckoutCustomerFormProps) {
 					/>
 
 					<Button type="submit" disabled={isPending}>
-						{isPending ? (
-							<Loader2 className="size-4 animate-spin" />
-						) : (
-							"Continuar"
-						)}
+						{isPending ? <Loader2 className="size-4 animate-spin" /> : "Salvar"}
 					</Button>
 				</form>
 			</Form>

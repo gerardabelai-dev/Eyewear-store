@@ -1,8 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -20,6 +21,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import type { CustomerAddress, Order } from "@/lib/db/schema";
 
 const formSchema = z.object({
 	address: z.object({
@@ -45,6 +47,39 @@ interface CheckoutShippingAddressFormProps {
 export function CheckoutShippingAddressForm({
 	orderId,
 }: CheckoutShippingAddressFormProps) {
+	const form = useForm<CustomerAddressFormValues>({
+		resolver: zodResolver(formSchema),
+		defaultValues: {
+			address: {
+				street: "",
+				number: "",
+				hasNoNumber: false,
+				complement: "",
+				hasNoComplement: false,
+				neighborhood: "",
+				city: "",
+				state: "",
+				zipCode: "",
+			},
+		},
+	});
+
+	const { data: order } = useQuery({
+		queryKey: ["order", { id: orderId }],
+		queryFn: async () => {
+			const response = await fetch(`/api/orders/${orderId}/get-order-by-id`);
+
+			if (!response.ok) {
+				console.error(response);
+				throw new Error(ERROR_CODES.FAILED_TO_GET_ORDER_DETAILS);
+			}
+
+			const { order } = await response.json();
+
+			return order;
+		},
+	});
+
 	const { mutate: createCustomerAddress, isPending } = useMutation({
 		mutationFn: async (values: CustomerAddressFormValues) => {
 			const createCustomerAddressResponse = await fetch(
@@ -70,9 +105,10 @@ export function CheckoutShippingAddressForm({
 				throw new Error(ERROR_CODES.FAILED_TO_CREATE_CUSTOMER_ADDRESS);
 			}
 
-			const { customerAddress } = await createCustomerAddressResponse.json();
-
-			console.log(customerAddress);
+			const { customerAddress } =
+				(await createCustomerAddressResponse.json()) as {
+					customerAddress: CustomerAddress;
+				};
 
 			const updateOrderCustomerAddressIdResponse = await fetch(
 				`/api/orders/${orderId}/update-order-customer-address-id`,
@@ -89,10 +125,11 @@ export function CheckoutShippingAddressForm({
 				throw new Error(ERROR_CODES.FAILED_TO_UPDATE_ORDER);
 			}
 
-			const { order } = await updateOrderCustomerAddressIdResponse.json();
-			console.log(order);
+			const { order } = (await updateOrderCustomerAddressIdResponse.json()) as {
+				order: Order;
+			};
 
-			return customerAddress;
+			return order;
 		},
 		onSuccess: (data) => {
 			console.log(data);
@@ -114,22 +151,24 @@ export function CheckoutShippingAddressForm({
 		},
 	});
 
-	const form = useForm<CustomerAddressFormValues>({
-		resolver: zodResolver(formSchema),
-		defaultValues: {
-			address: {
-				street: "",
-				number: "",
-				hasNoNumber: false,
-				complement: "",
-				hasNoComplement: false,
-				neighborhood: "",
-				city: "",
-				state: "",
-				zipCode: "",
-			},
-		},
-	});
+	// Update form when order data is available
+	useEffect(() => {
+		if (order?.customerAddress) {
+			form.setValue("address.street", order.customerAddress.street || "");
+			form.setValue("address.number", order.customerAddress.number || "");
+			form.setValue(
+				"address.complement",
+				order.customerAddress.complement || "",
+			);
+			form.setValue(
+				"address.neighborhood",
+				order.customerAddress.neighborhood || "",
+			);
+			form.setValue("address.city", order.customerAddress.city || "");
+			form.setValue("address.state", order.customerAddress.state || "");
+			form.setValue("address.zipCode", order.customerAddress.zipCode || "");
+		}
+	}, [order, form]);
 
 	function onSubmit(values: CustomerAddressFormValues) {
 		createCustomerAddress(values);
@@ -324,11 +363,7 @@ export function CheckoutShippingAddressForm({
 					/>
 
 					<Button type="submit" disabled={isPending}>
-						{isPending ? (
-							<Loader2 className="size-4 animate-spin" />
-						) : (
-							"Continuar"
-						)}
+						{isPending ? <Loader2 className="size-4 animate-spin" /> : "Salvar"}
 					</Button>
 				</form>
 			</Form>

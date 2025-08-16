@@ -27,6 +27,33 @@ export async function GET(
 
 	const orderFound = await db.query.order.findFirst({
 		where: eq(order.id, orderId),
+		with: {
+			customer: {
+				with: {
+					user: true,
+				},
+			},
+			customerAddress: true,
+			orderProducts: {
+				with: {
+					product: {
+						with: {
+							productPrice: true,
+						},
+					},
+				},
+			},
+			delivery: {
+				with: {
+					orderDeliveryMethod: true,
+				},
+			},
+			payment: {
+				with: {
+					orderPaymentMethod: true,
+				},
+			},
+		},
 	});
 
 	if (!orderFound) {
@@ -39,8 +66,6 @@ export async function GET(
 	}
 
 	return NextResponse.json({
-		id: orderFound.id,
-		createdAt: orderFound.createdAt,
-		updatedAt: orderFound.updatedAt,
+		order: orderFound,
 	});
 }
