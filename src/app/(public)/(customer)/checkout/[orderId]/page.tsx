@@ -1,11 +1,10 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getQueryClient } from "@/lib/tanstack-query/get-query-client";
 import { CheckoutCouponForm } from "./checkout-coupon-form";
 import { CheckoutCustomerForm } from "./checkout-customer-form";
+import { CheckoutOrderButton } from "./checkout-order-button";
 import { CheckoutPaymentMethodForm } from "./checkout-payment-method-form";
 import { CheckoutShippingAddressForm } from "./checkout-shipping-address-form";
 import { CheckoutShippingMethodForm } from "./checkout-shipping-method-form";
@@ -77,9 +76,7 @@ export default async function CheckoutPage({
 
 					<CheckoutCouponForm />
 
-					<Button asChild variant="vibrant" className="w-full" size="lg">
-						<Link href="/checkout/success">Finalizar compra</Link>
-					</Button>
+					<CheckoutOrderButton orderId={orderId} />
 				</div>
 			</section>
 		</>

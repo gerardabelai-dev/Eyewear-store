@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { ERROR_CODES } from "@/app/api/contants/error-codes";
+import type { Order } from "@/lib/db/schema";
 
 export const getOrderByIdQueryOptions = (orderId: string) =>
 	queryOptions({
@@ -14,6 +15,10 @@ export const getOrderByIdQueryOptions = (orderId: string) =>
 				throw new Error(ERROR_CODES.FAILED_TO_GET_ORDER_DETAILS);
 			}
 
-			return await response.json();
+			const { order } = (await response.json()) as {
+				order: Order;
+			};
+
+			return order;
 		},
 	});
