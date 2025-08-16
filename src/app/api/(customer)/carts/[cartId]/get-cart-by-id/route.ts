@@ -1,14 +1,16 @@
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { badRequestResponse } from "@/app/api/utils/bad-request-response";
+import { ERROR_CODES } from "@/app/api/contants/error-codes";
+import { HTTP_CODES } from "@/app/api/contants/http-codes";
+import { mapErrorCodes } from "@/app/api/utils/map-error-codes";
+import { mapInvalidZodResponse } from "@/app/api/utils/map-invalid-zod-response";
 import { db } from "@/lib/db";
 import { cart } from "@/lib/db/schema";
 
 const getCartByIdSchema = z.object({
 	cartId: z.string(),
 });
-
 type GetCartByIdResponse = z.infer<typeof getCartByIdSchema>;
 
 export async function GET(
@@ -18,7 +20,7 @@ export async function GET(
 	const { success, error, data } = getCartByIdSchema.safeParse(await params);
 
 	if (!success) {
-		return badRequestResponse(error);
+		return mapInvalidZodResponse(error);
 	}
 
 	const { cartId } = data;
@@ -41,12 +43,9 @@ export async function GET(
 	});
 
 	if (!cartFound) {
-		return Response.json(
-			{
-				message: `Cart ${cartId} not found`,
-			},
-			{ status: 404 },
-		);
+		return Response.json(mapErrorCodes(ERROR_CODES.CART_NOT_FOUND), {
+			status: HTTP_CODES.NOT_FOUND,
+		});
 	}
 
 	return NextResponse.json({

@@ -2,6 +2,7 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
+import { ERROR_CODES } from "@/app/api/contants/error-codes";
 import { Button } from "@/components/ui/button";
 
 export function CreateOrderButton({ cartId }: { cartId: string }) {
@@ -16,13 +17,10 @@ export function CreateOrderButton({ cartId }: { cartId: string }) {
 
 			if (!response.ok) {
 				console.error(response);
-				throw new Error(`Failed to create order for cart ${cartId}`);
+				throw new Error(ERROR_CODES.FAILED_TO_CREATE_ORDER);
 			}
 
-			const data = await response.json();
-			console.log(data);
-
-			return data;
+			return await response.json();
 		},
 		onSuccess: (data) => {
 			console.log(data);

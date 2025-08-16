@@ -3,8 +3,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ERROR_CODES } from "@/app/api/contants/error-codes";
 import { HTTP_CODES } from "@/app/api/contants/http-codes";
-import { badRequestResponse } from "@/app/api/utils/bad-request-response";
 import { mapErrorCodes } from "@/app/api/utils/map-error-codes";
+import { mapInvalidZodResponse } from "@/app/api/utils/map-invalid-zod-response";
 import { db } from "@/lib/db";
 import { cart, order } from "@/lib/db/schema";
 
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 	const { success, error, data } = createOrderFromCartIdSchema.safeParse(body);
 
 	if (!success) {
-		return badRequestResponse(error);
+		return mapInvalidZodResponse(error);
 	}
 
 	const { cartId } = data;
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 		.returning();
 
 	if (!orderCreated) {
-		return Response.json(mapErrorCodes(ERROR_CODES.ORDER_NOT_CREATED), {
+		return Response.json(mapErrorCodes(ERROR_CODES.FAILED_TO_CREATE_ORDER), {
 			status: HTTP_CODES.INTERNAL_SERVER_ERROR,
 		});
 	}

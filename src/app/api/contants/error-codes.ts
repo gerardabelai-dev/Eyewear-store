@@ -1,9 +1,12 @@
 export const ERROR_CODES = {
 	CART_NOT_FOUND: "CART_NOT_FOUND",
-	ORDER_NOT_CREATED: "ORDER_NOT_CREATED",
+	FAILED_TO_GET_CART: "FAILED_TO_GET_CART",
+	FAILED_TO_CREATE_ORDER: "FAILED_TO_CREATE_ORDER",
 } as const;
 
 export const ERROR_MESSAGES = {
 	[ERROR_CODES.CART_NOT_FOUND]: "Carrinho não encontrado",
-	[ERROR_CODES.ORDER_NOT_CREATED]: "Houve um erro ao criar o pedido",
+	[ERROR_CODES.FAILED_TO_CREATE_ORDER]: "Houve um erro ao criar o pedido",
+	[ERROR_CODES.FAILED_TO_GET_CART]:
+		"Houve um erro ao buscar os detalhes carrinho",
 } as const;
