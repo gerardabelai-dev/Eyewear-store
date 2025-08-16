@@ -1,9 +1,9 @@
 "use client";
 
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { notFound } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { getOrderByIdQueryOptions } from "@/http/orders/queries";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { OrderDetails } from "./order-details";
 import { OrderItems } from "./order-items";
 import { OrderSummary } from "./order-summary";
@@ -18,7 +18,7 @@ export function OrderSuccessContent({ orderId }: OrderSuccessContentProps) {
 	);
 
 	if (error) {
-		console.error("Failed to fetch order:", error);
+		console.error(error);
 		notFound();
 	}
 

@@ -31,8 +31,8 @@ export default async function CheckoutSuccessPage({
 				title="Está a caminho"
 				description={`Seu pedido #${orderId} foi processado e chegará em breve`}
 				action={
-					<Button disabled asChild variant="vibrant" size="lg">
-						<Link href="/orders">Acompanhar pedido</Link>
+					<Button asChild variant="vibrant" size="lg">
+						<Link href={`/orders/${orderId}`}>Acompanhar pedido</Link>
 					</Button>
 				}
 			/>

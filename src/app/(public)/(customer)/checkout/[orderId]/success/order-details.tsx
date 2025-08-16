@@ -91,7 +91,9 @@ export function OrderDetails({ order }: OrderDetailsProps) {
 								Status:{" "}
 								{order.payment?.orderPaymentStatus === "paid"
 									? "Pago"
-									: "Pendente"}
+									: order.payment?.orderPaymentStatus === "failed"
+										? "Falhou"
+										: "Pendente"}
 							</span>
 						</>
 					) : (
@@ -116,7 +118,11 @@ export function OrderDetails({ order }: OrderDetailsProps) {
 										? "Enviado"
 										: order.delivery?.orderDeliveryStatus === "processing"
 											? "Processando"
-											: "Pendente"}
+											: order.delivery?.orderDeliveryStatus === "cancelled"
+												? "Cancelado"
+												: order.delivery?.orderDeliveryStatus === "returned"
+													? "Devolvido"
+													: "Pendente"}
 							</span>
 						</>
 					) : (
