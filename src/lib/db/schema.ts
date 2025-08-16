@@ -192,17 +192,26 @@ export const cartProduct = pgTable("cartProduct", {
 });
 
 // Order
+export const orderStatus = pgEnum("orderStatus", [
+	"pending",
+	"paid",
+	"cancelled",
+]);
 export const order = pgTable("order", {
 	id: text("id")
 		.primaryKey()
 		.$defaultFn(() => generatePrefixId("order")),
-	customerId: text("customerId")
+	orderStatus: orderStatus("orderStatus").notNull().default("pending"),
+	cartId: text("cartId")
 		.notNull()
-		.references(() => customer.id, { onDelete: "set null" }),
-	customerAddressId: text("customerAddressId")
-		.notNull()
-		.references(() => customerAddress.id, { onDelete: "set null" }),
-	totalPriceInCents: integer("totalPriceInCents").notNull().default(0),
+		.references(() => cart.id, { onDelete: "set null" }),
+	customerId: text("customerId").references(() => customer.id, {
+		onDelete: "set null",
+	}),
+	customerAddressId: text("customerAddressId").references(
+		() => customerAddress.id,
+		{ onDelete: "set null" },
+	),
 	...timestamps,
 });
 
@@ -261,6 +270,7 @@ export const orderPayment = pgTable("orderPayment", {
 	orderPaymentStatus: orderPaymentStatus("orderPaymentStatus")
 		.notNull()
 		.default("pending"),
+	totalPriceInCents: integer("totalPriceInCents").notNull().default(0),
 	...timestamps,
 });
 

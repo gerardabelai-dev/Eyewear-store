@@ -1,17 +1,16 @@
 import { queryOptions } from "@tanstack/react-query";
 
-export const getCartQueryOptions = (cart_id: string) =>
+export const getCartQueryOptions = (cartId: string) =>
 	queryOptions({
-		queryKey: ["cart", { id: cart_id }],
+		queryKey: ["cart", { id: cartId }],
 		queryFn: async () => {
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_WEB_URL}/api/cart/${cart_id}`,
+				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts/${cartId}/get-cart-by-id`,
 			);
 			if (!response.ok) {
 				console.error(response);
 			}
 			const data = await response.json();
-			console.log(data);
 			return data;
 		},
 	});

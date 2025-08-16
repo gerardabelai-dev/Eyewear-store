@@ -1,28 +1,27 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PageHeader } from "@/components/page-header";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getQueryClient } from "@/lib/tanstack-query/get-query-client";
 import { CartItems } from "./cart-items";
 import { CartItemsSkeleton } from "./cart-items-skeleton";
+import { CreateOrderButton } from "./create-order-button";
 import { getCartQueryOptions } from "./get-cart-query-options";
 
 export default async function CartPage({
 	params,
 }: {
-	params: Promise<{ cart_id?: string }>;
+	params: Promise<{ cartId?: string }>;
 }) {
-	const { cart_id } = await params;
+	const { cartId } = await params;
 
-	if (!cart_id) {
+	if (!cartId) {
 		notFound();
 	}
 
 	const queryClient = getQueryClient();
 
-	void queryClient.prefetchQuery(getCartQueryOptions(cart_id));
+	void queryClient.prefetchQuery(getCartQueryOptions(cartId));
 
 	return (
 		<>
@@ -33,7 +32,7 @@ export default async function CartPage({
 
 			<section className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-4">
 				<Suspense fallback={<CartItemsSkeleton />}>
-					<CartItems cartId={cart_id} />
+					<CartItems cartId={cartId} />
 				</Suspense>
 
 				{/* Order Summary */}
@@ -66,9 +65,7 @@ export default async function CartPage({
 						<strong>R$ 120,00</strong>
 					</div>
 
-					<Button asChild variant="vibrant" className="w-full" size="lg">
-						<Link href="/checkout">Finalizar compra</Link>
-					</Button>
+					<CreateOrderButton cartId={cartId} />
 				</div>
 			</section>
 		</>

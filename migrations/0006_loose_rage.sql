@@ -1,0 +1,2 @@
+ALTER TABLE "order" ADD COLUMN "cartId" text NOT NULL;--> statement-breakpoint
+ALTER TABLE "order" ADD CONSTRAINT "order_cartId_cart_id_fk" FOREIGN KEY ("cartId") REFERENCES "public"."cart"("id") ON DELETE set null ON UPDATE no action;
