@@ -6,5 +6,6 @@
 		"source.organizeImports.biome": "always",
 		"source.fixAll.biome": "always",
 		"source.removeUnusedImports.biome": "always"
-	}
+	},
+	"filebunny.startingLocationOpenFolder": "/Users/victornogueira/work/caraquecoda/drvista/fullstack-admin/"
 }

@@ -22,35 +22,7 @@ const formSchema = z.object({
 		email: z.email(),
 		phone: z.string().min(1),
 	}),
-	// address: z.object({
-	// 	street: z.string().min(1),
-	// 	number: z.string().min(1),
-	// 	complement: z.string().optional(),
-	// 	neighborhood: z.string().min(1),
-	// 	city: z.string().min(1),
-	// 	state: z.string().min(1),
-	// 	zip: z.string().min(1),
-	// }),
-	// shipping: z.object({
-	// 	method: z.enum(["standard", "express"]),
-	// 	cost: z.number().positive(),
-	// }),
-	// payment: z.object({
-	// 	method: z.enum(["credit_card", "debit_card", "pix", "boleto"]),
-	// }),
-	// promoCode: z.string().optional(),
 });
-
-/*
- Checkout form 
- - Customer information
- - Shipping address
- - Shipping method
- - Payment method
- - Subtotal + Total
- - Promo Code
- - Checkout button
-*/
 
 export function CheckoutCustomerForm() {
 	const form = useForm<z.infer<typeof formSchema>>({

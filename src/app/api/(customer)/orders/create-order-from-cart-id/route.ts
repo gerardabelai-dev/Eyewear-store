@@ -46,5 +46,9 @@ export async function POST(request: Request) {
 		});
 	}
 
-	return NextResponse.json(orderCreated);
+	return NextResponse.json({
+		order: {
+			id: orderCreated.id,
+		},
+	});
 }
