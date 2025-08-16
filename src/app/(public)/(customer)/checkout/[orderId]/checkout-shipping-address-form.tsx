@@ -1,8 +1,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import z from "zod";
+import { ERROR_CODES, ERROR_MESSAGES } from "@/app/api/contants/error-codes";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -27,24 +31,90 @@ const formSchema = z.object({
 		neighborhood: z.string().min(1),
 		city: z.string().min(1),
 		state: z.string().min(1),
-		postalCode: z.string().min(1),
-		hasNoPostalCode: z.boolean().optional(),
+		zipCode: z.string().min(1),
+		hasNozipCode: z.boolean().optional(),
 	}),
 });
 
-/*
- Checkout form 
- - Customer information
- - Shipping address
- - Shipping method
- - Payment method
- - Subtotal + Total
- - Promo Code
- - Checkout button
-*/
+type CustomerAddressFormValues = z.infer<typeof formSchema>;
 
-export function CheckoutShippingAddressForm() {
-	const form = useForm<z.infer<typeof formSchema>>({
+interface CheckoutShippingAddressFormProps {
+	orderId: string;
+}
+
+export function CheckoutShippingAddressForm({
+	orderId,
+}: CheckoutShippingAddressFormProps) {
+	const { mutate: createCustomerAddress, isPending } = useMutation({
+		mutationFn: async (values: CustomerAddressFormValues) => {
+			const createCustomerAddressResponse = await fetch(
+				"/api/customers-addresses/create-customer-address",
+				{
+					method: "POST",
+					body: JSON.stringify({
+						orderId,
+						street: values.address.street,
+						number: values.address.number,
+						complement: values.address.complement,
+						neighborhood: values.address.neighborhood,
+						city: values.address.city,
+						state: values.address.state,
+						zipCode: values.address.zipCode,
+						country: "BR",
+						isDefault: true,
+					}),
+				},
+			);
+
+			if (!createCustomerAddressResponse.ok) {
+				throw new Error(ERROR_CODES.FAILED_TO_CREATE_CUSTOMER_ADDRESS);
+			}
+
+			const { customerAddress } = await createCustomerAddressResponse.json();
+
+			console.log(customerAddress);
+
+			const updateOrderCustomerAddressIdResponse = await fetch(
+				`/api/orders/${orderId}/update-order-customer-address-id`,
+				{
+					method: "POST",
+					body: JSON.stringify({
+						orderId,
+						customerAddressId: customerAddress.id,
+					}),
+				},
+			);
+
+			if (!updateOrderCustomerAddressIdResponse.ok) {
+				throw new Error(ERROR_CODES.FAILED_TO_UPDATE_ORDER);
+			}
+
+			const { order } = await updateOrderCustomerAddressIdResponse.json();
+			console.log(order);
+
+			return customerAddress;
+		},
+		onSuccess: (data) => {
+			console.log(data);
+		},
+		onError: (error) => {
+			console.error(error);
+			switch (error.message) {
+				case ERROR_CODES.FAILED_TO_CREATE_CUSTOMER_ADDRESS:
+					toast.error(
+						ERROR_MESSAGES[ERROR_CODES.FAILED_TO_CREATE_CUSTOMER_ADDRESS],
+					);
+					break;
+				case ERROR_CODES.FAILED_TO_UPDATE_ORDER:
+					toast.error(ERROR_MESSAGES[ERROR_CODES.FAILED_TO_UPDATE_ORDER]);
+					break;
+				default:
+					toast.error(ERROR_MESSAGES[ERROR_CODES.UNEXPECTED_ERROR]);
+			}
+		},
+	});
+
+	const form = useForm<CustomerAddressFormValues>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			address: {
@@ -56,13 +126,13 @@ export function CheckoutShippingAddressForm() {
 				neighborhood: "",
 				city: "",
 				state: "",
-				postalCode: "",
+				zipCode: "",
 			},
 		},
 	});
 
-	function onSubmit(values: z.infer<typeof formSchema>) {
-		console.log(values);
+	function onSubmit(values: CustomerAddressFormValues) {
+		createCustomerAddress(values);
 	}
 
 	return (
@@ -216,7 +286,7 @@ export function CheckoutShippingAddressForm() {
 
 					<FormField
 						control={form.control}
-						name="address.postalCode"
+						name="address.zipCode"
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>CEP</FormLabel>
@@ -231,18 +301,18 @@ export function CheckoutShippingAddressForm() {
 
 					<FormField
 						control={form.control}
-						name="address.hasNoPostalCode"
+						name="address.hasNozipCode"
 						render={({ field }) => (
 							<FormItem>
 								<FormControl>
 									<div className="flex items-start gap-3">
 										<Checkbox
-											id="hasNoPostalCode"
+											id="hasNozipCode"
 											checked={field.value ?? false}
 											onCheckedChange={field.onChange}
 										/>
 										<div className="grid gap-2">
-											<FormLabel htmlFor="hasNoPostalCode">Sem CEP?</FormLabel>
+											<FormLabel htmlFor="hasNozipCode">Sem CEP?</FormLabel>
 											<p className="text-muted-foreground text-sm">
 												Caso seu endereço não tenha CEP, marque esta opção
 											</p>
@@ -253,7 +323,13 @@ export function CheckoutShippingAddressForm() {
 						)}
 					/>
 
-					<Button type="submit">Continuar</Button>
+					<Button type="submit" disabled={isPending}>
+						{isPending ? (
+							<Loader2 className="size-4 animate-spin" />
+						) : (
+							"Continuar"
+						)}
+					</Button>
 				</form>
 			</Form>
 		</Card>

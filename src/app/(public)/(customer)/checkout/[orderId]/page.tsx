@@ -38,7 +38,7 @@ export default async function CheckoutPage({
 			<section className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-4">
 				<div className="flex flex-col gap-4">
 					<CheckoutCustomerForm orderId={orderId} />
-					<CheckoutShippingAddressForm />
+					<CheckoutShippingAddressForm orderId={orderId} />
 					<CheckoutShippingMethodForm />
 					<CheckoutPaymentMethodForm />
 				</div>

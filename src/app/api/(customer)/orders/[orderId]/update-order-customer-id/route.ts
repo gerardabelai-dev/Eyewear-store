@@ -61,13 +61,7 @@ export async function POST(request: Request) {
 		);
 	}
 
-	// returning data just for debugging, not needed in production
 	return NextResponse.json({
-		order: {
-			id: orderUpdated.id,
-			customerId: orderUpdated.customerId,
-			createdAt: orderUpdated.createdAt,
-			updatedAt: orderUpdated.updatedAt,
-		},
+		order: orderUpdated,
 	});
 }

@@ -12,6 +12,7 @@ export const ERROR_CODES = {
 	FAILED_TO_UPDATE_ORDER: "FAILED_TO_UPDATE_ORDER",
 	ORDER_NOT_FOUND: "ORDER_NOT_FOUND",
 	ORDER_ALREADY_HAS_CUSTOMER: "ORDER_ALREADY_HAS_CUSTOMER",
+	ORDER_HAS_NO_CUSTOMER: "ORDER_HAS_NO_CUSTOMER",
 
 	// User
 	USER_ALREADY_EXISTS: "USER_ALREADY_EXISTS",
@@ -19,6 +20,11 @@ export const ERROR_CODES = {
 
 	// Customer
 	FAILED_TO_CREATE_CUSTOMER: "FAILED_TO_CREATE_CUSTOMER",
+	CUSTOMER_NOT_FOUND: "CUSTOMER_NOT_FOUND",
+
+	// Customer Address
+	FAILED_TO_CREATE_CUSTOMER_ADDRESS: "FAILED_TO_CREATE_CUSTOMER_ADDRESS",
+	ORDER_ALREADY_HAS_CUSTOMER_ADDRESS: "ORDER_ALREADY_HAS_CUSTOMER_ADDRESS",
 } as const;
 
 export const ERROR_MESSAGES = {
@@ -38,6 +44,7 @@ export const ERROR_MESSAGES = {
 	[ERROR_CODES.FAILED_TO_UPDATE_ORDER]: "Houve um erro ao atualizar o pedido",
 	[ERROR_CODES.ORDER_NOT_FOUND]: "Pedido não encontrado",
 	[ERROR_CODES.ORDER_ALREADY_HAS_CUSTOMER]: "Pedido já possui um cliente",
+	[ERROR_CODES.ORDER_HAS_NO_CUSTOMER]: "Pedido não possui um cliente",
 
 	// User
 	[ERROR_CODES.USER_ALREADY_EXISTS]: "Usuário com este e-mail já existe",
@@ -45,4 +52,11 @@ export const ERROR_MESSAGES = {
 
 	// Customer
 	[ERROR_CODES.FAILED_TO_CREATE_CUSTOMER]: "Houve um erro ao criar o cliente",
+	[ERROR_CODES.CUSTOMER_NOT_FOUND]: "Cliente não encontrado",
+
+	// Customer Address
+	[ERROR_CODES.FAILED_TO_CREATE_CUSTOMER_ADDRESS]:
+		"Houve um erro ao criar o endereço do cliente",
+	[ERROR_CODES.ORDER_ALREADY_HAS_CUSTOMER_ADDRESS]:
+		"Pedido já possui um endereço de cliente",
 } as const;
