@@ -57,6 +57,13 @@
       "when": 1755303071204,
       "tag": "0007_conscious_lila_cheney",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1755347112324,
+      "tag": "0008_zippy_shinobi_shaw",
+      "breakpoints": true
     }
   ]
 }

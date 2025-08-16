@@ -82,6 +82,7 @@ export const customer = pgTable("customer", {
 		.references(() => user.id, { onDelete: "set null" }),
 	firstName: text("firstName").notNull(),
 	lastName: text("lastName").notNull(),
+	phoneNumber: text("phoneNumber"),
 	...timestamps,
 });
 

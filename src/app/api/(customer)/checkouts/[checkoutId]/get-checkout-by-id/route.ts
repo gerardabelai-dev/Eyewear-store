@@ -30,9 +30,12 @@ export async function GET(
 	});
 
 	if (!orderFound) {
-		return Response.json(mapErrorCodes(ERROR_CODES.FAILED_TO_GET_CHECKOUT), {
-			status: HTTP_CODES.NOT_FOUND,
-		});
+		return Response.json(
+			mapErrorCodes(ERROR_CODES.FAILED_TO_GET_ORDER_DETAILS),
+			{
+				status: HTTP_CODES.NOT_FOUND,
+			},
+		);
 	}
 
 	return NextResponse.json({

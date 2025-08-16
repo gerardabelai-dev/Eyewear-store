@@ -3,7 +3,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ERROR_CODES } from "@/app/api/contants/error-codes";
+import { toast } from "sonner";
+import { ERROR_CODES, ERROR_MESSAGES } from "@/app/api/contants/error-codes";
 import { Button } from "@/components/ui/button";
 
 export function CreateOrderButton({ cartId }: { cartId: string }) {
@@ -30,6 +31,13 @@ export function CreateOrderButton({ cartId }: { cartId: string }) {
 		},
 		onError: (error) => {
 			console.error(error);
+			switch (error.message) {
+				case ERROR_CODES.FAILED_TO_CREATE_ORDER:
+					toast.error(ERROR_MESSAGES[ERROR_CODES.FAILED_TO_CREATE_ORDER]);
+					break;
+				default:
+					toast.error(ERROR_MESSAGES[ERROR_CODES.UNEXPECTED_ERROR]);
+			}
 		},
 	});
 

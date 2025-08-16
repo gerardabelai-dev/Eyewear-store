@@ -11,7 +11,7 @@ export const getOrderByIdQueryOptions = (orderId: string) =>
 
 			if (!response.ok) {
 				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_GET_CHECKOUT);
+				throw new Error(ERROR_CODES.FAILED_TO_GET_ORDER_DETAILS);
 			}
 
 			return await response.json();

@@ -160,7 +160,10 @@ export default async function HomePage() {
 					</p>
 				</div>
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full md:w-fit mx-auto">
-					<Link href="/cart" className="flex flex-col items-center gap-2">
+					<Link
+						href="/cart/crt_4nfsqo"
+						className="flex flex-col items-center gap-2"
+					>
 						<div className="relative h-48 md:h-32 w-full aspect-video rounded">
 							<Image
 								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp"
