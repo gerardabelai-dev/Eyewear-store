@@ -216,23 +216,6 @@ export const order = pgTable("order", {
 	...timestamps,
 });
 
-export const orderProduct = pgTable("orderProduct", {
-	id: text("id")
-		.primaryKey()
-		.$defaultFn(() => generatePrefixId("orderProduct")),
-	orderId: text("orderId")
-		.notNull()
-		.references(() => order.id, { onDelete: "set null" }),
-	productId: text("productId")
-		.notNull()
-		.references(() => product.id, { onDelete: "set null" }),
-	productPriceId: text("productPriceId")
-		.notNull()
-		.references(() => productPrice.id, { onDelete: "set null" }),
-	quantity: integer("quantity").notNull().default(1),
-	...timestamps,
-});
-
 export const orderDeliveryMethod = pgTable("orderDeliveryMethod", {
 	id: text("id")
 		.primaryKey()
@@ -341,9 +324,6 @@ export type NewCategorySecondary = typeof categorySecondary.$inferInsert;
 export type Order = typeof order.$inferSelect;
 export type NewOrder = typeof order.$inferInsert;
 
-export type OrderProduct = typeof orderProduct.$inferSelect;
-export type NewOrderProduct = typeof orderProduct.$inferInsert;
-
 export type OrderDelivery = typeof orderDelivery.$inferSelect;
 export type NewOrderDelivery = typeof orderDelivery.$inferInsert;
 
@@ -411,7 +391,6 @@ export const productRelations = relations(product, ({ many }) => ({
 	images: many(productImage),
 	productPrice: many(productPrice),
 	cartProducts: many(cartProduct),
-	orderProducts: many(orderProduct),
 }));
 
 export const productImageRelations = relations(productImage, ({ one }) => ({
@@ -429,7 +408,6 @@ export const productPriceRelations = relations(
 			references: [product.id],
 		}),
 		cartProducts: many(cartProduct),
-		orderProducts: many(orderProduct),
 	}),
 );
 
@@ -466,7 +444,7 @@ export const cartProductRelations = relations(cartProduct, ({ one }) => ({
 	}),
 }));
 
-export const orderRelations = relations(order, ({ one, many }) => ({
+export const orderRelations = relations(order, ({ one }) => ({
 	customer: one(customer, {
 		fields: [order.customerId],
 		references: [customer.id],
@@ -475,27 +453,15 @@ export const orderRelations = relations(order, ({ one, many }) => ({
 		fields: [order.customerAddressId],
 		references: [customerAddress.id],
 	}),
-	orderProducts: many(orderProduct),
+	cart: one(cart, {
+		fields: [order.cartId],
+		references: [cart.id],
+	}),
 	delivery: one(orderDelivery, {
 		fields: [order.id],
 		references: [orderDelivery.orderId],
 	}),
 	payment: one(orderPayment),
-}));
-
-export const orderProductRelations = relations(orderProduct, ({ one }) => ({
-	order: one(order, {
-		fields: [orderProduct.orderId],
-		references: [order.id],
-	}),
-	product: one(product, {
-		fields: [orderProduct.productId],
-		references: [product.id],
-	}),
-	productPrice: one(productPrice, {
-		fields: [orderProduct.productPriceId],
-		references: [productPrice.id],
-	}),
 }));
 
 export const orderDeliveryRelations = relations(orderDelivery, ({ one }) => ({

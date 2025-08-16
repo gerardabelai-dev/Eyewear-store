@@ -22,7 +22,6 @@ const tableNameToPrefix = {
 
 	// Order
 	order: "ord",
-	orderProduct: "orp",
 	orderDeliveryMethod: "odm",
 	orderDelivery: "del",
 	orderPayment: "pay",

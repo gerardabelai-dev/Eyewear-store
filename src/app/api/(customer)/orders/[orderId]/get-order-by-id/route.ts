@@ -34,11 +34,16 @@ export async function GET(
 				},
 			},
 			customerAddress: true,
-			orderProducts: {
+			cart: {
 				with: {
-					product: {
+					cartProducts: {
 						with: {
-							productPrice: true,
+							product: {
+								with: {
+									productPrice: true,
+									images: true,
+								},
+							},
 						},
 					},
 				},

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { Suspense, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -27,7 +27,11 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { OrderPaymentMethod } from "@/lib/db/schema";
+import {
+	getOrderByIdQueryOptions,
+	getOrderPaymentMethodsQueryOptions,
+	useCreateOrderPaymentMutation,
+} from "@/http";
 
 const formSchema = z.object({
 	payment: z.object({
@@ -51,63 +55,30 @@ export function CheckoutPaymentMethodForm({
 		},
 	});
 
-	const { data: order } = useQuery({
-		queryKey: ["order", { id: orderId }],
-		queryFn: async () => {
-			const response = await fetch(`/api/orders/${orderId}/get-order-by-id`);
+	const { data: order } = useQuery(getOrderByIdQueryOptions(orderId));
 
-			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_GET_ORDER_DETAILS);
-			}
+	const { data: orderPaymentMethods = [] } = useQuery(
+		getOrderPaymentMethodsQueryOptions(),
+	);
 
-			const { order } = await response.json();
-
-			return order;
-		},
-	});
-
-	const { data: orderPaymentMethods = [] } = useQuery({
-		queryKey: ["orderPaymentMethods"],
-		queryFn: async () => {
-			const response = await fetch("/api/order-payment-methods/list-all");
-			const { orderPaymentMethods } = await response.json();
-			return orderPaymentMethods as OrderPaymentMethod[];
-		},
-	});
-
-	const { mutate: updateOrderPaymentMethod, isPending } = useMutation({
-		mutationFn: async (values: z.infer<typeof formSchema>) => {
-			const response = await fetch("/api/order-payments/create-order-payment", {
-				method: "POST",
-				body: JSON.stringify({
-					orderId,
-					orderPaymentMethodId: values.payment.orderPaymentMethodId,
-				}),
-			});
-
-			if (!response.ok) {
-				throw new Error(ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT);
-			}
-
-			return response.json();
-		},
-		onSuccess: (data) => {
-			console.log(data);
-		},
-		onError: (error) => {
-			console.error(error);
-			switch (error.message) {
-				case ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT:
-					toast.error(
-						ERROR_MESSAGES[ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT],
-					);
-					break;
-				default:
-					toast.error(ERROR_MESSAGES[ERROR_CODES.UNEXPECTED_ERROR]);
-			}
-		},
-	});
+	const { mutate: updateOrderPaymentMethod, isPending } =
+		useCreateOrderPaymentMutation({
+			onSuccess: (data) => {
+				console.log(data);
+			},
+			onError: (error) => {
+				console.error(error);
+				switch (error.message) {
+					case ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT:
+						toast.error(
+							ERROR_MESSAGES[ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT],
+						);
+						break;
+					default:
+						toast.error(ERROR_MESSAGES[ERROR_CODES.UNEXPECTED_ERROR]);
+				}
+			},
+		});
 
 	useEffect(() => {
 		if (order?.payment?.orderPaymentMethodId) {
@@ -131,7 +102,10 @@ export function CheckoutPaymentMethodForm({
 	}, [order, orderPaymentMethods, form]);
 
 	function onSubmit(values: z.infer<typeof formSchema>) {
-		updateOrderPaymentMethod(values);
+		updateOrderPaymentMethod({
+			orderId,
+			orderPaymentMethodId: values.payment.orderPaymentMethodId,
+		});
 	}
 
 	return (
@@ -190,7 +164,7 @@ export function CheckoutPaymentMethodForm({
 						{isPending ? (
 							<Loader2 className="w-4 h-4 animate-spin" />
 						) : (
-							"Continuar"
+							"Salvar"
 						)}
 					</Button>
 				</form>

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { Suspense, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -27,7 +27,11 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { OrderDelivery, OrderDeliveryMethod } from "@/lib/db/schema";
+import {
+	getOrderDeliveryMethodsQueryOptions,
+	getOrderDeliveryQueryOptions,
+	useCreateOrderDeliveryMutation,
+} from "@/http";
 
 const formSchema = z.object({
 	shipping: z.object({
@@ -52,74 +56,32 @@ export function CheckoutShippingMethodForm({
 		},
 	});
 
-	const { data: orderDelivery } = useQuery({
-		queryKey: ["order-delivery", { id: orderId }],
-		queryFn: async () => {
-			const response = await fetch(`/api/orders/${orderId}/get-order-delivery`);
+	const { data: orderDelivery } = useQuery(
+		getOrderDeliveryQueryOptions(orderId),
+	);
 
-			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_GET_ORDER_DETAILS);
-			}
+	const { data: orderDeliveryMethods = [] } = useQuery(
+		getOrderDeliveryMethodsQueryOptions(),
+	);
 
-			const { orderDelivery } = (await response.json()) as {
-				orderDelivery: OrderDelivery;
-			};
-
-			return orderDelivery;
-		},
-	});
-
-	const { data: orderDeliveryMethods = [] } = useQuery({
-		queryKey: ["orderDeliveryMethods"],
-		queryFn: async () => {
-			const response = await fetch("/api/order-delivery-methods/list-all");
-			const { orderDeliveryMethods } = (await response.json()) as {
-				orderDeliveryMethods: OrderDeliveryMethod[];
-			};
-			return orderDeliveryMethods;
-		},
-	});
-
-	const { mutate: createOrderDeliveryMethod, isPending } = useMutation({
-		mutationFn: async (values: ShippingFormValues) => {
-			const response = await fetch(
-				`/api/order-deliveries/create-order-delivery`,
-				{
-					method: "POST",
-					body: JSON.stringify({
-						orderId,
-						orderDeliveryMethodId: values.shipping.orderDeliveryMethodId,
-					}),
-				},
-			);
-
-			if (!response.ok) {
-				throw new Error(ERROR_CODES.FAILED_TO_CREATE_ORDER_DELIVERY);
-			}
-
-			const { orderDelivery } = (await response.json()) as {
-				orderDelivery: OrderDelivery;
-			};
-
-			return orderDelivery;
-		},
-		onSuccess: (data) => {
-			console.log(data);
-		},
-		onError: (error) => {
-			console.error(error);
-			switch (error.message) {
-				case ERROR_CODES.FAILED_TO_CREATE_ORDER_DELIVERY:
-					toast.error(
-						ERROR_MESSAGES[ERROR_CODES.FAILED_TO_CREATE_ORDER_DELIVERY],
-					);
-					break;
-				default:
-					toast.error(ERROR_MESSAGES[ERROR_CODES.UNEXPECTED_ERROR]);
-			}
-		},
-	});
+	const { mutate: createOrderDeliveryMethod, isPending } =
+		useCreateOrderDeliveryMutation({
+			onSuccess: (data) => {
+				console.log(data);
+			},
+			onError: (error) => {
+				console.error(error);
+				switch (error.message) {
+					case ERROR_CODES.FAILED_TO_CREATE_ORDER_DELIVERY:
+						toast.error(
+							ERROR_MESSAGES[ERROR_CODES.FAILED_TO_CREATE_ORDER_DELIVERY],
+						);
+						break;
+					default:
+						toast.error(ERROR_MESSAGES[ERROR_CODES.UNEXPECTED_ERROR]);
+				}
+			},
+		});
 
 	useEffect(() => {
 		if (orderDelivery?.orderDeliveryMethodId) {
@@ -131,7 +93,10 @@ export function CheckoutShippingMethodForm({
 	}, [orderDelivery, form]);
 
 	function onSubmit(values: ShippingFormValues) {
-		createOrderDeliveryMethod(values);
+		createOrderDeliveryMethod({
+			orderId,
+			orderDeliveryMethodId: values.shipping.orderDeliveryMethodId,
+		});
 	}
 
 	return (
@@ -190,7 +155,7 @@ export function CheckoutShippingMethodForm({
 						{isPending ? (
 							<Loader2 className="w-4 h-4 animate-spin" />
 						) : (
-							"Continuar"
+							"Salvar"
 						)}
 					</Button>
 				</form>

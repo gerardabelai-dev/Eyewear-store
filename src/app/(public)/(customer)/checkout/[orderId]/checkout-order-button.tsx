@@ -4,32 +4,36 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { getOrderByIdQueryOptions } from "./get-checkout-query-options";
+import { getOrderByIdQueryOptions, getOrderDeliveryQueryOptions } from "@/http";
 
 interface CheckoutOrderButtonProps {
 	orderId: string;
 }
 
 export function CheckoutOrderButton({ orderId }: CheckoutOrderButtonProps) {
-	const { data: order, isPending: IsLoadingOrder } = useQuery(
+	const { data: order, isPending: isLoadingOrder } = useQuery(
 		getOrderByIdQueryOptions(orderId),
 	);
+
+	const { data: orderDelivery, isPending: isLoadingOrderDelivery } = useQuery({
+		...getOrderDeliveryQueryOptions(orderId),
+		enabled: !!order?.customerId && !!order?.customerAddressId,
+	});
 
 	const isPendingCustomerInformation =
 		!order?.customerId || !order?.customerAddressId;
 
-	// TODO: fetch order delivery
-	const isPendingShippingInformation = false;
-	// TODO: fetch order payment
-	const isPendingPaymentInformation = false;
+	const isPendingShippingInformation = !orderDelivery?.orderDeliveryMethodId;
+
+	// Check if order has payment information (this is included in the order data)
+	const isPendingPaymentInformation = !order?.payment?.orderPaymentMethodId;
 
 	const isOrderPendingRequirements =
 		isPendingCustomerInformation ||
 		isPendingShippingInformation ||
 		isPendingPaymentInformation;
 
-	// TODO: add other loading states, if any of them are loading them should be disabled
-	const isLoading = IsLoadingOrder;
+	const isLoading = isLoadingOrder || isLoadingOrderDelivery;
 
 	if (isLoading) {
 		return (

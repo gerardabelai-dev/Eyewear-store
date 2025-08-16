@@ -32,9 +32,6 @@ async function resetDatabase() {
 		console.log("🔥 Dropping existing tables...");
 
 		// Drop business tables that reference other tables first
-		await resetDb.execute(sql`DROP TABLE IF EXISTS "orderProduct" CASCADE`);
-		console.log("   ✅ Dropped orderProduct table");
-
 		await resetDb.execute(sql`DROP TABLE IF EXISTS "orderDelivery" CASCADE`);
 		console.log("   ✅ Dropped orderDelivery table");
 

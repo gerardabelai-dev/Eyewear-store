@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -20,6 +20,11 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+	getOrderByIdQueryOptions,
+	useCreateCustomerMutation,
+	useUpdateOrderCustomerIdMutation,
+} from "@/http";
 
 const formSchema = z.object({
 	customer: z.object({
@@ -47,71 +52,15 @@ export function CheckoutCustomerForm({ orderId }: CheckoutCustomerFormProps) {
 		},
 	});
 
-	const { data: order } = useQuery({
-		queryKey: ["order", { id: orderId }],
-		queryFn: async () => {
-			const response = await fetch(`/api/orders/${orderId}/get-order-by-id`);
+	const { data: order } = useQuery(getOrderByIdQueryOptions(orderId));
 
-			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_GET_ORDER_DETAILS);
-			}
-
-			const { order } = await response.json();
-
-			return order;
-		},
-	});
-
-	const { mutate: createCustomer, isPending } = useMutation({
-		mutationFn: async (values: CustomerFormValues) => {
-			// Create user and customer
-			const [firstName, lastName] = values.customer.fullName.split(" ");
-			const createCustomerResponse = await fetch(
-				"/api/customers/create-customer",
-				{
-					method: "POST",
-					body: JSON.stringify({
-						firstName,
-						lastName,
-						email: values.customer.email,
-						phoneNumber: values.customer.phone,
-					}),
-				},
-			);
-
-			if (!createCustomerResponse.ok) {
-				console.error(createCustomerResponse);
-				throw new Error(ERROR_CODES.FAILED_TO_CREATE_CUSTOMER);
-			}
-
-			const { customer } = await createCustomerResponse.json();
-
+	const createCustomerMutation = useCreateCustomerMutation({
+		onSuccess: (data) => {
 			// Update order with customer id
-			const updateOrderResponse = await fetch(
-				`/api/orders/${orderId}/update-order-customer-id`,
-				{
-					method: "POST",
-					body: JSON.stringify({
-						orderId,
-						customerId: customer.id,
-					}),
-				},
-			);
-
-			if (!updateOrderResponse.ok) {
-				console.error(updateOrderResponse);
-				throw new Error(ERROR_CODES.FAILED_TO_UPDATE_ORDER);
-			}
-
-			const { order } = await updateOrderResponse.json();
-
-			console.log(order);
-
-			return customer;
-		},
-		onSuccess: (data: { customer: { id: string } }) => {
-			console.log(data);
+			updateOrderCustomerIdMutation.mutate({
+				orderId,
+				customerId: data.customer.id,
+			});
 		},
 		onError: (error) => {
 			console.error(error);
@@ -119,6 +68,19 @@ export function CheckoutCustomerForm({ orderId }: CheckoutCustomerFormProps) {
 				case ERROR_CODES.FAILED_TO_CREATE_CUSTOMER:
 					toast.error(ERROR_MESSAGES[ERROR_CODES.FAILED_TO_CREATE_CUSTOMER]);
 					break;
+				default:
+					toast.error(ERROR_MESSAGES[ERROR_CODES.UNEXPECTED_ERROR]);
+			}
+		},
+	});
+
+	const updateOrderCustomerIdMutation = useUpdateOrderCustomerIdMutation({
+		onSuccess: (data) => {
+			console.log(data);
+		},
+		onError: (error) => {
+			console.error(error);
+			switch (error.message) {
 				case ERROR_CODES.FAILED_TO_UPDATE_ORDER:
 					toast.error(ERROR_MESSAGES[ERROR_CODES.FAILED_TO_UPDATE_ORDER]);
 					break;
@@ -128,19 +90,29 @@ export function CheckoutCustomerForm({ orderId }: CheckoutCustomerFormProps) {
 		},
 	});
 
+	const isPending =
+		createCustomerMutation.isPending || updateOrderCustomerIdMutation.isPending;
+
 	useEffect(() => {
-		if (order?.customer) {
+		if (order?.customer && order.customer.user) {
 			form.setValue(
 				"customer.fullName",
 				`${order.customer.firstName} ${order.customer.lastName}`,
 			);
 			form.setValue("customer.email", order.customer.user.email);
-			form.setValue("customer.phone", order.customer.phoneNumber);
+			form.setValue("customer.phone", order.customer.phoneNumber || "");
 		}
 	}, [order, form]);
 
 	function onSubmit(values: CustomerFormValues) {
-		createCustomer(values);
+		// Create user and customer
+		const [firstName, lastName] = values.customer.fullName.split(" ");
+		createCustomerMutation.mutate({
+			firstName,
+			lastName,
+			email: values.customer.email,
+			phoneNumber: values.customer.phone,
+		});
 	}
 
 	return (

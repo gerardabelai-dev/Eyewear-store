@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -21,7 +21,11 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import type { CustomerAddress, Order } from "@/lib/db/schema";
+import {
+	getOrderByIdQueryOptions,
+	useCreateCustomerAddressMutation,
+	useUpdateOrderCustomerAddressIdMutation,
+} from "@/http";
 
 const formSchema = z.object({
 	address: z.object({
@@ -64,75 +68,15 @@ export function CheckoutShippingAddressForm({
 		},
 	});
 
-	const { data: order } = useQuery({
-		queryKey: ["order", { id: orderId }],
-		queryFn: async () => {
-			const response = await fetch(`/api/orders/${orderId}/get-order-by-id`);
+	const { data: order } = useQuery(getOrderByIdQueryOptions(orderId));
 
-			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_GET_ORDER_DETAILS);
-			}
-
-			const { order } = await response.json();
-
-			return order;
-		},
-	});
-
-	const { mutate: createCustomerAddress, isPending } = useMutation({
-		mutationFn: async (values: CustomerAddressFormValues) => {
-			const createCustomerAddressResponse = await fetch(
-				"/api/customers-addresses/create-customer-address",
-				{
-					method: "POST",
-					body: JSON.stringify({
-						orderId,
-						street: values.address.street,
-						number: values.address.number,
-						complement: values.address.complement,
-						neighborhood: values.address.neighborhood,
-						city: values.address.city,
-						state: values.address.state,
-						zipCode: values.address.zipCode,
-						country: "BR",
-						isDefault: true,
-					}),
-				},
-			);
-
-			if (!createCustomerAddressResponse.ok) {
-				throw new Error(ERROR_CODES.FAILED_TO_CREATE_CUSTOMER_ADDRESS);
-			}
-
-			const { customerAddress } =
-				(await createCustomerAddressResponse.json()) as {
-					customerAddress: CustomerAddress;
-				};
-
-			const updateOrderCustomerAddressIdResponse = await fetch(
-				`/api/orders/${orderId}/update-order-customer-address-id`,
-				{
-					method: "POST",
-					body: JSON.stringify({
-						orderId,
-						customerAddressId: customerAddress.id,
-					}),
-				},
-			);
-
-			if (!updateOrderCustomerAddressIdResponse.ok) {
-				throw new Error(ERROR_CODES.FAILED_TO_UPDATE_ORDER);
-			}
-
-			const { order } = (await updateOrderCustomerAddressIdResponse.json()) as {
-				order: Order;
-			};
-
-			return order;
-		},
+	const createCustomerAddressMutation = useCreateCustomerAddressMutation({
 		onSuccess: (data) => {
-			console.log(data);
+			// Update order with customer address id
+			updateOrderCustomerAddressIdMutation.mutate({
+				orderId,
+				customerAddressId: data.customerAddress.id,
+			});
 		},
 		onError: (error) => {
 			console.error(error);
@@ -142,14 +86,32 @@ export function CheckoutShippingAddressForm({
 						ERROR_MESSAGES[ERROR_CODES.FAILED_TO_CREATE_CUSTOMER_ADDRESS],
 					);
 					break;
-				case ERROR_CODES.FAILED_TO_UPDATE_ORDER:
-					toast.error(ERROR_MESSAGES[ERROR_CODES.FAILED_TO_UPDATE_ORDER]);
-					break;
 				default:
 					toast.error(ERROR_MESSAGES[ERROR_CODES.UNEXPECTED_ERROR]);
 			}
 		},
 	});
+
+	const updateOrderCustomerAddressIdMutation =
+		useUpdateOrderCustomerAddressIdMutation({
+			onSuccess: (data) => {
+				console.log(data);
+			},
+			onError: (error) => {
+				console.error(error);
+				switch (error.message) {
+					case ERROR_CODES.FAILED_TO_UPDATE_ORDER:
+						toast.error(ERROR_MESSAGES[ERROR_CODES.FAILED_TO_UPDATE_ORDER]);
+						break;
+					default:
+						toast.error(ERROR_MESSAGES[ERROR_CODES.UNEXPECTED_ERROR]);
+				}
+			},
+		});
+
+	const isPending =
+		createCustomerAddressMutation.isPending ||
+		updateOrderCustomerAddressIdMutation.isPending;
 
 	// Update form when order data is available
 	useEffect(() => {
@@ -171,7 +133,18 @@ export function CheckoutShippingAddressForm({
 	}, [order, form]);
 
 	function onSubmit(values: CustomerAddressFormValues) {
-		createCustomerAddress(values);
+		createCustomerAddressMutation.mutate({
+			orderId,
+			street: values.address.street,
+			number: values.address.number,
+			complement: values.address.complement || "",
+			neighborhood: values.address.neighborhood,
+			city: values.address.city,
+			state: values.address.state,
+			zipCode: values.address.zipCode,
+			country: "BR",
+			isDefault: true,
+		});
 	}
 
 	return (

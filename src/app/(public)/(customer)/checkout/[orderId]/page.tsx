@@ -32,8 +32,6 @@ export default async function CheckoutPage({
 				description="Verifique seu pedido e finalize sua compra"
 			/>
 
-			<h1 className="text-lg font-bold">DEBUG: {orderId}</h1>
-
 			<section className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-4">
 				<div className="flex flex-col gap-4">
 					<CheckoutCustomerForm orderId={orderId} />

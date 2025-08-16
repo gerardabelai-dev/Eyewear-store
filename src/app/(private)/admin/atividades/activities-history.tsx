@@ -448,16 +448,13 @@ function getActivityInfo(
 					};
 				}
 				break;
-			case "orderProduct":
+			case "cartProduct":
 				if (content.id && content.quantity) {
 					relatedEntity = {
 						name: `${content.quantity}x produto`,
 						id: content.id,
-						type: "orderProduct",
-						url: getEntityLinkUrl(
-							"orderProduct",
-							content.orderId || content.id,
-						),
+						type: "cartProduct",
+						url: getEntityLinkUrl("cartProduct", content.orderId || content.id),
 					};
 				}
 				break;
@@ -497,7 +494,7 @@ export function ActivitiesHistory() {
 			</CardHeader>
 			<CardContent>
 				<Timeline>
-					{mockActivities.map((activity) => {
+					{mockActivities.map((activity, index) => {
 						const { entity } = parseActivityType(activity.type);
 						const ActivityIcon = getEntityIcon(entity);
 						const activityColor = getActivityColor(activity.type);
@@ -506,6 +503,7 @@ export function ActivitiesHistory() {
 							<TimelineItem
 								key={activity.id}
 								className="m-0! flex-row items-center gap-3 py-2.5!"
+								step={index + 1}
 							>
 								<div
 									className={`flex h-8 w-8 items-center justify-center rounded-full ${activityColor}`}

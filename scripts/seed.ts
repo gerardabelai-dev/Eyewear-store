@@ -42,7 +42,6 @@ async function clearDatabase() {
 	// Clear order-related tables (depend on customer)
 	await seedDb.delete(schema.orderPayment);
 	await seedDb.delete(schema.orderDelivery);
-	await seedDb.delete(schema.orderProduct);
 	await seedDb.delete(schema.order);
 
 	// Clear customer-related tables (depend on customer and user)
@@ -433,45 +432,6 @@ async function seedOrder({
 	return order;
 }
 
-async function seedOrderProduct({
-	orderId,
-	productId,
-	productPriceId,
-	quantity,
-}: {
-	orderId: string;
-	productId: string;
-	productPriceId: string;
-	quantity: number;
-}) {
-	console.info(
-		`📦 Creating order product for order ID: ${orderId}, product ID: ${productId}, quantity: ${quantity}...`,
-	);
-
-	const [orderProduct] = await seedDb
-		.insert(schema.orderProduct)
-		.values({
-			orderId,
-			productId,
-			productPriceId,
-			quantity,
-		})
-		.returning();
-
-	console.info(
-		`✅ Order product created successfully with ID: ${orderProduct.id}`,
-	);
-
-	await seedActivity({
-		type: "orderProduct.created",
-		actorId: "system",
-		actorType: "system",
-		metadata: {
-			content: orderProduct,
-		},
-	});
-}
-
 async function seedOrderDelivery({ orderId }: { orderId: string }) {
 	console.info(`🚚 Creating order delivery for order ID: ${orderId}...`);
 
@@ -586,7 +546,7 @@ async function seed() {
 				totalPriceInCents: productPrice.priceInCents * randomProductQuantity,
 				userId: user.id,
 			});
-			await seedOrderProduct({
+			await seedCartProduct({
 				orderId: order.id,
 				productId: product.id,
 				productPriceId: productPrice.id,

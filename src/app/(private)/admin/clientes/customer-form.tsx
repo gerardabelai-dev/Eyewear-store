@@ -63,8 +63,7 @@ export function CustomerForm({ customer, onSuccess }: CustomerFormProps) {
 		},
 	});
 
-	const onSubmitCustomerDetails = async (values: CustomerFormValues) => {
-		console.debug("onSubmitCustomerDetails", values);
+	const onSubmitCustomerDetails = async (_values: CustomerFormValues) => {
 		setIsSubmittingDetails(true);
 		// Simulate API call
 		await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -79,8 +78,9 @@ export function CustomerForm({ customer, onSuccess }: CustomerFormProps) {
 		onSuccess?.();
 	};
 
-	const onSubmitCustomerAddress = async (values: CustomerAddressFormValues) => {
-		console.debug("onSubmitCustomerAddress", values);
+	const onSubmitCustomerAddress = async (
+		_values: CustomerAddressFormValues,
+	) => {
 		setIsSubmittingAddress(true);
 		// Simulate API call
 		await new Promise((resolve) => setTimeout(resolve, 3000));

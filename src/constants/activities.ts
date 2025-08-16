@@ -15,7 +15,7 @@ export const ACTIVITY_ENTITIES = {
 	PRODUCT_IMAGE: "productImage",
 	PRODUCT_PRICE: "productPrice",
 	CATEGORY_SECONDARY: "categorySecondary",
-	ORDER_PRODUCT: "orderProduct",
+	CART_PRODUCT: "cartProduct",
 } as const;
 
 // Activity action types
@@ -42,7 +42,7 @@ export const ENTITY_NAMES: Record<string, string> = {
 	[ACTIVITY_ENTITIES.PRODUCT_IMAGE]: "imagem de produto",
 	[ACTIVITY_ENTITIES.PRODUCT_PRICE]: "preço",
 	[ACTIVITY_ENTITIES.CATEGORY_SECONDARY]: "subcategoria",
-	[ACTIVITY_ENTITIES.ORDER_PRODUCT]: "item do pedido",
+	[ACTIVITY_ENTITIES.CART_PRODUCT]: "item do pedido",
 };
 
 // Contextual action text for natural language activities
@@ -125,11 +125,11 @@ export const CONTEXTUAL_ACTIONS: Record<string, string> = {
 		"removeu a subcategoria",
 
 	// Order product actions
-	[`${ACTIVITY_ENTITIES.ORDER_PRODUCT}.${ACTIVITY_ACTIONS.CREATED}`]:
+	[`${ACTIVITY_ENTITIES.CART_PRODUCT}.${ACTIVITY_ACTIONS.CREATED}`]:
 		"adicionou o item",
-	[`${ACTIVITY_ENTITIES.ORDER_PRODUCT}.${ACTIVITY_ACTIONS.UPDATED}`]:
+	[`${ACTIVITY_ENTITIES.CART_PRODUCT}.${ACTIVITY_ACTIONS.UPDATED}`]:
 		"atualizou o item",
-	[`${ACTIVITY_ENTITIES.ORDER_PRODUCT}.${ACTIVITY_ACTIONS.DELETED}`]:
+	[`${ACTIVITY_ENTITIES.CART_PRODUCT}.${ACTIVITY_ACTIONS.DELETED}`]:
 		"removeu o item",
 };
 
