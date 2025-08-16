@@ -67,7 +67,7 @@ export function CheckoutShippingMethodForm({
 			);
 
 			if (!response.ok) {
-				throw new Error(ERROR_CODES.FAILED_TO_UPDATE_ORDER_DELIVERY_METHOD);
+				throw new Error(ERROR_CODES.FAILED_TO_CREATE_ORDER_DELIVERY);
 			}
 
 			return response.json();
@@ -78,9 +78,9 @@ export function CheckoutShippingMethodForm({
 		onError: (error) => {
 			console.error(error);
 			switch (error.message) {
-				case ERROR_CODES.FAILED_TO_UPDATE_ORDER_DELIVERY_METHOD:
+				case ERROR_CODES.FAILED_TO_CREATE_ORDER_DELIVERY:
 					toast.error(
-						ERROR_MESSAGES[ERROR_CODES.FAILED_TO_UPDATE_ORDER_DELIVERY_METHOD],
+						ERROR_MESSAGES[ERROR_CODES.FAILED_TO_CREATE_ORDER_DELIVERY],
 					);
 					break;
 				default:

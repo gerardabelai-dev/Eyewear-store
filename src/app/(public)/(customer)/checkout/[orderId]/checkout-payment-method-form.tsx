@@ -1,8 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import { Suspense } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import z from "zod";
+import { ERROR_CODES, ERROR_MESSAGES } from "@/app/api/contants/error-codes";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import {
@@ -21,10 +26,12 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { OrderPaymentMethod } from "@/lib/db/schema";
 
 const formSchema = z.object({
 	payment: z.object({
-		method: z.enum(["credit_card", "debit_card", "pix", "boleto"]),
+		orderPaymentMethodId: z.string(),
 	}),
 });
 
@@ -35,17 +42,60 @@ interface CheckoutPaymentMethodFormProps {
 export function CheckoutPaymentMethodForm({
 	orderId,
 }: CheckoutPaymentMethodFormProps) {
+	const { data: orderPaymentMethods } = useSuspenseQuery({
+		queryKey: ["orderPaymentMethods"],
+		queryFn: async () => {
+			const response = await fetch("/api/order-payment-methods/list-all");
+			const { orderPaymentMethods } = await response.json();
+			console.log(orderPaymentMethods);
+			return orderPaymentMethods as OrderPaymentMethod[];
+		},
+	});
+
+	const { mutate: updateOrderPaymentMethod, isPending } = useMutation({
+		mutationFn: async (values: z.infer<typeof formSchema>) => {
+			const response = await fetch("/api/order-payments/create-order-payment", {
+				method: "POST",
+				body: JSON.stringify({
+					orderId,
+					orderPaymentMethodId: values.payment.orderPaymentMethodId,
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error(ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT);
+			}
+
+			return response.json();
+		},
+		onSuccess: (data) => {
+			console.log(data);
+		},
+		onError: (error) => {
+			console.error(error);
+			switch (error.message) {
+				case ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT:
+					toast.error(
+						ERROR_MESSAGES[ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT],
+					);
+					break;
+				default:
+					toast.error(ERROR_MESSAGES[ERROR_CODES.UNEXPECTED_ERROR]);
+			}
+		},
+	});
+
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			payment: {
-				method: "credit_card",
+				orderPaymentMethodId: orderPaymentMethods[0].id,
 			},
 		},
 	});
 
 	function onSubmit(values: z.infer<typeof formSchema>) {
-		console.log(values);
+		updateOrderPaymentMethod(values);
 	}
 
 	return (
@@ -58,24 +108,37 @@ export function CheckoutPaymentMethodForm({
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 					<FormField
 						control={form.control}
-						name="payment.method"
+						name="payment.orderPaymentMethodId"
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Método de pagamento</FormLabel>
 								<FormControl>
-									<Select {...field}>
+									<Select value={field.value} onValueChange={field.onChange}>
 										<SelectTrigger>
-											<SelectValue placeholder="Selecione o método de pagamento" />
+											<SelectValue placeholder="Selecione..." />
 										</SelectTrigger>
 										<SelectContent>
-											<SelectItem value="credit_card">
-												Cartão de crédito
-											</SelectItem>
-											<SelectItem value="debit_card">
-												Cartão de débito
-											</SelectItem>
-											<SelectItem value="pix">Pix</SelectItem>
-											<SelectItem value="boleto">Boleto</SelectItem>
+											<Suspense
+												fallback={
+													<SelectItem value="loading">
+														<Skeleton className="h-10 w-full" />
+													</SelectItem>
+												}
+											>
+												{orderPaymentMethods.length === 0 && (
+													<SelectItem value="no-payment-methods">
+														Nenhum método de pagamento disponível
+													</SelectItem>
+												)}
+												{orderPaymentMethods?.map((orderPaymentMethod) => (
+													<SelectItem
+														key={orderPaymentMethod.id}
+														value={orderPaymentMethod.id}
+													>
+														{orderPaymentMethod.method}
+													</SelectItem>
+												))}
+											</Suspense>
 										</SelectContent>
 									</Select>
 								</FormControl>
@@ -87,7 +150,13 @@ export function CheckoutPaymentMethodForm({
 						)}
 					/>
 
-					<Button type="submit">Continuar</Button>
+					<Button type="submit" disabled={isPending}>
+						{isPending ? (
+							<Loader2 className="w-4 h-4 animate-spin" />
+						) : (
+							"Continuar"
+						)}
+					</Button>
 				</form>
 			</Form>
 		</Card>

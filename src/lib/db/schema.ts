@@ -267,6 +267,14 @@ export const orderDelivery = pgTable("orderDelivery", {
 	...timestamps,
 });
 
+export const orderPaymentMethod = pgTable("orderPaymentMethod", {
+	id: text("id")
+		.primaryKey()
+		.$defaultFn(() => generatePrefixId("orderPaymentMethod")),
+	method: text("method").notNull(),
+	...timestamps,
+});
+
 export const orderPaymentStatus = pgEnum("orderPaymentStatus", [
 	"pending",
 	"paid",
@@ -280,6 +288,9 @@ export const orderPayment = pgTable("orderPayment", {
 	orderId: text("orderId")
 		.notNull()
 		.references(() => order.id, { onDelete: "set null" }),
+	orderPaymentMethodId: text("orderPaymentMethodId")
+		.notNull()
+		.references(() => orderPaymentMethod.id, { onDelete: "set null" }),
 	orderPaymentStatus: orderPaymentStatus("orderPaymentStatus")
 		.notNull()
 		.default("pending"),
@@ -350,6 +361,9 @@ export type NewCartProduct = typeof cartProduct.$inferInsert;
 
 export type OrderDeliveryMethod = typeof orderDeliveryMethod.$inferSelect;
 export type NewOrderDeliveryMethod = typeof orderDeliveryMethod.$inferInsert;
+
+export type OrderPaymentMethod = typeof orderPaymentMethod.$inferSelect;
+export type NewOrderPaymentMethod = typeof orderPaymentMethod.$inferInsert;
 
 // Relations
 export const userRelations = relations(user, ({ one, many }) => ({
@@ -499,6 +513,10 @@ export const orderPaymentRelations = relations(orderPayment, ({ one }) => ({
 	order: one(order, {
 		fields: [orderPayment.orderId],
 		references: [order.id],
+	}),
+	orderPaymentMethod: one(orderPaymentMethod, {
+		fields: [orderPayment.orderPaymentMethodId],
+		references: [orderPaymentMethod.id],
 	}),
 }));
 

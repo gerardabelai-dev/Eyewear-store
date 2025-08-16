@@ -17,8 +17,6 @@ export const ERROR_CODES = {
 
 	// Order Delivery Method
 	ORDER_DELIVERY_METHODS_NOT_FOUND: "ORDER_DELIVERY_METHODS_NOT_FOUND",
-	FAILED_TO_UPDATE_ORDER_DELIVERY_METHOD:
-		"FAILED_TO_UPDATE_ORDER_DELIVERY_METHOD",
 	FAILED_TO_CREATE_ORDER_DELIVERY: "FAILED_TO_CREATE_ORDER_DELIVERY",
 
 	// User
@@ -32,6 +30,10 @@ export const ERROR_CODES = {
 	// Customer Address
 	FAILED_TO_CREATE_CUSTOMER_ADDRESS: "FAILED_TO_CREATE_CUSTOMER_ADDRESS",
 	ORDER_ALREADY_HAS_CUSTOMER_ADDRESS: "ORDER_ALREADY_HAS_CUSTOMER_ADDRESS",
+
+	// Order Payment
+	FAILED_TO_CREATE_ORDER_PAYMENT: "FAILED_TO_CREATE_ORDER_PAYMENT",
+	ORDER_PAYMENT_METHODS_NOT_FOUND: "ORDER_PAYMENT_METHODS_NOT_FOUND",
 } as const;
 
 export const ERROR_MESSAGES = {
@@ -58,10 +60,12 @@ export const ERROR_MESSAGES = {
 	// Order Delivery Method
 	[ERROR_CODES.ORDER_DELIVERY_METHODS_NOT_FOUND]:
 		"Nenhum método de envio disponível",
-	[ERROR_CODES.FAILED_TO_UPDATE_ORDER_DELIVERY_METHOD]:
-		"Houve um erro ao atualizar o método de envio do pedido",
 	[ERROR_CODES.FAILED_TO_CREATE_ORDER_DELIVERY]:
-		"Houve um erro ao criar o método de envio do pedido",
+		"Houve um erro ao atualizar o método de envio do pedido",
+
+	// Order Payment
+	[ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT]:
+		"Houve um erro ao criar o pagamento do pedido",
 
 	// User
 	[ERROR_CODES.USER_ALREADY_EXISTS]: "Usuário com este e-mail já existe",

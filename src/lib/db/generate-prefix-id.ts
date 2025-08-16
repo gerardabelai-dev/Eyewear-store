@@ -26,6 +26,7 @@ const tableNameToPrefix = {
 	orderDeliveryMethod: "odm",
 	orderDelivery: "del",
 	orderPayment: "pay",
+	orderPaymentMethod: "pym",
 
 	// Activity
 	activity: "act",
