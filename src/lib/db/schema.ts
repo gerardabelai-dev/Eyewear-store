@@ -233,6 +233,15 @@ export const orderProduct = pgTable("orderProduct", {
 	...timestamps,
 });
 
+export const orderDeliveryMethod = pgTable("orderDeliveryMethod", {
+	id: text("id")
+		.primaryKey()
+		.$defaultFn(() => generatePrefixId("orderDeliveryMethod")),
+	method: text("method").notNull(),
+	costInCents: integer("costInCents").notNull().default(0),
+	...timestamps,
+});
+
 export const orderDeliveryStatus = pgEnum("orderDeliveryStatus", [
 	"pending",
 	"processing",
@@ -249,6 +258,9 @@ export const orderDelivery = pgTable("orderDelivery", {
 	orderId: text("orderId")
 		.notNull()
 		.references(() => order.id, { onDelete: "set null" }),
+	orderDeliveryMethodId: text("orderDeliveryMethodId")
+		.notNull()
+		.references(() => orderDeliveryMethod.id, { onDelete: "set null" }),
 	orderDeliveryStatus: orderDeliveryStatus("orderDeliveryStatus")
 		.notNull()
 		.default("pending"),
@@ -335,6 +347,9 @@ export type NewCart = typeof cart.$inferInsert;
 
 export type CartProduct = typeof cartProduct.$inferSelect;
 export type NewCartProduct = typeof cartProduct.$inferInsert;
+
+export type OrderDeliveryMethod = typeof orderDeliveryMethod.$inferSelect;
+export type NewOrderDeliveryMethod = typeof orderDeliveryMethod.$inferInsert;
 
 // Relations
 export const userRelations = relations(user, ({ one, many }) => ({
@@ -447,7 +462,10 @@ export const orderRelations = relations(order, ({ one, many }) => ({
 		references: [customerAddress.id],
 	}),
 	orderProducts: many(orderProduct),
-	delivery: one(orderDelivery),
+	delivery: one(orderDelivery, {
+		fields: [order.id],
+		references: [orderDelivery.orderId],
+	}),
 	payment: one(orderPayment),
 }));
 
@@ -470,6 +488,10 @@ export const orderDeliveryRelations = relations(orderDelivery, ({ one }) => ({
 	order: one(order, {
 		fields: [orderDelivery.orderId],
 		references: [order.id],
+	}),
+	orderDeliveryMethod: one(orderDeliveryMethod, {
+		fields: [orderDelivery.orderDeliveryMethodId],
+		references: [orderDeliveryMethod.id],
 	}),
 }));
 

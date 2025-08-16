@@ -28,18 +28,13 @@ const formSchema = z.object({
 	}),
 });
 
-/*
- Checkout form 
- - Customer information
- - Shipping address
- - Shipping method
- - Payment method
- - Subtotal + Total
- - Promo Code
- - Checkout button
-*/
+interface CheckoutPaymentMethodFormProps {
+	orderId: string;
+}
 
-export function CheckoutPaymentMethodForm() {
+export function CheckoutPaymentMethodForm({
+	orderId,
+}: CheckoutPaymentMethodFormProps) {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {

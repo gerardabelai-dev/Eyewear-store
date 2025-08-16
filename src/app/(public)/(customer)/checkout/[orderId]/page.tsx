@@ -39,8 +39,8 @@ export default async function CheckoutPage({
 				<div className="flex flex-col gap-4">
 					<CheckoutCustomerForm orderId={orderId} />
 					<CheckoutShippingAddressForm orderId={orderId} />
-					<CheckoutShippingMethodForm />
-					<CheckoutPaymentMethodForm />
+					<CheckoutShippingMethodForm orderId={orderId} />
+					<CheckoutPaymentMethodForm orderId={orderId} />
 				</div>
 
 				{/* Order Summary */}
