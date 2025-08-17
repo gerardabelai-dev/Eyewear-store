@@ -22,26 +22,31 @@ export interface GetCartResponse {
 	id: string;
 	items: Array<{
 		id: string;
+		cartId: string;
+		productId: string;
+		productPriceId: string;
 		quantity: number;
+		createdAt: string;
+		updatedAt: string;
 		product: {
 			id: string;
 			name: string;
-			description: string;
-			productPrice: {
-				id: string;
-				price: number;
-				currency: string;
-			};
+			description: string | null;
+			stock: number;
 			images: Array<{
 				id: string;
-				url: string;
-				alt: string;
+				imageUrl: string;
 			}>;
+			productPrice: {
+				id: string;
+				priceInCents: number;
+				discountPercentage: number;
+			};
 		};
 		productPrice: {
 			id: string;
-			price: number;
-			currency: string;
+			priceInCents: number;
+			discountPercentage: number;
 		};
 	}>;
 	createdAt: Date;

@@ -13,29 +13,11 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import type { Product, ProductImage, ProductPrice } from "@/lib/db/schema";
+import type { GetCartResponse } from "@/http/types";
+import { calculateDiscountedPrice, formatPrice } from "@/lib/format-price";
 import { getCartQueryOptions } from "./get-cart-query-options";
 
-interface CartItemData {
-	id: string;
-	cartId: string;
-	productId: string;
-	productPriceId: string;
-	quantity: number;
-	createdAt: string;
-	updatedAt: string;
-	product: Product & {
-		images: ProductImage[];
-	};
-	productPrice: ProductPrice;
-}
-
-function formatPrice(priceInCents: number): string {
-	return new Intl.NumberFormat("pt-BR", {
-		style: "currency",
-		currency: "BRL",
-	}).format(priceInCents / 100);
-}
+type CartItemData = GetCartResponse["items"][0];
 
 function CartItem({ item }: { item: CartItemData }) {
 	const product = item.product;
@@ -48,8 +30,10 @@ function CartItem({ item }: { item: CartItemData }) {
 		"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg";
 
 	// Calculate actual price considering discount
-	const discountedPrice =
-		productPrice.priceInCents * (1 - productPrice.discountPercentage / 100);
+	const discountedPrice = calculateDiscountedPrice(
+		productPrice.priceInCents,
+		productPrice.discountPercentage,
+	);
 
 	return (
 		<li className="flex gap-4">
