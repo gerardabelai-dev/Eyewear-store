@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { Suspense, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -46,6 +46,8 @@ interface CheckoutPaymentMethodFormProps {
 export function CheckoutPaymentMethodForm({
 	orderId,
 }: CheckoutPaymentMethodFormProps) {
+	const queryClient = useQueryClient();
+
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -65,6 +67,8 @@ export function CheckoutPaymentMethodForm({
 		useCreateOrderPaymentMutation({
 			onSuccess: (data) => {
 				console.log(data);
+				// Invalidate order query to refresh checkout button state
+				queryClient.invalidateQueries(getOrderByIdQueryOptions(orderId));
 			},
 			onError: (error) => {
 				console.error(error);

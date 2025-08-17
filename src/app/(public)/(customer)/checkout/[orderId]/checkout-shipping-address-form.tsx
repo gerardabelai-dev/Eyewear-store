@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -27,20 +27,48 @@ import {
 	useUpdateOrderCustomerAddressIdMutation,
 } from "@/http";
 
-const formSchema = z.object({
-	address: z.object({
-		street: z.string().min(1),
-		number: z.string().min(1),
-		hasNoNumber: z.boolean().optional(),
-		complement: z.string().optional(),
-		hasNoComplement: z.boolean().optional(),
-		neighborhood: z.string().min(1),
-		city: z.string().min(1),
-		state: z.string().min(1),
-		zipCode: z.string().min(1),
-		hasNozipCode: z.boolean().optional(),
-	}),
-});
+const formSchema = z
+	.object({
+		address: z.object({
+			street: z.string().min(1),
+			number: z.string().optional(),
+			hasNoNumber: z.boolean().optional(),
+			complement: z.string().optional(),
+			hasNoComplement: z.boolean().optional(),
+			neighborhood: z.string().min(1),
+			city: z.string().min(1),
+			state: z.string().min(1),
+			zipCode: z.string().optional(),
+			hasNozipCode: z.boolean().optional(),
+		}),
+	})
+	.superRefine((data, ctx) => {
+		// If "hasNoNumber" is not checked, number is required
+		if (
+			!data.address.hasNoNumber &&
+			(!data.address.number || data.address.number.trim() === "")
+		) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: "Número é obrigatório",
+				path: ["address", "number"],
+			});
+		}
+
+		// If "hasNozipCode" is not checked, zipCode is required
+		if (
+			!data.address.hasNozipCode &&
+			(!data.address.zipCode || data.address.zipCode.trim() === "")
+		) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: "CEP é obrigatório",
+				path: ["address", "zipCode"],
+			});
+		}
+
+		// Complement is always optional, no validation needed for hasNoComplement
+	});
 
 type CustomerAddressFormValues = z.infer<typeof formSchema>;
 
@@ -51,6 +79,8 @@ interface CheckoutShippingAddressFormProps {
 export function CheckoutShippingAddressForm({
 	orderId,
 }: CheckoutShippingAddressFormProps) {
+	const queryClient = useQueryClient();
+
 	const form = useForm<CustomerAddressFormValues>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -64,6 +94,7 @@ export function CheckoutShippingAddressForm({
 				city: "",
 				state: "",
 				zipCode: "",
+				hasNozipCode: false,
 			},
 		},
 	});
@@ -96,6 +127,8 @@ export function CheckoutShippingAddressForm({
 		useUpdateOrderCustomerAddressIdMutation({
 			onSuccess: (data) => {
 				console.log(data);
+				// Invalidate order query to refresh checkout button state
+				queryClient.invalidateQueries(getOrderByIdQueryOptions(orderId));
 			},
 			onError: (error) => {
 				console.error(error);
@@ -113,6 +146,30 @@ export function CheckoutShippingAddressForm({
 		createCustomerAddressMutation.isPending ||
 		updateOrderCustomerAddressIdMutation.isPending;
 
+	// Watch checkbox values to handle field disabling
+	const hasNoNumber = form.watch("address.hasNoNumber");
+	const hasNoComplement = form.watch("address.hasNoComplement");
+	const hasNozipCode = form.watch("address.hasNozipCode");
+
+	// Clear fields when checkboxes are checked
+	useEffect(() => {
+		if (hasNoNumber) {
+			form.setValue("address.number", "");
+		}
+	}, [hasNoNumber, form]);
+
+	useEffect(() => {
+		if (hasNoComplement) {
+			form.setValue("address.complement", "");
+		}
+	}, [hasNoComplement, form]);
+
+	useEffect(() => {
+		if (hasNozipCode) {
+			form.setValue("address.zipCode", "");
+		}
+	}, [hasNozipCode, form]);
+
 	// Update form when order data is available
 	useEffect(() => {
 		if (order?.customerAddress) {
@@ -129,6 +186,20 @@ export function CheckoutShippingAddressForm({
 			form.setValue("address.city", order.customerAddress.city || "");
 			form.setValue("address.state", order.customerAddress.state || "");
 			form.setValue("address.zipCode", order.customerAddress.zipCode || "");
+
+			// Use stored checkbox states from database
+			form.setValue(
+				"address.hasNoNumber",
+				order.customerAddress.hasNoNumber || false,
+			);
+			form.setValue(
+				"address.hasNoComplement",
+				order.customerAddress.hasNoComplement || false,
+			);
+			form.setValue(
+				"address.hasNozipCode",
+				order.customerAddress.hasNozipCode || false,
+			);
 		}
 	}, [order, form]);
 
@@ -136,12 +207,17 @@ export function CheckoutShippingAddressForm({
 		createCustomerAddressMutation.mutate({
 			orderId,
 			street: values.address.street,
-			number: values.address.number,
-			complement: values.address.complement || "",
+			number: values.address.hasNoNumber ? "" : values.address.number || "",
+			hasNoNumber: values.address.hasNoNumber || false,
+			complement: values.address.hasNoComplement
+				? ""
+				: values.address.complement || "",
+			hasNoComplement: values.address.hasNoComplement || false,
 			neighborhood: values.address.neighborhood,
 			city: values.address.city,
 			state: values.address.state,
-			zipCode: values.address.zipCode,
+			zipCode: values.address.hasNozipCode ? "" : values.address.zipCode || "",
+			hasNozipCode: values.address.hasNozipCode || false,
 			country: "BR",
 			isDefault: true,
 		});
@@ -176,7 +252,7 @@ export function CheckoutShippingAddressForm({
 							<FormItem>
 								<FormLabel>Número</FormLabel>
 								<FormControl>
-									<Input {...field} placeholder="123" />
+									<Input {...field} placeholder="123" disabled={hasNoNumber} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -214,7 +290,11 @@ export function CheckoutShippingAddressForm({
 							<FormItem>
 								<FormLabel>Complemento</FormLabel>
 								<FormControl>
-									<Input {...field} placeholder="Apto 123" />
+									<Input
+										{...field}
+										placeholder="Apto 123"
+										disabled={hasNoComplement}
+									/>
 								</FormControl>
 								<FormDescription>
 									Digite o complemento da sua casa
@@ -303,7 +383,11 @@ export function CheckoutShippingAddressForm({
 							<FormItem>
 								<FormLabel>CEP</FormLabel>
 								<FormControl>
-									<Input {...field} placeholder="12345-678" />
+									<Input
+										{...field}
+										placeholder="12345-678"
+										disabled={hasNozipCode}
+									/>
 								</FormControl>
 								<FormDescription>Digite o CEP da sua casa</FormDescription>
 								<FormMessage />

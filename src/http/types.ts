@@ -141,11 +141,14 @@ export interface CreateCustomerAddressRequest {
 	orderId: string;
 	street: string;
 	number: string;
+	hasNoNumber: boolean;
 	complement: string;
+	hasNoComplement: boolean;
 	neighborhood: string;
 	city: string;
 	state: string;
 	zipCode: string;
+	hasNozipCode: boolean;
 	country: string;
 	isDefault: boolean;
 }

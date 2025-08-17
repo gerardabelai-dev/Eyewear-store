@@ -30,6 +30,11 @@ export const getOrderDeliveryQueryOptions = (orderId: string) =>
 				`${process.env.NEXT_PUBLIC_WEB_URL}/api/orders/${orderId}/get-order-delivery`,
 			);
 
+			// If delivery doesn't exist yet (404), return null instead of throwing
+			if (response.status === 404) {
+				return null;
+			}
+
 			if (!response.ok) {
 				console.error(response);
 				throw new Error(ERROR_CODES.ORDER_DELIVERY_NOT_FOUND);

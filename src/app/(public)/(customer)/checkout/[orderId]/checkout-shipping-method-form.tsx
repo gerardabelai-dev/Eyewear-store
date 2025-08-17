@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { Suspense, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+	getOrderByIdQueryOptions,
 	getOrderDeliveryMethodsQueryOptions,
 	getOrderDeliveryQueryOptions,
 	useCreateOrderDeliveryMutation,
@@ -47,6 +48,8 @@ interface CheckoutShippingMethodFormProps {
 export function CheckoutShippingMethodForm({
 	orderId,
 }: CheckoutShippingMethodFormProps) {
+	const queryClient = useQueryClient();
+
 	const form = useForm<ShippingFormValues>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -68,6 +71,8 @@ export function CheckoutShippingMethodForm({
 		useCreateOrderDeliveryMutation({
 			onSuccess: (data) => {
 				console.log(data);
+				// Invalidate order query to refresh checkout button state
+				queryClient.invalidateQueries(getOrderByIdQueryOptions(orderId));
 			},
 			onError: (error) => {
 				console.error(error);
@@ -85,12 +90,23 @@ export function CheckoutShippingMethodForm({
 
 	useEffect(() => {
 		if (orderDelivery?.orderDeliveryMethodId) {
+			// If order already has a delivery method selected, use it
 			form.setValue(
 				"shipping.orderDeliveryMethodId",
 				orderDelivery.orderDeliveryMethodId,
 			);
+		} else if (
+			orderDeliveryMethods.length > 0 &&
+			!form.getValues("shipping.orderDeliveryMethodId")
+		) {
+			// If no delivery method is selected and methods are available, select the first one
+			const firstMethodId = orderDeliveryMethods[0].id;
+			form.setValue("shipping.orderDeliveryMethodId", firstMethodId);
+
+			// Note: We don't auto-submit here to avoid errors on page load
+			// User can submit manually if they want to save the selection
 		}
-	}, [orderDelivery, form]);
+	}, [orderDelivery, orderDeliveryMethods, form]);
 
 	function onSubmit(values: ShippingFormValues) {
 		createOrderDeliveryMethod({
