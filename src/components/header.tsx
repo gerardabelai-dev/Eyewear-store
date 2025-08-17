@@ -1,7 +1,10 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ROUTES } from "@/constants/routes";
 import { AppLogo } from "./brand";
+import { CartButton } from "./cart-button";
 
 export function Header() {
 	return (
@@ -13,8 +16,11 @@ export function Header() {
 						<AppLogo showText={true} />
 					</Link>
 
-					{/* Right side - Auth buttons */}
+					{/* Right side - Cart and Auth buttons */}
 					<div className="flex items-center gap-4">
+						<Suspense fallback={<Skeleton className="h-8 w-8 rounded-full" />}>
+							<CartButton />
+						</Suspense>
 						<Link href={ROUTES.SIGN_IN} className="hidden md:block">
 							<Button variant="ghost" size="sm">
 								Entrar

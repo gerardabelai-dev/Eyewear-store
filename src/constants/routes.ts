@@ -19,6 +19,9 @@ export const ROUTES = {
 	// Private user routes
 	CUSTOMER_PROFILE: "/minha-conta",
 
+	// Customer routes
+	CART: (cartId: string) => `/cart/${cartId}`,
+
 	// API routes
 	API: {
 		AUTH: "/api/auth",

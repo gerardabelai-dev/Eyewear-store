@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCartStore } from "@/stores/cart-store";
+import { useCart } from "@/hooks/use-cart";
 
 interface ProductItemProps {
 	id: string;
@@ -26,13 +26,17 @@ export function ProductItem({
 	imageClassName = "relative h-48 md:h-32 w-full aspect-video",
 	contentClassName,
 }: ProductItemProps) {
-	const addItem = useCartStore((state) => state.addItem);
+	const { addItem, isCreatingCart, isAddingProduct } = useCart();
 
-	const handleClick = () => {
-		addItem({
-			productId: id,
-			quantity: 1,
-		});
+	const handleClick = async () => {
+		try {
+			await addItem({
+				productId: id,
+				quantity: 1,
+			});
+		} catch (error) {
+			console.error("Failed to add item to cart:", error);
+		}
 	};
 
 	const handleKeyDown = (event: React.KeyboardEvent) => {
@@ -42,9 +46,11 @@ export function ProductItem({
 		}
 	};
 
+	const isLoading = isCreatingCart || isAddingProduct;
+
 	return (
 		<div
-			className={`${className} cursor-pointer transition-transform duration-200 hover:scale-[1.02]`}
+			className={`${className} cursor-pointer transition-transform duration-200 hover:scale-[1.02] ${isLoading ? "opacity-50 pointer-events-none" : ""}`}
 			onClick={handleClick}
 			onKeyDown={handleKeyDown}
 			role="button"

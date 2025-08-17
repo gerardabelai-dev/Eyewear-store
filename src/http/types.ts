@@ -18,6 +18,31 @@ export interface ApiResponse<T> {
 }
 
 // Cart Types
+export interface CreateCartResponse {
+	cart: {
+		id: string;
+		createdAt: Date;
+		updatedAt: Date;
+	};
+}
+
+export interface AddProductToCartRequest {
+	productId: string;
+	quantity?: number;
+}
+
+export interface AddProductToCartResponse {
+	cartProduct: {
+		id: string;
+		cartId: string;
+		productId: string;
+		productPriceId: string;
+		quantity: number;
+		createdAt: Date;
+		updatedAt: Date;
+	};
+}
+
 export interface GetCartResponse {
 	id: string;
 	items: Array<{

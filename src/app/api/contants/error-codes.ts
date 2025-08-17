@@ -5,6 +5,12 @@ export const ERROR_CODES = {
 	// Cart
 	CART_NOT_FOUND: "CART_NOT_FOUND",
 	FAILED_TO_GET_CART: "FAILED_TO_GET_CART",
+	FAILED_TO_CREATE_CART: "FAILED_TO_CREATE_CART",
+	FAILED_TO_ADD_PRODUCT_TO_CART: "FAILED_TO_ADD_PRODUCT_TO_CART",
+
+	// Product
+	PRODUCT_NOT_FOUND: "PRODUCT_NOT_FOUND",
+	PRODUCT_PRICE_NOT_FOUND: "PRODUCT_PRICE_NOT_FOUND",
 
 	// Order
 	FAILED_TO_CREATE_ORDER: "FAILED_TO_CREATE_ORDER",
@@ -49,6 +55,13 @@ export const ERROR_MESSAGES = {
 	[ERROR_CODES.CART_NOT_FOUND]: "Carrinho não encontrado",
 	[ERROR_CODES.FAILED_TO_GET_CART]:
 		"Houve um erro ao buscar os detalhes carrinho",
+	[ERROR_CODES.FAILED_TO_CREATE_CART]: "Houve um erro ao criar o carrinho",
+	[ERROR_CODES.FAILED_TO_ADD_PRODUCT_TO_CART]:
+		"Houve um erro ao adicionar o produto ao carrinho",
+
+	// Product
+	[ERROR_CODES.PRODUCT_NOT_FOUND]: "Produto não encontrado",
+	[ERROR_CODES.PRODUCT_PRICE_NOT_FOUND]: "Preço do produto não encontrado",
 
 	// Order
 	[ERROR_CODES.FAILED_TO_CREATE_ORDER]: "Houve um erro ao criar o pedido",
