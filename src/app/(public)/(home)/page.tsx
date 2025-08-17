@@ -24,6 +24,165 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ProductItem } from "./product-item";
+
+// Mock product data
+const collectionsData = [
+	{
+		id: "grau",
+		name: "Óculos de Grau",
+		href: "/cart/crt_4nfsqo",
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp",
+	},
+	{
+		id: "sol",
+		name: "Óculos de Sol",
+		href: "/cart",
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp",
+	},
+	{
+		id: "luz-azul",
+		name: "Óculos Luz Azul",
+		href: "/cart",
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp",
+	},
+	{
+		id: "leitura",
+		name: "Óculos de Leitura",
+		href: "/cart",
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp",
+	},
+];
+
+const featuredProductsData = Array.from({ length: 8 }, (_, index) => ({
+	id: `featured-${index + 1}`,
+	name: "Ubell",
+	price: "$39",
+	href: "/cart",
+	image:
+		"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp",
+}));
+
+const bestSellersGrauData = Array.from({ length: 8 }, (_, index) => ({
+	id: `grau-${index + 1}`,
+	name: "Ubell",
+	price: "$39",
+	href: "/cart",
+	image:
+		"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg",
+}));
+
+const bestSellersSolData = [
+	{
+		id: "sol-1",
+		name: "Ray-Ban",
+		price: "$89",
+		href: "/cart",
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
+	},
+	{
+		id: "sol-2",
+		name: "Oakley",
+		price: "$99",
+		href: "/cart",
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
+	},
+	{
+		id: "sol-3",
+		name: "Persol",
+		price: "$79",
+		href: "/cart",
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
+	},
+	{
+		id: "sol-4",
+		name: "Maui Jim",
+		price: "$109",
+		href: "/cart",
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
+	},
+	{
+		id: "sol-5",
+		name: "Gucci",
+		price: "$199",
+		href: "/cart",
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
+	},
+	{
+		id: "sol-6",
+		name: "Prada",
+		price: "$159",
+		href: "/cart",
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
+	},
+	{
+		id: "sol-7",
+		name: "Versace",
+		price: "$179",
+		href: "/cart",
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
+	},
+	{
+		id: "sol-8",
+		name: "Tom Ford",
+		price: "$149",
+		href: "/cart",
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
+	},
+];
+
+const blogPostsData = [
+	{
+		id: "blog-1",
+		title:
+			"Guia de Óculos de Volta às Aulas: Encontrando os Óculos Certos para o Novo Ano Letivo",
+		href: "/cart",
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp",
+	},
+	{
+		id: "blog-2",
+		title:
+			"Da praia ao brunch: Como usar seus óculos de sol durante todo o verão",
+		href: "/cart",
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Zyra_1.jpg",
+	},
+	{
+		id: "blog-3",
+		title: "Como limpar sua flanela para óculos da maneira correta",
+		href: "/cart",
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Quinn_1.jpg",
+	},
+];
+
+const customerReviewsData = [
+	{
+		id: "review-1",
+		name: "John Doe",
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Chogath_5.jpg",
+	},
+	{
+		id: "review-2",
+		name: "Jane Smith",
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Kennen_2.jpg",
+	},
+];
 
 export default async function HomePage() {
 	return (
@@ -160,60 +319,16 @@ export default async function HomePage() {
 					</p>
 				</div>
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full md:w-fit mx-auto">
-					<Link
-						href="/cart/crt_4nfsqo"
-						className="flex flex-col items-center gap-2"
-					>
-						<div className="relative h-48 md:h-32 w-full aspect-video rounded">
-							<Image
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp"
-								alt="Óculos de grau"
-								className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-								quality={75}
-								fill
-							/>
-						</div>
-						<h3>Óculos de Grau</h3>
-					</Link>
-
-					<Link href="/cart" className="flex flex-col items-center gap-2">
-						<div className="relative h-48 md:h-32 w-full aspect-video">
-							<Image
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp"
-								alt="Óculos de grau"
-								className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-								quality={75}
-								fill
-							/>
-						</div>
-						<h3>Óculos de Sol</h3>
-					</Link>
-
-					<Link href="/cart" className="flex flex-col items-center gap-2">
-						<div className="relative h-48 md:h-32 w-full aspect-video">
-							<Image
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp"
-								alt="Óculos de grau"
-								className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-								quality={75}
-								fill
-							/>
-						</div>
-						<h3>Óculos Luz Azul</h3>
-					</Link>
-
-					<Link href="/cart" className="flex flex-col items-center gap-2">
-						<div className="relative h-48 md:h-32 w-full aspect-video">
-							<Image
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp"
-								alt="Óculos de grau"
-								className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-								quality={75}
-								fill
-							/>
-						</div>
-						<h3>Óculos de Leitura</h3>
-					</Link>
+					{collectionsData.map((collection) => (
+						<ProductItem
+							key={collection.id}
+							id={collection.id}
+							name={collection.name}
+							image={collection.image}
+							showPrice={false}
+							imageClassName="relative h-48 md:h-32 w-full aspect-video rounded"
+						/>
+					))}
 				</div>
 			</section>
 
@@ -236,133 +351,16 @@ export default async function HomePage() {
 					</div>
 				</div>
 				<div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-full md:w-fit mx-auto">
-					<Link href="/cart" className="flex flex-col items-center gap-2">
-						<div className="relative h-48 md:h-32 w-full aspect-video">
-							<Image
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
-								alt="Óculos de grau"
-								className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-								quality={75}
-								fill
-							/>
-						</div>
-						<div className="flex gap-2">
-							<strong>Ubell</strong>
-							<span>$39</span>
-						</div>
-					</Link>
-
-					<Link href="/cart" className="flex flex-col items-center gap-2">
-						<div className="relative h-48 md:h-32 w-full aspect-video">
-							<Image
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
-								alt="Óculos de grau"
-								className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-								quality={75}
-								fill
-							/>
-						</div>
-						<div className="flex gap-2">
-							<strong>Ubell</strong>
-							<span>$39</span>
-						</div>
-					</Link>
-
-					<Link href="/cart" className="flex flex-col items-center gap-2">
-						<div className="relative h-48 md:h-32 w-full aspect-video">
-							<Image
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
-								alt="Óculos de grau"
-								className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-								quality={75}
-								fill
-							/>
-						</div>
-						<div className="flex gap-2">
-							<strong>Ubell</strong>
-							<span>$39</span>
-						</div>
-					</Link>
-
-					<Link href="/cart" className="flex flex-col items-center gap-2">
-						<div className="relative h-48 md:h-32 w-full aspect-video">
-							<Image
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
-								alt="Óculos de grau"
-								className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-								quality={75}
-								fill
-							/>
-						</div>
-						<div className="flex gap-2">
-							<strong>Ubell</strong>
-							<span>$39</span>
-						</div>
-					</Link>
-
-					<Link href="/cart" className="flex flex-col items-center gap-2">
-						<div className="relative h-48 md:h-32 w-full aspect-video">
-							<Image
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
-								alt="Óculos de grau"
-								className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-								quality={75}
-								fill
-							/>
-						</div>
-						<div className="flex gap-2">
-							<strong>Ubell</strong>
-							<span>$39</span>
-						</div>
-					</Link>
-
-					<Link href="/cart" className="flex flex-col items-center gap-2">
-						<div className="relative h-48 md:h-32 w-full aspect-video">
-							<Image
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
-								alt="Óculos de grau"
-								className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-								quality={75}
-								fill
-							/>
-						</div>
-						<div className="flex gap-2">
-							<strong>Ubell</strong>
-							<span>$39</span>
-						</div>
-					</Link>
-
-					<Link href="/cart" className="flex flex-col items-center gap-2">
-						<div className="relative h-48 md:h-32 w-full aspect-video">
-							<Image
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
-								alt="Óculos de grau"
-								className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-								quality={75}
-								fill
-							/>
-						</div>
-						<div className="flex gap-2">
-							<strong>Ubell</strong>
-							<span>$39</span>
-						</div>
-					</Link>
-
-					<Link href="/cart" className="flex flex-col items-center gap-2">
-						<div className="relative h-48 md:h-32 w-full aspect-video">
-							<Image
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
-								alt="Óculos de grau"
-								className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-								quality={75}
-								fill
-							/>
-						</div>
-						<div className="flex gap-2">
-							<strong>Ubell</strong>
-							<span>$39</span>
-						</div>
-					</Link>
+					{featuredProductsData.map((product) => (
+						<ProductItem
+							key={product.id}
+							id={product.id}
+							name={product.name}
+							price={product.price}
+							image={product.image}
+							alt="Óculos de grau"
+						/>
+					))}
 				</div>
 				<div className="flex flex-col md:flex-row gap-2">
 					<Button variant="outline">Mais Óculos de Grau</Button>
@@ -389,133 +387,16 @@ export default async function HomePage() {
 							Lentes de alto índice 1,61 grátis com 100% de proteção UV
 						</p>
 						<div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-full md:w-fit mx-auto">
-							<Link href="/cart" className="flex flex-col items-center gap-2">
-								<div className="relative h-48 md:h-32 w-full aspect-video">
-									<Image
-										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
-										alt="Óculos de grau"
-										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-										quality={75}
-										fill
-									/>
-								</div>
-								<div className="flex gap-2">
-									<strong>Ubell</strong>
-									<span>$39</span>
-								</div>
-							</Link>
-
-							<Link href="/cart" className="flex flex-col items-center gap-2">
-								<div className="relative h-48 md:h-32 w-full aspect-video">
-									<Image
-										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
-										alt="Óculos de grau"
-										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-										quality={75}
-										fill
-									/>
-								</div>
-								<div className="flex gap-2">
-									<strong>Ubell</strong>
-									<span>$39</span>
-								</div>
-							</Link>
-
-							<Link href="/cart" className="flex flex-col items-center gap-2">
-								<div className="relative h-48 md:h-32 w-full aspect-video">
-									<Image
-										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
-										alt="Óculos de grau"
-										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-										quality={75}
-										fill
-									/>
-								</div>
-								<div className="flex gap-2">
-									<strong>Ubell</strong>
-									<span>$39</span>
-								</div>
-							</Link>
-
-							<Link href="/cart" className="flex flex-col items-center gap-2">
-								<div className="relative h-48 md:h-32 w-full aspect-video">
-									<Image
-										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
-										alt="Óculos de grau"
-										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-										quality={75}
-										fill
-									/>
-								</div>
-								<div className="flex gap-2">
-									<strong>Ubell</strong>
-									<span>$39</span>
-								</div>
-							</Link>
-
-							<Link href="/cart" className="flex flex-col items-center gap-2">
-								<div className="relative h-48 md:h-32 w-full aspect-video">
-									<Image
-										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
-										alt="Óculos de grau"
-										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-										quality={75}
-										fill
-									/>
-								</div>
-								<div className="flex gap-2">
-									<strong>Ubell</strong>
-									<span>$39</span>
-								</div>
-							</Link>
-
-							<Link href="/cart" className="flex flex-col items-center gap-2">
-								<div className="relative h-48 md:h-32 w-full aspect-video">
-									<Image
-										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
-										alt="Óculos de grau"
-										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-										quality={75}
-										fill
-									/>
-								</div>
-								<div className="flex gap-2">
-									<strong>Ubell</strong>
-									<span>$39</span>
-								</div>
-							</Link>
-
-							<Link href="/cart" className="flex flex-col items-center gap-2">
-								<div className="relative h-48 md:h-32 w-full aspect-video">
-									<Image
-										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
-										alt="Óculos de grau"
-										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-										quality={75}
-										fill
-									/>
-								</div>
-								<div className="flex gap-2">
-									<strong>Ubell</strong>
-									<span>$39</span>
-								</div>
-							</Link>
-
-							<Link href="/cart" className="flex flex-col items-center gap-2">
-								<div className="relative h-48 md:h-32 w-full aspect-video">
-									<Image
-										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
-										alt="Óculos de grau"
-										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-										quality={75}
-										fill
-									/>
-								</div>
-								<div className="flex gap-2">
-									<strong>Ubell</strong>
-									<span>$39</span>
-								</div>
-							</Link>
+							{bestSellersGrauData.map((product) => (
+								<ProductItem
+									key={product.id}
+									id={product.id}
+									name={product.name}
+									price={product.price}
+									image={product.image}
+									alt="Óculos de grau"
+								/>
+							))}
 						</div>
 					</TabsContent>
 
@@ -525,133 +406,16 @@ export default async function HomePage() {
 							proteção UV
 						</p>
 						<div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-full md:w-fit mx-auto">
-							<Link href="/cart" className="flex flex-col items-center gap-2">
-								<div className="relative h-48 md:h-32 w-full aspect-video">
-									<Image
-										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
-										alt="Óculos de sol"
-										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-										quality={75}
-										fill
-									/>
-								</div>
-								<div className="flex gap-2">
-									<strong>Ray-Ban</strong>
-									<span>$89</span>
-								</div>
-							</Link>
-
-							<Link href="/cart" className="flex flex-col items-center gap-2">
-								<div className="relative h-48 md:h-32 w-full aspect-video">
-									<Image
-										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
-										alt="Óculos de sol"
-										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-										quality={75}
-										fill
-									/>
-								</div>
-								<div className="flex gap-2">
-									<strong>Oakley</strong>
-									<span>$99</span>
-								</div>
-							</Link>
-
-							<Link href="/cart" className="flex flex-col items-center gap-2">
-								<div className="relative h-48 md:h-32 w-full aspect-video">
-									<Image
-										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
-										alt="Óculos de sol"
-										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-										quality={75}
-										fill
-									/>
-								</div>
-								<div className="flex gap-2">
-									<strong>Persol</strong>
-									<span>$79</span>
-								</div>
-							</Link>
-
-							<Link href="/cart" className="flex flex-col items-center gap-2">
-								<div className="relative h-48 md:h-32 w-full aspect-video">
-									<Image
-										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
-										alt="Óculos de sol"
-										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-										quality={75}
-										fill
-									/>
-								</div>
-								<div className="flex gap-2">
-									<strong>Maui Jim</strong>
-									<span>$109</span>
-								</div>
-							</Link>
-
-							<Link href="/cart" className="flex flex-col items-center gap-2">
-								<div className="relative h-48 md:h-32 w-full aspect-video">
-									<Image
-										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
-										alt="Óculos de sol"
-										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-										quality={75}
-										fill
-									/>
-								</div>
-								<div className="flex gap-2">
-									<strong>Gucci</strong>
-									<span>$199</span>
-								</div>
-							</Link>
-
-							<Link href="/cart" className="flex flex-col items-center gap-2">
-								<div className="relative h-48 md:h-32 w-full aspect-video">
-									<Image
-										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
-										alt="Óculos de sol"
-										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-										quality={75}
-										fill
-									/>
-								</div>
-								<div className="flex gap-2">
-									<strong>Prada</strong>
-									<span>$159</span>
-								</div>
-							</Link>
-
-							<Link href="/cart" className="flex flex-col items-center gap-2">
-								<div className="relative h-48 md:h-32 w-full aspect-video">
-									<Image
-										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
-										alt="Óculos de sol"
-										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-										quality={75}
-										fill
-									/>
-								</div>
-								<div className="flex gap-2">
-									<strong>Versace</strong>
-									<span>$179</span>
-								</div>
-							</Link>
-
-							<Link href="/cart" className="flex flex-col items-center gap-2">
-								<div className="relative h-48 md:h-32 w-full aspect-video">
-									<Image
-										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp"
-										alt="Óculos de sol"
-										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-										quality={75}
-										fill
-									/>
-								</div>
-								<div className="flex gap-2">
-									<strong>Tom Ford</strong>
-									<span>$149</span>
-								</div>
-							</Link>
+							{bestSellersSolData.map((product) => (
+								<ProductItem
+									key={product.id}
+									id={product.id}
+									name={product.name}
+									price={product.price}
+									image={product.image}
+									alt="Óculos de sol"
+								/>
+							))}
 						</div>
 					</TabsContent>
 				</Tabs>
@@ -670,50 +434,24 @@ export default async function HomePage() {
 				</div>
 
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-7xl">
-					<Link href="/cart" className="flex flex-col items-center gap-2">
-						<div className="relative h-52 w-full aspect-video overflow-hidden">
-							<Image
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp"
-								alt="Óculos de grau"
-								className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-								quality={75}
-								fill
-							/>
-						</div>
-						<h3 className="text-lg font-bold">
-							Guia de Óculos de Volta às Aulas: Encontrando os Óculos Certos
-							para o Novo Ano Letivo
-						</h3>
-					</Link>
-					<Link href="/cart" className="flex flex-col items-center gap-2">
-						<div className="relative h-52 w-full aspect-video overflow-hidden">
-							<Image
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Zyra_1.jpg"
-								alt="Óculos de grau"
-								className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-								quality={75}
-								fill
-							/>
-						</div>
-						<h3 className="text-lg font-bold">
-							Da praia ao brunch: Como usar seus óculos de sol durante todo o
-							verão
-						</h3>
-					</Link>
-					<Link href="/cart" className="flex flex-col items-center gap-2">
-						<div className="relative h-52 w-full aspect-video overflow-hidden">
-							<Image
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Quinn_1.jpg"
-								alt="Óculos de grau"
-								className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-								quality={75}
-								fill
-							/>
-						</div>
-						<h3 className="text-lg font-bold">
-							Como limpar sua flanela para óculos da maneira correta
-						</h3>
-					</Link>
+					{blogPostsData.map((post) => (
+						<Link
+							key={post.id}
+							href={post.href}
+							className="flex flex-col items-center gap-2"
+						>
+							<div className="relative h-52 w-full aspect-video overflow-hidden">
+								<Image
+									src={post.image}
+									alt="Blog post"
+									className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
+									quality={75}
+									fill
+								/>
+							</div>
+							<h3 className="text-lg font-bold">{post.title}</h3>
+						</Link>
+					))}
 				</div>
 				<div className="flex gap-2">
 					<Button variant="outline">Explore Nosso Blog</Button>
@@ -730,44 +468,56 @@ export default async function HomePage() {
 
 				<div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
 					<Marquee pauseOnHover className="[--duration:40s]">
-						{Array.from({ length: 10 }).map((_, index) => (
-							<div key={index} className="relative w-52 h-72 group">
-								<Image
-									src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Chogath_5.jpg"
-									alt="Óculos de sol"
-									className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-									quality={75}
-									fill
-								/>
+						{Array.from({ length: 10 }).map((_, index) => {
+							const review = customerReviewsData[0]; // Use first review data
+							return (
+								<div
+									key={`marquee1-${index}`}
+									className="relative w-52 h-72 group"
+								>
+									<Image
+										src={review.image}
+										alt="Customer review"
+										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
+										quality={75}
+										fill
+									/>
 
-								<div className="flex items-center gap-2 absolute bottom-2 left-2 transition-transform duration-300 hover:scale-105">
-									<span className="text-white font-medium text-sm drop-shadow-xs">
-										John Doe
-									</span>
-									<ChevronRight className="size-4 text-white" />
+									<div className="flex items-center gap-2 absolute bottom-2 left-2 transition-transform duration-300 hover:scale-105">
+										<span className="text-white font-medium text-sm drop-shadow-xs">
+											{review.name}
+										</span>
+										<ChevronRight className="size-4 text-white" />
+									</div>
 								</div>
-							</div>
-						))}
+							);
+						})}
 					</Marquee>
 					<Marquee reverse pauseOnHover className="[--duration:40s]">
-						{Array.from({ length: 10 }).map((_, index) => (
-							<div key={index} className="relative w-52 h-72 group">
-								<Image
-									src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Kennen_2.jpg"
-									alt="Óculos de sol"
-									className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
-									quality={75}
-									fill
-								/>
+						{Array.from({ length: 10 }).map((_, index) => {
+							const review = customerReviewsData[1]; // Use second review data
+							return (
+								<div
+									key={`marquee2-${index}`}
+									className="relative w-52 h-72 group"
+								>
+									<Image
+										src={review.image}
+										alt="Customer review"
+										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
+										quality={75}
+										fill
+									/>
 
-								<div className="flex items-center gap-2 absolute bottom-2 left-2 transition-transform duration-300 hover:scale-105">
-									<span className="text-white font-medium text-sm drop-shadow-xs">
-										Jane Smith
-									</span>
-									<ChevronRight className="size-4 text-white" />
+									<div className="flex items-center gap-2 absolute bottom-2 left-2 transition-transform duration-300 hover:scale-105">
+										<span className="text-white font-medium text-sm drop-shadow-xs">
+											{review.name}
+										</span>
+										<ChevronRight className="size-4 text-white" />
+									</div>
 								</div>
-							</div>
-						))}
+							);
+						})}
 					</Marquee>
 					<div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background"></div>
 					<div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-background"></div>
