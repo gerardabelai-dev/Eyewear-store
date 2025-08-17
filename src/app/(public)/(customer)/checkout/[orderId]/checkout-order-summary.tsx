@@ -54,7 +54,7 @@ export function CheckoutOrderSummary({ orderId }: { orderId: string }) {
 
 	// Get delivery cost if available
 	const deliveryCostInCents =
-		order.delivery?.orderDeliveryMethod?.priceInCents || 1000; // Default R$ 10,00
+		order.delivery?.orderDeliveryMethod?.costInCents || 1000; // Default R$ 10,00
 
 	// For now, using fixed values for taxes
 	// These could be calculated based on delivery method, location, etc.

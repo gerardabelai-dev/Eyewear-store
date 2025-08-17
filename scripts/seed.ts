@@ -44,6 +44,10 @@ async function clearDatabase() {
 	await seedDb.delete(schema.orderDelivery);
 	await seedDb.delete(schema.order);
 
+	// Clear cart-related tables
+	await seedDb.delete(schema.cartProduct);
+	await seedDb.delete(schema.cart);
+
 	// Clear customer-related tables (depend on customer and user)
 	await seedDb.delete(schema.customerAddress);
 	await seedDb.delete(schema.customer);
@@ -56,6 +60,10 @@ async function clearDatabase() {
 	// Clear category tables
 	await seedDb.delete(schema.categorySecondary);
 	await seedDb.delete(schema.category);
+
+	// Clear order method tables
+	await seedDb.delete(schema.orderDeliveryMethod);
+	await seedDb.delete(schema.orderPaymentMethod);
 
 	// Clear better-auth tables last (user is referenced by customer)
 	await seedDb.delete(schema.session);
@@ -263,6 +271,18 @@ async function seedProduct() {
 	return product;
 }
 
+// Product image URLs
+const PRODUCT_IMAGE_URLS = [
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Chogath_5.jpg",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Galio_1.jpg",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Kennen_2.jpg",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Quinn_1.jpg",
+];
+
 async function seedProductImage(productId: string) {
 	console.info(`🖼️  Creating product image for product ID: ${productId}...`);
 
@@ -270,7 +290,7 @@ async function seedProductImage(productId: string) {
 		.insert(schema.productImage)
 		.values({
 			productId,
-			imageUrl: faker.image.urlPicsumPhotos({ width: 1000, height: 1000 }),
+			imageUrl: faker.helpers.arrayElement(PRODUCT_IMAGE_URLS),
 		})
 		.returning();
 
@@ -393,19 +413,79 @@ async function seedCategorySecondary(categoryId: string) {
 	});
 }
 
+async function seedCart() {
+	console.info("🛒 Creating cart...");
+
+	const [cart] = await seedDb.insert(schema.cart).values({}).returning();
+
+	console.info(`✅ Cart created successfully with ID: ${cart.id}`);
+
+	await seedActivity({
+		type: "cart.created",
+		actorId: "system",
+		actorType: "system",
+		metadata: {
+			content: cart,
+		},
+	});
+
+	return cart;
+}
+
+async function seedCartProduct({
+	cartId,
+	productId,
+	productPriceId,
+	quantity,
+}: {
+	cartId: string;
+	productId: string;
+	productPriceId: string;
+	quantity: number;
+}) {
+	console.info(
+		`🛒 Creating cart product for cart ID: ${cartId}, product ID: ${productId}, quantity: ${quantity}...`,
+	);
+
+	const [cartProduct] = await seedDb
+		.insert(schema.cartProduct)
+		.values({
+			cartId,
+			productId,
+			productPriceId,
+			quantity,
+		})
+		.returning();
+
+	console.info(
+		`✅ Cart product created successfully with ID: ${cartProduct.id}`,
+	);
+
+	await seedActivity({
+		type: "cartProduct.created",
+		actorId: "system",
+		actorType: "system",
+		metadata: {
+			content: cartProduct,
+		},
+	});
+
+	return cartProduct;
+}
+
 async function seedOrder({
 	customerId,
 	customerAddressId,
-	totalPriceInCents,
+	cartId,
 	userId,
 }: {
 	customerId: string;
 	customerAddressId: string;
-	totalPriceInCents: number;
+	cartId: string;
 	userId: string;
 }) {
 	console.info(
-		`🛒 Creating order for customer ID: ${customerId}, address ID: ${customerAddressId}, total: ${totalPriceInCents} cents...`,
+		`🛒 Creating order for customer ID: ${customerId}, address ID: ${customerAddressId}, cart ID: ${cartId}...`,
 	);
 
 	const [order] = await seedDb
@@ -413,7 +493,7 @@ async function seedOrder({
 		.values({
 			customerId,
 			customerAddressId,
-			totalPriceInCents,
+			cartId,
 		})
 		.returning();
 
@@ -432,13 +512,82 @@ async function seedOrder({
 	return order;
 }
 
-async function seedOrderDelivery({ orderId }: { orderId: string }) {
+async function seedOrderDeliveryMethod() {
+	console.info("🚚 Creating order delivery method...");
+
+	const [orderDeliveryMethod] = await seedDb
+		.insert(schema.orderDeliveryMethod)
+		.values({
+			method: faker.helpers.arrayElement([
+				"Standard Delivery",
+				"Express Delivery",
+				"Overnight Delivery",
+			]),
+			costInCents: faker.number.int({ min: 500, max: 2000 }),
+		})
+		.returning();
+
+	console.info(
+		`✅ Order delivery method created successfully with ID: ${orderDeliveryMethod.id}`,
+	);
+
+	await seedActivity({
+		type: "orderDeliveryMethod.created",
+		actorId: "system",
+		actorType: "system",
+		metadata: {
+			content: orderDeliveryMethod,
+		},
+	});
+
+	return orderDeliveryMethod;
+}
+
+async function seedOrderPaymentMethod() {
+	console.info("💳 Creating order payment method...");
+
+	const [orderPaymentMethod] = await seedDb
+		.insert(schema.orderPaymentMethod)
+		.values({
+			method: faker.helpers.arrayElement([
+				"Credit Card",
+				"Debit Card",
+				"PayPal",
+				"Bank Transfer",
+			]),
+		})
+		.returning();
+
+	console.info(
+		`✅ Order payment method created successfully with ID: ${orderPaymentMethod.id}`,
+	);
+
+	await seedActivity({
+		type: "orderPaymentMethod.created",
+		actorId: "system",
+		actorType: "system",
+		metadata: {
+			content: orderPaymentMethod,
+		},
+	});
+
+	return orderPaymentMethod;
+}
+
+async function seedOrderDelivery({
+	orderId,
+	orderDeliveryMethodId,
+}: {
+	orderId: string;
+	orderDeliveryMethodId: string;
+}) {
 	console.info(`🚚 Creating order delivery for order ID: ${orderId}...`);
 
 	const [orderDelivery] = await seedDb
 		.insert(schema.orderDelivery)
 		.values({
 			orderId,
+			orderDeliveryMethodId,
 		})
 		.returning();
 
@@ -456,13 +605,23 @@ async function seedOrderDelivery({ orderId }: { orderId: string }) {
 	});
 }
 
-async function seedOrderPayment({ orderId }: { orderId: string }) {
+async function seedOrderPayment({
+	orderId,
+	orderPaymentMethodId,
+	totalPriceInCents,
+}: {
+	orderId: string;
+	orderPaymentMethodId: string;
+	totalPriceInCents: number;
+}) {
 	console.info(`💳 Creating order payment for order ID: ${orderId}...`);
 
 	const [orderPayment] = await seedDb
 		.insert(schema.orderPayment)
 		.values({
 			orderId,
+			orderPaymentMethodId,
+			totalPriceInCents,
 		})
 		.returning();
 
@@ -528,35 +687,73 @@ async function seed() {
 
 		// Seed data in correct order
 		const users = await seedUsers();
+
+		// Create delivery and payment methods first (needed for orders)
+		const orderDeliveryMethod = await seedOrderDeliveryMethod();
+		const orderPaymentMethod = await seedOrderPaymentMethod();
+
+		// Create 10 products
+		const products = [];
+		for (let i = 0; i < 10; i++) {
+			const product = await seedProduct();
+			await seedProductImage(product.id);
+			const productPrice = await seedProductPrice(product.id);
+			products.push({ product, productPrice });
+		}
+
+		// Create 3 categories with 2 subcategories each
+		for (let i = 0; i < 3; i++) {
+			const category = await seedCategory();
+			for (let j = 0; j < 2; j++) {
+				await seedCategorySecondary(category.id);
+			}
+		}
+
+		// Create orders for each user
 		for (const user of users) {
 			await seedSessions(user.id);
 			await seedAccounts(user.id);
 
 			const customer = await seedCustomer(user.id);
 			const customerAddress = await seedCustomerAddress(customer.id, user.id);
-			const product = await seedProduct();
-			await seedProductImage(product.id);
-			const productPrice = await seedProductPrice(product.id);
-			const category = await seedCategory();
-			await seedCategorySecondary(category.id);
-			const randomProductQuantity = faker.number.int({ min: 1, max: 10 });
+
+			// Create cart and add random products
+			const cart = await seedCart();
+			let totalPriceInCents = 0;
+
+			// Add 1-3 random products to cart
+			const numberOfProducts = faker.number.int({ min: 1, max: 3 });
+			for (let i = 0; i < numberOfProducts; i++) {
+				const randomProduct = faker.helpers.arrayElement(products);
+				const randomQuantity = faker.number.int({ min: 1, max: 5 });
+
+				await seedCartProduct({
+					cartId: cart.id,
+					productId: randomProduct.product.id,
+					productPriceId: randomProduct.productPrice.id,
+					quantity: randomQuantity,
+				});
+
+				totalPriceInCents +=
+					randomProduct.productPrice.priceInCents * randomQuantity;
+			}
+
 			const order = await seedOrder({
 				customerId: customer.id,
 				customerAddressId: customerAddress.id,
-				totalPriceInCents: productPrice.priceInCents * randomProductQuantity,
+				cartId: cart.id,
 				userId: user.id,
 			});
-			await seedCartProduct({
-				orderId: order.id,
-				productId: product.id,
-				productPriceId: productPrice.id,
-				quantity: randomProductQuantity,
-			});
+
 			await seedOrderDelivery({
 				orderId: order.id,
+				orderDeliveryMethodId: orderDeliveryMethod.id,
 			});
+
 			await seedOrderPayment({
 				orderId: order.id,
+				orderPaymentMethodId: orderPaymentMethod.id,
+				totalPriceInCents,
 			});
 		}
 

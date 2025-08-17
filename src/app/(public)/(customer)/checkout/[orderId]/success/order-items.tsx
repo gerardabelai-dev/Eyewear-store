@@ -24,7 +24,9 @@ export function OrderItems({ order }: OrderItemsProps) {
 		<ul className="flex flex-col gap-4">
 			{cartProducts.map((cartProduct, index) => {
 				const product = cartProduct.product;
-				const productPrice = product?.productPrice?.[0];
+				const productPrice = Array.isArray(product?.productPrice)
+					? product.productPrice[0]
+					: product?.productPrice;
 				const totalPrice = productPrice
 					? (productPrice.priceInCents * cartProduct.quantity) / 100
 					: 0;

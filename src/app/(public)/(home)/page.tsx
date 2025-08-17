@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import {
 	BadgeCheck,
 	ChevronDown,
@@ -24,13 +25,85 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { db } from "@/lib/db";
+import { product } from "@/lib/db/schema";
+import { formatPrice } from "@/lib/format-price";
 import { ProductItem } from "./product-item";
 
-// Mock product data
-const collectionsData = [
+// Type definitions
+type ProductWithDetails = {
+	id: string;
+	name: string;
+	price: string;
+	image: string;
+	href: string;
+};
+
+// Server-side data fetching
+async function getFeaturedProducts(): Promise<ProductWithDetails[]> {
+	try {
+		const products = await db.query.product.findMany({
+			where: eq(product.status, "active"),
+			with: {
+				images: {
+					limit: 1,
+				},
+				productPrice: {
+					where: (productPrice, { eq }) => eq(productPrice.isDefault, true),
+					limit: 1,
+				},
+			},
+			limit: 8,
+		});
+
+		return products.map((product) => ({
+			id: product.id,
+			name: product.name,
+			price: formatPrice(product.productPrice[0]?.priceInCents || 0),
+			image: product.images[0]?.imageUrl || "/placeholder-product.jpg",
+			href: `/products/${product.id}`,
+		}));
+	} catch (error) {
+		console.error("Error fetching featured products:", error);
+		return [];
+	}
+}
+
+async function getCollectionProducts(): Promise<ProductWithDetails[]> {
+	try {
+		const products = await db.query.product.findMany({
+			where: eq(product.status, "active"),
+			with: {
+				images: {
+					limit: 1,
+				},
+				productPrice: {
+					where: (productPrice, { eq }) => eq(productPrice.isDefault, true),
+					limit: 1,
+				},
+			},
+			limit: 4,
+		});
+
+		return products.map((product) => ({
+			id: product.id,
+			name: product.name,
+			price: formatPrice(product.productPrice[0]?.priceInCents || 0),
+			image: product.images[0]?.imageUrl || "/placeholder-product.jpg",
+			href: `/products/${product.id}`,
+		}));
+	} catch (error) {
+		console.error("Error fetching collection products:", error);
+		return [];
+	}
+}
+
+// Mock product data - fallback for sections not yet connected to DB
+const collectionsData: ProductWithDetails[] = [
 	{
 		id: "grau",
 		name: "Óculos de Grau",
+		price: "R$ 199,00",
 		href: "/cart/crt_4nfsqo",
 		image:
 			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp",
@@ -38,6 +111,7 @@ const collectionsData = [
 	{
 		id: "sol",
 		name: "Óculos de Sol",
+		price: "R$ 149,00",
 		href: "/cart",
 		image:
 			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp",
@@ -45,6 +119,7 @@ const collectionsData = [
 	{
 		id: "luz-azul",
 		name: "Óculos Luz Azul",
+		price: "R$ 179,00",
 		href: "/cart",
 		image:
 			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp",
@@ -52,6 +127,7 @@ const collectionsData = [
 	{
 		id: "leitura",
 		name: "Óculos de Leitura",
+		price: "R$ 129,00",
 		href: "/cart",
 		image:
 			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp",
@@ -185,6 +261,15 @@ const customerReviewsData = [
 ];
 
 export default async function HomePage() {
+	// Fetch data on the server
+	const [featuredProducts, collectionProducts] = await Promise.all([
+		getFeaturedProducts(),
+		getCollectionProducts(),
+	]);
+
+	// Use fetched data or fallback to mock data
+	const collectionsToShow =
+		collectionProducts.length > 0 ? collectionProducts : collectionsData;
 	return (
 		<>
 			{/* Hero Section */}
@@ -319,13 +404,14 @@ export default async function HomePage() {
 					</p>
 				</div>
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full md:w-fit mx-auto">
-					{collectionsData.map((collection) => (
+					{collectionsToShow.map((collection) => (
 						<ProductItem
 							key={collection.id}
 							id={collection.id}
 							name={collection.name}
+							price={collection.price}
 							image={collection.image}
-							showPrice={false}
+							showPrice={collectionProducts.length > 0}
 							imageClassName="relative h-48 md:h-32 w-full aspect-video rounded"
 						/>
 					))}
@@ -351,16 +437,27 @@ export default async function HomePage() {
 					</div>
 				</div>
 				<div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-full md:w-fit mx-auto">
-					{featuredProductsData.map((product) => (
-						<ProductItem
-							key={product.id}
-							id={product.id}
-							name={product.name}
-							price={product.price}
-							image={product.image}
-							alt="Óculos de grau"
-						/>
-					))}
+					{featuredProducts.length > 0
+						? featuredProducts.map((product) => (
+								<ProductItem
+									key={product.id}
+									id={product.id}
+									name={product.name}
+									price={product.price}
+									image={product.image}
+									alt="Produto em destaque"
+								/>
+							))
+						: featuredProductsData.map((product) => (
+								<ProductItem
+									key={product.id}
+									id={product.id}
+									name={product.name}
+									price={product.price}
+									image={product.image}
+									alt="Óculos de grau"
+								/>
+							))}
 				</div>
 				<div className="flex flex-col md:flex-row gap-2">
 					<Button variant="outline">Mais Óculos de Grau</Button>
@@ -387,16 +484,27 @@ export default async function HomePage() {
 							Lentes de alto índice 1,61 grátis com 100% de proteção UV
 						</p>
 						<div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-full md:w-fit mx-auto">
-							{bestSellersGrauData.map((product) => (
-								<ProductItem
-									key={product.id}
-									id={product.id}
-									name={product.name}
-									price={product.price}
-									image={product.image}
-									alt="Óculos de grau"
-								/>
-							))}
+							{featuredProducts.length > 0
+								? featuredProducts.map((product) => (
+										<ProductItem
+											key={`grau-${product.id}`}
+											id={product.id}
+											name={product.name}
+											price={product.price}
+											image={product.image}
+											alt="Óculos de grau"
+										/>
+									))
+								: bestSellersGrauData.map((product) => (
+										<ProductItem
+											key={product.id}
+											id={product.id}
+											name={product.name}
+											price={product.price}
+											image={product.image}
+											alt="Óculos de grau"
+										/>
+									))}
 						</div>
 					</TabsContent>
 
@@ -406,16 +514,27 @@ export default async function HomePage() {
 							proteção UV
 						</p>
 						<div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-full md:w-fit mx-auto">
-							{bestSellersSolData.map((product) => (
-								<ProductItem
-									key={product.id}
-									id={product.id}
-									name={product.name}
-									price={product.price}
-									image={product.image}
-									alt="Óculos de sol"
-								/>
-							))}
+							{featuredProducts.length > 0
+								? featuredProducts.map((product) => (
+										<ProductItem
+											key={`sol-${product.id}`}
+											id={product.id}
+											name={product.name}
+											price={product.price}
+											image={product.image}
+											alt="Óculos de sol"
+										/>
+									))
+								: bestSellersSolData.map((product) => (
+										<ProductItem
+											key={product.id}
+											id={product.id}
+											name={product.name}
+											price={product.price}
+											image={product.image}
+											alt="Óculos de sol"
+										/>
+									))}
 						</div>
 					</TabsContent>
 				</Tabs>

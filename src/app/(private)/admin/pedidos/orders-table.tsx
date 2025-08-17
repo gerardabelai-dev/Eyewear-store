@@ -40,9 +40,10 @@ type OrderWithDetails = Order & {
 const getMockOrders = (): OrderWithDetails[] => [
 	{
 		id: "order_1",
+		orderStatus: "pending",
+		cartId: "cart_1",
 		customerId: "customer_1",
 		customerAddressId: "customerAddress_1",
-		totalPriceInCents: 359990,
 		createdAt: new Date("2024-01-20"),
 		updatedAt: new Date("2024-01-20"),
 		customerName: "João Silva",
@@ -53,9 +54,10 @@ const getMockOrders = (): OrderWithDetails[] => [
 	},
 	{
 		id: "order_2",
+		orderStatus: "pending",
+		cartId: "cart_2",
 		customerId: "customer_2",
 		customerAddressId: "customerAddress_2",
-		totalPriceInCents: 14970,
 		createdAt: new Date("2024-01-19"),
 		updatedAt: new Date("2024-01-19"),
 		customerName: "Maria Santos",
@@ -66,9 +68,10 @@ const getMockOrders = (): OrderWithDetails[] => [
 	},
 	{
 		id: "order_3",
+		orderStatus: "pending",
+		cartId: "cart_3",
 		customerId: "customer_3",
 		customerAddressId: "customerAddress_3",
-		totalPriceInCents: 189900,
 		createdAt: new Date("2024-01-18"),
 		updatedAt: new Date("2024-01-18"),
 		customerName: "Pedro Oliveira",
@@ -81,7 +84,8 @@ const getMockOrders = (): OrderWithDetails[] => [
 		id: "order_4",
 		customerId: "customer_4",
 		customerAddressId: "customerAddress_4",
-		totalPriceInCents: 75500,
+		orderStatus: "pending",
+		cartId: "cart_4",
 		createdAt: new Date("2024-01-17"),
 		updatedAt: new Date("2024-01-17"),
 		customerName: "Ana Costa",
@@ -209,7 +213,8 @@ export function OrdersTable({ orders: ordersProp }: OrdersTableProps) {
 										{getPaymentStatusBadge(order.paymentStatus)}
 									</TableCell>
 									<TableCell className="font-medium">
-										{formatCurrency(order.totalPriceInCents)}
+										{formatCurrency(0)}{" "}
+										{/* TODO: Calculate from orderPayment */}
 									</TableCell>
 									<TableCell className="text-sm text-muted-foreground">
 										{order.productCount} produto

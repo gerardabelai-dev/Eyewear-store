@@ -11,7 +11,9 @@ export function OrderSummary({ order }: OrderSummaryProps) {
 	// Calculate subtotal from cart products
 	const subtotal =
 		cartProducts.reduce((total, cartProduct) => {
-			const productPrice = cartProduct.product?.productPrice?.[0];
+			const productPrice = Array.isArray(cartProduct.product?.productPrice)
+				? cartProduct.product.productPrice[0]
+				: cartProduct.product?.productPrice;
 			if (productPrice) {
 				return total + productPrice.priceInCents * cartProduct.quantity;
 			}
