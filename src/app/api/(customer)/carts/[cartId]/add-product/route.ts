@@ -18,7 +18,6 @@ const addProductToCartBodySchema = z.object({
 });
 
 type AddProductToCartParams = z.infer<typeof addProductToCartParamsSchema>;
-type AddProductToCartBody = z.infer<typeof addProductToCartBodySchema>;
 
 export async function POST(
 	request: Request,
@@ -93,7 +92,7 @@ export async function POST(
 			),
 		});
 
-		let updatedCartProduct;
+		let updatedCartProduct: typeof cartProduct.$inferSelect;
 
 		if (existingCartProduct) {
 			// Update existing cart product quantity

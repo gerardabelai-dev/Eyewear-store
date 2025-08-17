@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
-	const { theme, setTheme, systemTheme } = useTheme();
+	const { theme, setTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);
 
 	// Prevent hydration mismatch by only rendering after mount

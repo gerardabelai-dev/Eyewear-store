@@ -270,7 +270,7 @@ export function OrdersTable({ orders: ordersProp }: OrdersTableProps) {
 
 			{editingOrder && (
 				<Drawer
-					trigger={<></>}
+					trigger={null}
 					title="Editar Pedido"
 					icon={<Edit className="h-4 w-4" />}
 					open={!!editingOrder}

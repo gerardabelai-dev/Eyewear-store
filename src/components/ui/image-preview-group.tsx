@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface ImagePreviewGroupProps {
@@ -15,7 +14,6 @@ export function ImagePreviewGroup({
 	maxVisible = 3,
 	size = 40,
 	className,
-	onViewAll,
 }: ImagePreviewGroupProps) {
 	if (!images || images.length === 0) {
 		return (

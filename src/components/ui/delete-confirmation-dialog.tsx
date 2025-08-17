@@ -27,7 +27,6 @@ interface DeleteConfirmationDialogProps {
 
 export function DeleteConfirmationDialog({
 	productId,
-	productName,
 	onConfirm,
 	trigger,
 	isLoading = false,

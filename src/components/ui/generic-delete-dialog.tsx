@@ -30,7 +30,6 @@ interface GenericDeleteDialogProps {
 export function GenericDeleteDialog({
 	open,
 	onOpenChange,
-	itemId,
 	itemName,
 	itemType,
 	onConfirm,
