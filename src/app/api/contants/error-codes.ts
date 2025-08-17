@@ -60,6 +60,8 @@ export const ERROR_MESSAGES = {
 	[ERROR_CODES.ORDER_HAS_NO_CUSTOMER]: "Pedido não possui um cliente",
 	[ERROR_CODES.ORDER_ALREADY_HAS_DELIVERY_METHOD]:
 		"Pedido já possui um método de envio",
+	[ERROR_CODES.ORDER_ALREADY_HAS_PAYMENT_METHOD]:
+		"Pedido já possui um método de pagamento",
 
 	// Order Delivery
 	[ERROR_CODES.ORDER_DELIVERY_NOT_FOUND]: "Método de envio não encontrado",
@@ -73,6 +75,8 @@ export const ERROR_MESSAGES = {
 	// Order Payment
 	[ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT]:
 		"Houve um erro ao criar o pagamento do pedido",
+	[ERROR_CODES.ORDER_PAYMENT_METHODS_NOT_FOUND]:
+		"Nenhum método de pagamento disponível",
 
 	// User
 	[ERROR_CODES.USER_ALREADY_EXISTS]: "Usuário com este e-mail já existe",
