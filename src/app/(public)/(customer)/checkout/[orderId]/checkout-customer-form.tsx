@@ -28,7 +28,18 @@ import {
 
 const formSchema = z.object({
 	customer: z.object({
-		fullName: z.string().min(2),
+		fullName: z
+			.string()
+			.min(2, "Nome é obrigatório")
+			.refine(
+				(value) => {
+					const words = value.trim().split(/\s+/);
+					return words.length >= 2;
+				},
+				{
+					message: "Informe seu nome e sobrenome",
+				},
+			),
 		email: z.email(),
 		phone: z.string().min(1),
 	}),

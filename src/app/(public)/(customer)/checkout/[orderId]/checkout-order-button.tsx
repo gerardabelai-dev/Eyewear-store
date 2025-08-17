@@ -2,18 +2,29 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { getOrderByIdQueryOptions } from "@/http";
+import { useCartStore } from "@/stores/cart-store";
 
 interface CheckoutOrderButtonProps {
 	orderId: string;
 }
 
 export function CheckoutOrderButton({ orderId }: CheckoutOrderButtonProps) {
+	const router = useRouter();
+	const { clearCartId } = useCartStore();
+
 	const { data: order, isPending: isLoadingOrder } = useQuery(
 		getOrderByIdQueryOptions(orderId),
 	);
+
+	const handleFinishOrder = () => {
+		// Clear the cart since the order is now complete
+		clearCartId();
+		// Navigate to success page
+		router.push(`/checkout/${orderId}/success`);
+	};
 
 	// Check if customer information is complete
 	const isPendingCustomerInformation =
@@ -65,17 +76,13 @@ export function CheckoutOrderButton({ orderId }: CheckoutOrderButtonProps) {
 
 	return (
 		<Button
-			asChild={!isOrderPendingRequirements}
 			variant="vibrant"
 			className="w-full"
 			size="lg"
 			disabled={isOrderPendingRequirements}
+			onClick={!isOrderPendingRequirements ? handleFinishOrder : undefined}
 		>
-			{isOrderPendingRequirements ? (
-				getButtonText()
-			) : (
-				<Link href={`/checkout/${orderId}/success`}>Finalizar compra</Link>
-			)}
+			{isOrderPendingRequirements ? getButtonText() : "Finalizar compra"}
 		</Button>
 	);
 }

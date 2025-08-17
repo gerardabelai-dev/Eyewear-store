@@ -1,11 +1,19 @@
 import type {
+	Cart,
+	CartProduct,
 	Customer,
 	CustomerAddress,
+	NewCustomer,
+	NewCustomerAddress,
 	Order,
 	OrderDelivery,
 	OrderDeliveryMethod,
 	OrderPayment,
 	OrderPaymentMethod,
+	Product,
+	ProductImage,
+	ProductPrice,
+	User,
 } from "@/lib/db/schema";
 
 // API Response Types
@@ -19,11 +27,7 @@ export interface ApiResponse<T> {
 
 // Cart Types
 export interface CreateCartResponse {
-	cart: {
-		id: string;
-		createdAt: Date;
-		updatedAt: Date;
-	};
+	cart: Cart;
 }
 
 export interface AddProductToCartRequest {
@@ -32,50 +36,19 @@ export interface AddProductToCartRequest {
 }
 
 export interface AddProductToCartResponse {
-	cartProduct: {
-		id: string;
-		cartId: string;
-		productId: string;
-		productPriceId: string;
-		quantity: number;
-		createdAt: Date;
-		updatedAt: Date;
-	};
+	cartProduct: CartProduct;
 }
 
-export interface GetCartResponse {
-	id: string;
-	items: Array<{
-		id: string;
-		cartId: string;
-		productId: string;
-		productPriceId: string;
-		quantity: number;
-		createdAt: string;
-		updatedAt: string;
-		product: {
-			id: string;
-			name: string;
-			description: string | null;
-			stock: number;
-			images: Array<{
-				id: string;
-				imageUrl: string;
-			}>;
-			productPrice: {
-				id: string;
-				priceInCents: number;
-				discountPercentage: number;
+export interface GetCartResponse extends Cart {
+	items: Array<
+		CartProduct & {
+			product: Product & {
+				images: ProductImage[];
+				productPrice: ProductPrice;
 			};
-		};
-		productPrice: {
-			id: string;
-			priceInCents: number;
-			discountPercentage: number;
-		};
-	}>;
-	createdAt: Date;
-	updatedAt: Date;
+			productPrice: ProductPrice;
+		}
+	>;
 }
 
 // Order Types
@@ -84,52 +57,25 @@ export interface CreateOrderFromCartRequest {
 }
 
 export interface CreateOrderFromCartResponse {
-	order: {
-		id: string;
-	};
+	order: Pick<Order, "id">;
 }
 
 export interface GetOrderResponse {
 	order: Order & {
 		customer?: Customer & {
-			user: {
-				id: string;
-				email: string;
-				name: string;
-			};
+			user: Pick<User, "id" | "email" | "name">;
 		};
 		customerAddress?: CustomerAddress;
-		cart?: {
-			id: string;
-			cartProducts: Array<{
-				id: string;
-				cartId: string;
-				productId: string;
-				productPriceId: string;
-				quantity: number;
-				createdAt: string;
-				updatedAt: string;
-				product: {
-					id: string;
-					name: string;
-					description: string | null;
-					stock: number;
-					images: Array<{
-						id: string;
-						imageUrl: string;
-					}>;
-					productPrice: {
-						id: string;
-						priceInCents: number;
-						discountPercentage: number;
+		cart?: Cart & {
+			cartProducts: Array<
+				CartProduct & {
+					product: Product & {
+						images: ProductImage[];
+						productPrice: ProductPrice;
 					};
-				};
-				productPrice?: {
-					id: string;
-					priceInCents: number;
-					discountPercentage: number;
-				};
-			}>;
+					productPrice?: ProductPrice;
+				}
+			>;
 		};
 		delivery?: OrderDelivery & {
 			orderDeliveryMethod: OrderDeliveryMethod;
@@ -141,11 +87,9 @@ export interface GetOrderResponse {
 }
 
 // Customer Types
-export interface CreateCustomerRequest {
-	firstName: string;
-	lastName: string;
-	email: string;
-	phoneNumber: string;
+export interface CreateCustomerRequest
+	extends Pick<NewCustomer, "firstName" | "lastName" | "phoneNumber"> {
+	email: string; // This comes from the user, not customer table
 }
 
 export interface CreateCustomerResponse {
@@ -162,20 +106,9 @@ export interface UpdateOrderCustomerIdResponse {
 }
 
 // Customer Address Types
-export interface CreateCustomerAddressRequest {
-	orderId: string;
-	street: string;
-	number: string;
-	hasNoNumber: boolean;
-	complement: string;
-	hasNoComplement: boolean;
-	neighborhood: string;
-	city: string;
-	state: string;
-	zipCode: string;
-	hasNozipCode: boolean;
-	country: string;
-	isDefault: boolean;
+export interface CreateCustomerAddressRequest
+	extends Omit<NewCustomerAddress, "customerId"> {
+	orderId: string; // Used to associate with order during creation
 }
 
 export interface CreateCustomerAddressResponse {
@@ -203,10 +136,8 @@ export interface ListOrderDeliveryMethodsResponse {
 	orderDeliveryMethods: OrderDeliveryMethod[];
 }
 
-export interface CreateOrderDeliveryRequest {
-	orderId: string;
-	orderDeliveryMethodId: string;
-}
+export interface CreateOrderDeliveryRequest
+	extends Pick<OrderDelivery, "orderId" | "orderDeliveryMethodId"> {}
 
 export interface CreateOrderDeliveryResponse {
 	orderDelivery: OrderDelivery;
@@ -217,10 +148,8 @@ export interface ListOrderPaymentMethodsResponse {
 	orderPaymentMethods: OrderPaymentMethod[];
 }
 
-export interface CreateOrderPaymentRequest {
-	orderId: string;
-	orderPaymentMethodId: string;
-}
+export interface CreateOrderPaymentRequest
+	extends Pick<OrderPayment, "orderId" | "orderPaymentMethodId"> {}
 
 export interface CreateOrderPaymentResponse {
 	orderPayment: OrderPayment;

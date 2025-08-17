@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { toast } from "sonner";
 import { useCart } from "@/hooks/use-cart";
 
 interface ProductItemProps {
@@ -34,8 +35,10 @@ export function ProductItem({
 				productId: id,
 				quantity: 1,
 			});
+			toast.success(`${name} adicionado ao carrinho!`);
 		} catch (error) {
 			console.error("Failed to add item to cart:", error);
+			toast.error("Erro ao adicionar produto ao carrinho");
 		}
 	};
 
