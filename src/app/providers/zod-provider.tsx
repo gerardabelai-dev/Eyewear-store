@@ -38,6 +38,10 @@ export function ZodProvider(props: { children: React.ReactNode }) {
 								return `Máximo ${issue.maximum} item(s)`;
 							}
 							break;
+						case "invalid_format":
+							// Handle email validation errors
+							return "Endereço de e-mail inválido";
+
 						case "invalid_type":
 							if (issue.input === undefined) {
 								return "Campo obrigatório";

@@ -147,7 +147,7 @@ export function CheckoutCustomerForm({ orderId }: CheckoutCustomerFormProps) {
 								<FormControl>
 									<Input {...field} placeholder="Victor Nogueira" />
 								</FormControl>
-								<FormDescription>Informe seu nome e sobrenome</FormDescription>
+								<FormDescription>Como devemos te chamar?</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
