@@ -4,6 +4,7 @@ import { queryKeys } from "@/http/query-keys";
 import type {
 	AddProductToCartResponse,
 	CreateCartResponse,
+	RemoveProductFromCartResponse,
 } from "@/http/types";
 
 export const useCreateCart = () => {
@@ -67,6 +68,44 @@ export const useAddProductToCart = () => {
 			if (!response.ok) {
 				console.error(response);
 				throw new Error(ERROR_CODES.FAILED_TO_ADD_PRODUCT_TO_CART);
+			}
+
+			return await response.json();
+		},
+		onSuccess: (_, variables) => {
+			// Invalidate cart query to refetch updated cart data
+			queryClient.invalidateQueries({
+				queryKey: queryKeys.cart(variables.cartId),
+			});
+		},
+	});
+};
+
+export const useRemoveProductFromCart = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({
+			cartId,
+			productId,
+		}: {
+			cartId: string;
+			productId: string;
+		}): Promise<RemoveProductFromCartResponse> => {
+			const response = await fetch(
+				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts/${cartId}/remove-product`,
+				{
+					method: "DELETE",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ productId }),
+				},
+			);
+
+			if (!response.ok) {
+				console.error(response);
+				throw new Error(ERROR_CODES.FAILED_TO_REMOVE_PRODUCT_FROM_CART);
 			}
 
 			return await response.json();

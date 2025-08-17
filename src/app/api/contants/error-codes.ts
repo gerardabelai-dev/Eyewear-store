@@ -7,6 +7,7 @@ export const ERROR_CODES = {
 	FAILED_TO_GET_CART: "FAILED_TO_GET_CART",
 	FAILED_TO_CREATE_CART: "FAILED_TO_CREATE_CART",
 	FAILED_TO_ADD_PRODUCT_TO_CART: "FAILED_TO_ADD_PRODUCT_TO_CART",
+	FAILED_TO_REMOVE_PRODUCT_FROM_CART: "FAILED_TO_REMOVE_PRODUCT_FROM_CART",
 
 	// Product
 	PRODUCT_NOT_FOUND: "PRODUCT_NOT_FOUND",
@@ -58,6 +59,8 @@ export const ERROR_MESSAGES = {
 	[ERROR_CODES.FAILED_TO_CREATE_CART]: "Houve um erro ao criar o carrinho",
 	[ERROR_CODES.FAILED_TO_ADD_PRODUCT_TO_CART]:
 		"Houve um erro ao adicionar o produto ao carrinho",
+	[ERROR_CODES.FAILED_TO_REMOVE_PRODUCT_FROM_CART]:
+		"Houve um erro ao remover o produto do carrinho",
 
 	// Product
 	[ERROR_CODES.PRODUCT_NOT_FOUND]: "Produto não encontrado",

@@ -39,6 +39,15 @@ export interface AddProductToCartResponse {
 	cartProduct: CartProduct;
 }
 
+export interface RemoveProductFromCartRequest {
+	productId: string;
+}
+
+export interface RemoveProductFromCartResponse {
+	success: boolean;
+	message: string;
+}
+
 export interface GetCartResponse extends Cart {
 	items: Array<
 		CartProduct & {

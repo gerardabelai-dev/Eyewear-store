@@ -13,16 +13,20 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { useRemoveProductFromCart } from "@/http/cart/mutations";
 import type { GetCartResponse } from "@/http/types";
 import { calculateDiscountedPrice, formatPrice } from "@/lib/format-price";
+
 import { getCartQueryOptions } from "./get-cart-query-options";
 
 type CartItemData = GetCartResponse["items"][0];
 
-function CartItem({ item }: { item: CartItemData }) {
+function CartItem({ item, cartId }: { item: CartItemData; cartId: string }) {
 	const product = item.product;
 	const productPrice = item.productPrice;
 	const quantity = item.quantity;
+
+	const removeProductMutation = useRemoveProductFromCart();
 
 	// Get the first product image or use a placeholder
 	const imageUrl =
@@ -34,6 +38,21 @@ function CartItem({ item }: { item: CartItemData }) {
 		productPrice.priceInCents,
 		productPrice.discountPercentage,
 	);
+
+	const handleRemoveProduct = () => {
+		removeProductMutation.mutate(
+			{
+				cartId,
+				productId: product.id,
+			},
+			{
+				onSuccess: () => {
+					// If this was the last item in cart, clear the cart store
+					// The query will be invalidated and refetched by the mutation
+				},
+			},
+		);
+	};
 
 	return (
 		<li className="flex gap-4">
@@ -90,7 +109,13 @@ function CartItem({ item }: { item: CartItemData }) {
 						</SelectContent>
 					</Select>
 
-					<Button variant="ghost" size="icon">
+					<Button
+						variant="ghost"
+						size="icon"
+						onClick={handleRemoveProduct}
+						disabled={removeProductMutation.isPending}
+						className="flex items-center justify-center p-0"
+					>
 						<Trash2 className="size-4" />
 					</Button>
 				</div>
@@ -118,7 +143,13 @@ function CartItem({ item }: { item: CartItemData }) {
 				</Select>
 			</div>
 
-			<Button variant="ghost" size="icon" className="hidden md:block">
+			<Button
+				variant="ghost"
+				size="icon"
+				className="hidden md:flex items-center justify-center p-0"
+				onClick={handleRemoveProduct}
+				disabled={removeProductMutation.isPending}
+			>
 				<Trash2 className="size-4" />
 			</Button>
 		</li>
@@ -143,7 +174,7 @@ export function CartItems({ cartId }: { cartId: string }) {
 		<ul className="flex flex-col gap-4">
 			{data.items.map((item: CartItemData, index: number) => (
 				<div key={item.id}>
-					<CartItem item={item} />
+					<CartItem item={item} cartId={cartId} />
 					{index < data.items.length - 1 && <Separator className="my-6" />}
 				</div>
 			))}
