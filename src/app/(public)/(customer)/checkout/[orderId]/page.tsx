@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { PageHeader } from "@/components/page-header";
-import { Separator } from "@/components/ui/separator";
 import { getQueryClient } from "@/lib/tanstack-query/get-query-client";
-import { CheckoutCouponForm } from "./checkout-coupon-form";
 import { CheckoutCustomerForm } from "./checkout-customer-form";
-import { CheckoutOrderButton } from "./checkout-order-button";
+import { CheckoutOrderSummary } from "./checkout-order-summary";
+import { CheckoutOrderSummarySkeleton } from "./checkout-order-summary-skeleton";
 import { CheckoutPaymentMethodForm } from "./checkout-payment-method-form";
 import { CheckoutShippingAddressForm } from "./checkout-shipping-address-form";
 import { CheckoutShippingMethodForm } from "./checkout-shipping-method-form";
@@ -40,42 +40,9 @@ export default async function CheckoutPage({
 					<CheckoutPaymentMethodForm orderId={orderId} />
 				</div>
 
-				{/* Order Summary */}
-				<div className="flex flex-col gap-4 bg-muted p-8 rounded h-fit sticky top-14">
-					<h2 className="text-lg font-bold">Resumo do pedido</h2>
-
-					<div className="flex gap-2 justify-between">
-						<span>Subtotal</span>
-						<strong>R$ 100,00</strong>
-					</div>
-
-					<Separator />
-
-					<div className="flex gap-2 justify-between">
-						<span>Frete</span>
-						<strong>R$ 10,00</strong>
-					</div>
-
-					<Separator />
-
-					<div className="flex gap-2 justify-between">
-						<span>Taxas e impostos</span>
-						<strong>R$ 10,00</strong>
-					</div>
-
-					<Separator />
-
-					<div className="flex gap-2 justify-between">
-						<span>Total</span>
-						<strong>R$ 120,00</strong>
-					</div>
-
-					<Separator />
-
-					<CheckoutCouponForm />
-
-					<CheckoutOrderButton orderId={orderId} />
-				</div>
+				<Suspense fallback={<CheckoutOrderSummarySkeleton />}>
+					<CheckoutOrderSummary orderId={orderId} />
+				</Suspense>
 			</section>
 		</>
 	);

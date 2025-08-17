@@ -74,20 +74,38 @@ export interface GetOrderResponse {
 			};
 		};
 		customerAddress?: CustomerAddress;
-		cartProducts?: Array<{
+		cart?: {
 			id: string;
-			quantity: number;
-			product: {
+			cartProducts: Array<{
 				id: string;
-				name: string;
-				description: string;
-				productPrice: {
+				cartId: string;
+				productId: string;
+				productPriceId: string;
+				quantity: number;
+				createdAt: string;
+				updatedAt: string;
+				product: {
 					id: string;
-					price: number;
-					currency: string;
+					name: string;
+					description: string | null;
+					stock: number;
+					images: Array<{
+						id: string;
+						imageUrl: string;
+					}>;
+					productPrice: {
+						id: string;
+						priceInCents: number;
+						discountPercentage: number;
+					};
 				};
-			};
-		}>;
+				productPrice?: {
+					id: string;
+					priceInCents: number;
+					discountPercentage: number;
+				};
+			}>;
+		};
 		delivery?: OrderDelivery & {
 			orderDeliveryMethod: OrderDeliveryMethod;
 		};
