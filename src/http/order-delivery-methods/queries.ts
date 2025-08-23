@@ -1,11 +1,11 @@
 import { queryOptions } from "@tanstack/react-query";
 import { ERROR_CODES } from "@/app/api/contants/error-codes";
-import { queryKeys } from "@/http/query-keys";
+import { QUERY_KEYS } from "@/http/query-keys";
 import type { ListOrderDeliveryMethodsResponse } from "@/http/types";
 
 export const getOrderDeliveryMethodsQueryOptions = () =>
 	queryOptions({
-		queryKey: queryKeys.orderDeliveryMethods(),
+		queryKey: QUERY_KEYS.orderDeliveryMethods(),
 		queryFn: async () => {
 			const response = await fetch(
 				`${process.env.NEXT_PUBLIC_WEB_URL}/api/order-delivery-methods/list-all`,

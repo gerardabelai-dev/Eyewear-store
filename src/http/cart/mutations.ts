@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ERROR_CODES } from "@/app/api/contants/error-codes";
-import { queryKeys } from "@/http/query-keys";
+import { QUERY_KEYS } from "@/http/query-keys";
+
 import type {
 	AddProductToCartResponse,
 	CreateCartResponse,
@@ -31,7 +32,7 @@ export const useCreateCart = () => {
 		},
 		onSuccess: (data) => {
 			// Cache the new cart data
-			queryClient.setQueryData(queryKeys.cart(data.cart.id), {
+			queryClient.setQueryData(QUERY_KEYS.cart(data.cart.id), {
 				id: data.cart.id,
 				items: [],
 				createdAt: data.cart.createdAt,
@@ -75,7 +76,7 @@ export const useAddProductToCart = () => {
 		onSuccess: (_, variables) => {
 			// Invalidate cart query to refetch updated cart data
 			queryClient.invalidateQueries({
-				queryKey: queryKeys.cart(variables.cartId),
+				queryKey: QUERY_KEYS.cart(variables.cartId),
 			});
 		},
 	});
@@ -113,7 +114,7 @@ export const useRemoveProductFromCart = () => {
 		onSuccess: (_, variables) => {
 			// Invalidate cart query to refetch updated cart data
 			queryClient.invalidateQueries({
-				queryKey: queryKeys.cart(variables.cartId),
+				queryKey: QUERY_KEYS.cart(variables.cartId),
 			});
 		},
 	});

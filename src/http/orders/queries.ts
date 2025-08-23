@@ -1,11 +1,11 @@
 import { queryOptions } from "@tanstack/react-query";
 import { ERROR_CODES } from "@/app/api/contants/error-codes";
-import { queryKeys } from "@/http/query-keys";
+import { QUERY_KEYS } from "@/http/query-keys";
 import type { GetOrderDeliveryResponse, GetOrderResponse } from "@/http/types";
 
 export const getOrderByIdQueryOptions = (orderId: string) =>
 	queryOptions({
-		queryKey: queryKeys.order(orderId),
+		queryKey: QUERY_KEYS.order(orderId),
 		queryFn: async () => {
 			const response = await fetch(
 				`${process.env.NEXT_PUBLIC_WEB_URL}/api/orders/${orderId}/get-order-by-id`,
@@ -24,7 +24,7 @@ export const getOrderByIdQueryOptions = (orderId: string) =>
 
 export const getOrderDeliveryQueryOptions = (orderId: string) =>
 	queryOptions({
-		queryKey: queryKeys.orderDelivery(orderId),
+		queryKey: QUERY_KEYS.orderDelivery(orderId),
 		queryFn: async () => {
 			const response = await fetch(
 				`${process.env.NEXT_PUBLIC_WEB_URL}/api/orders/${orderId}/get-order-delivery`,

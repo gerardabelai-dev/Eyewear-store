@@ -1,5 +1,5 @@
 // Query Keys Factory
-export const queryKeys = {
+export const QUERY_KEYS = {
 	// Cart
 	cart: (cartId: string) => ["cart", { id: cartId }] as const,
 

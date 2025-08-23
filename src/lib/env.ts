@@ -21,6 +21,13 @@ const schema = z.object({
 
 	// Resend Configuration
 	RESEND_API_KEY: z.string().min(1, "RESEND_API_KEY is required"),
+
+	// Stripe Configuration
+	STRIPE_SECRET_KEY: z.string().min(1, "STRIPE_SECRET_KEY is required"),
+	STRIPE_PUBLISHABLE_KEY: z
+		.string()
+		.min(1, "STRIPE_PUBLISHABLE_KEY is required"),
+	STRIPE_WEBHOOK_SECRET: z.string().min(1, "STRIPE_WEBHOOK_SECRET is required"),
 });
 
 export const env = schema.parse(process.env);

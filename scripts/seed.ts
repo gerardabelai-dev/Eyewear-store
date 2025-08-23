@@ -543,23 +543,19 @@ async function seedOrderDeliveryMethod() {
 	return orderDeliveryMethod;
 }
 
-async function seedOrderPaymentMethod() {
-	console.info("💳 Creating order payment method...");
+async function seedOrderPaymentMethods() {
+	console.info("💳 Creating order payment methods...");
 
-	const [orderPaymentMethod] = await seedDb
+	// Create Credit Card payment method (for Stripe integration)
+	const [creditCardMethod] = await seedDb
 		.insert(schema.orderPaymentMethod)
 		.values({
-			method: faker.helpers.arrayElement([
-				"Credit Card",
-				"Debit Card",
-				"PayPal",
-				"Bank Transfer",
-			]),
+			method: "Credit Card",
 		})
 		.returning();
 
 	console.info(
-		`✅ Order payment method created successfully with ID: ${orderPaymentMethod.id}`,
+		`✅ Credit Card payment method created successfully with ID: ${creditCardMethod.id}`,
 	);
 
 	await seedActivity({
@@ -567,11 +563,39 @@ async function seedOrderPaymentMethod() {
 		actorId: "system",
 		actorType: "system",
 		metadata: {
-			content: orderPaymentMethod,
+			content: creditCardMethod,
 		},
 	});
 
-	return orderPaymentMethod;
+	// Create other payment methods
+	const otherMethods = ["Debit Card", "PayPal", "Bank Transfer"];
+	const paymentMethods = [creditCardMethod];
+
+	for (const method of otherMethods) {
+		const [paymentMethod] = await seedDb
+			.insert(schema.orderPaymentMethod)
+			.values({
+				method,
+			})
+			.returning();
+
+		console.info(
+			`✅ ${method} payment method created successfully with ID: ${paymentMethod.id}`,
+		);
+
+		await seedActivity({
+			type: "orderPaymentMethod.created",
+			actorId: "system",
+			actorType: "system",
+			metadata: {
+				content: paymentMethod,
+			},
+		});
+
+		paymentMethods.push(paymentMethod);
+	}
+
+	return paymentMethods;
 }
 
 async function seedOrderDelivery({
@@ -690,7 +714,12 @@ async function seed() {
 
 		// Create delivery and payment methods first (needed for orders)
 		const orderDeliveryMethod = await seedOrderDeliveryMethod();
-		const orderPaymentMethod = await seedOrderPaymentMethod();
+		const orderPaymentMethods = await seedOrderPaymentMethods();
+
+		// Use Credit Card as the default payment method for seeded orders
+		const defaultPaymentMethod =
+			orderPaymentMethods.find((method) => method.method === "Credit Card") ||
+			orderPaymentMethods[0];
 
 		// Create 10 products
 		const products = [];
@@ -752,7 +781,7 @@ async function seed() {
 
 			await seedOrderPayment({
 				orderId: order.id,
-				orderPaymentMethodId: orderPaymentMethod.id,
+				orderPaymentMethodId: defaultPaymentMethod.id,
 				totalPriceInCents,
 			});
 		}

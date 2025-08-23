@@ -163,3 +163,13 @@ export interface CreateOrderPaymentRequest
 export interface CreateOrderPaymentResponse {
 	orderPayment: OrderPayment;
 }
+
+// Stripe Types
+export interface CreatePaymentIntentRequest {
+	orderId: string;
+}
+
+export interface CreatePaymentIntentResponse {
+	clientSecret: string;
+	paymentIntentId: string;
+}

@@ -281,6 +281,10 @@ export const orderPayment = pgTable("orderPayment", {
 		.notNull()
 		.default("pending"),
 	totalPriceInCents: integer("totalPriceInCents").notNull().default(0),
+	// Stripe-specific fields
+	stripePaymentIntentId: text("stripePaymentIntentId"),
+	stripeClientSecret: text("stripeClientSecret"),
+	stripePaymentMethodId: text("stripePaymentMethodId"),
 	...timestamps,
 });
 

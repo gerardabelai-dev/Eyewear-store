@@ -2,6 +2,11 @@ export const ERROR_CODES = {
 	// Generic
 	UNEXPECTED_ERROR: "UNEXPECTED_ERROR",
 
+	// Stripe
+	UNEXPECTED_STRIPE_ERROR: "UNEXPECTED_STRIPE_ERROR",
+	MISSING_STRIPE_SIGNATURE: "MISSING_STRIPE_SIGNATURE",
+	INVALID_STRIPE_SIGNATURE: "INVALID_STRIPE_SIGNATURE",
+
 	// Cart
 	CART_NOT_FOUND: "CART_NOT_FOUND",
 	FAILED_TO_GET_CART: "FAILED_TO_GET_CART",
@@ -42,6 +47,9 @@ export const ERROR_CODES = {
 	// Order Payment
 	FAILED_TO_CREATE_ORDER_PAYMENT: "FAILED_TO_CREATE_ORDER_PAYMENT",
 	ORDER_PAYMENT_METHODS_NOT_FOUND: "ORDER_PAYMENT_METHODS_NOT_FOUND",
+	FAILED_TO_UPDATE_ORDER_PAYMENT: "FAILED_TO_UPDATE_ORDER_PAYMENT",
+	ORDER_ALREADY_HAS_STRIPE_PAYMENT_INTENT:
+		"ORDER_ALREADY_HAS_STRIPE_PAYMENT_INTENT",
 
 	// Order Delivery
 	ORDER_DELIVERY_NOT_FOUND: "ORDER_DELIVERY_NOT_FOUND",
@@ -51,6 +59,13 @@ export const ERROR_MESSAGES = {
 	// Generic
 	[ERROR_CODES.UNEXPECTED_ERROR]:
 		"Não foi possível completar a ação, houve um erro inesperado",
+
+	// Stripe
+	[ERROR_CODES.UNEXPECTED_STRIPE_ERROR]:
+		"Houve um erro inesperado com nosso sistema de pagamento",
+	[ERROR_CODES.MISSING_STRIPE_SIGNATURE]:
+		"Não foi possível verificar a assinatura do webhook",
+	[ERROR_CODES.INVALID_STRIPE_SIGNATURE]: "A assinatura do webhook é inválida",
 
 	// Cart
 	[ERROR_CODES.CART_NOT_FOUND]: "Carrinho não encontrado",
@@ -76,8 +91,6 @@ export const ERROR_MESSAGES = {
 	[ERROR_CODES.ORDER_HAS_NO_CUSTOMER]: "Pedido não possui um cliente",
 	[ERROR_CODES.ORDER_ALREADY_HAS_DELIVERY_METHOD]:
 		"Pedido já possui um método de envio",
-	[ERROR_CODES.ORDER_ALREADY_HAS_PAYMENT_METHOD]:
-		"Pedido já possui um método de pagamento",
 
 	// Order Delivery
 	[ERROR_CODES.ORDER_DELIVERY_NOT_FOUND]: "Método de envio não encontrado",
@@ -93,6 +106,12 @@ export const ERROR_MESSAGES = {
 		"Houve um erro ao criar o pagamento do pedido",
 	[ERROR_CODES.ORDER_PAYMENT_METHODS_NOT_FOUND]:
 		"Nenhum método de pagamento disponível",
+	[ERROR_CODES.ORDER_ALREADY_HAS_STRIPE_PAYMENT_INTENT]:
+		"Pedido já possui um pagamento em andamento",
+	[ERROR_CODES.FAILED_TO_UPDATE_ORDER_PAYMENT]:
+		"Houve um erro ao atualizar o pagamento do pedido",
+	[ERROR_CODES.ORDER_ALREADY_HAS_PAYMENT_METHOD]:
+		"Pedido já possui um método de pagamento",
 
 	// User
 	[ERROR_CODES.USER_ALREADY_EXISTS]: "Usuário com este e-mail já existe",

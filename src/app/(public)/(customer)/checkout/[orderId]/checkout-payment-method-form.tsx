@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -31,6 +31,7 @@ import {
 	getOrderByIdQueryOptions,
 	getOrderPaymentMethodsQueryOptions,
 	useCreateOrderPaymentMutation,
+	useCreatePaymentIntentMutation,
 } from "@/http";
 
 const formSchema = z.object({
@@ -41,12 +42,30 @@ const formSchema = z.object({
 
 interface CheckoutPaymentMethodFormProps {
 	orderId: string;
+	// TODO: define type
+	stripePromise: Promise<any>;
 }
 
 export function CheckoutPaymentMethodForm({
 	orderId,
 }: CheckoutPaymentMethodFormProps) {
 	const queryClient = useQueryClient();
+	const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(
+		null,
+	);
+	const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
+
+	const { mutate: createPaymentIntent, isPending: isCreatingPaymentIntent } =
+		useCreatePaymentIntentMutation({
+			onSuccess: (data) => {
+				console.log("💰 Payment intent created:", data);
+				setStripeClientSecret(data.clientSecret);
+				setPaymentIntentId(data.paymentIntentId);
+			},
+			onError: (error) => {
+				console.error(error);
+			},
+		});
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -85,6 +104,11 @@ export function CheckoutPaymentMethodForm({
 		});
 
 	useEffect(() => {
+		createPaymentIntent({ orderId });
+	}, []);
+
+	// TODO: remove this later when we have a way to create a payment intent
+	useEffect(() => {
 		if (order?.payment?.orderPaymentMethodId) {
 			// If order already has a payment method, use it
 			form.setValue(
@@ -117,6 +141,19 @@ export function CheckoutPaymentMethodForm({
 			<CardTitle className="flex items-center gap-2">
 				Seu método de pagamento
 			</CardTitle>
+
+			{isCreatingPaymentIntent && (
+				<div>
+					<h2>Criando payment intent...</h2>
+				</div>
+			)}
+
+			{stripeClientSecret && !isCreatingPaymentIntent && paymentIntentId && (
+				<div className="space-y-2 text-sm">
+					<p>Stripe Client Secret: {stripeClientSecret}</p>
+					<p>Payment Intent ID: {paymentIntentId}</p>
+				</div>
+			)}
 
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
