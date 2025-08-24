@@ -27,6 +27,9 @@ const schema = z.object({
 	STRIPE_PUBLISHABLE_KEY: z
 		.string()
 		.min(1, "STRIPE_PUBLISHABLE_KEY is required"),
+	NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z
+		.string()
+		.min(1, "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is required"),
 	STRIPE_WEBHOOK_SECRET: z.string().min(1, "STRIPE_WEBHOOK_SECRET is required"),
 });
 

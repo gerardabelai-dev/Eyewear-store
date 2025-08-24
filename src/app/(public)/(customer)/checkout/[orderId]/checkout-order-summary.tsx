@@ -8,6 +8,11 @@ import { CheckoutCouponForm } from "./checkout-coupon-form";
 import { CheckoutOrderButton } from "./checkout-order-button";
 import { getOrderByIdQueryOptions } from "./get-checkout-query-options";
 
+interface CheckoutOrderSummaryProps {
+	orderId: string;
+	stripePublishableKey: string;
+}
+
 type OrderData = GetOrderResponse["order"];
 type CartProductData = NonNullable<OrderData["cart"]>["cartProducts"][0];
 
@@ -27,7 +32,10 @@ function calculateItemTotal(item: CartProductData): number {
 	return discountedPrice * item.quantity;
 }
 
-export function CheckoutOrderSummary({ orderId }: { orderId: string }) {
+export function CheckoutOrderSummary({
+	orderId,
+	stripePublishableKey,
+}: CheckoutOrderSummaryProps) {
 	const { data: order } = useSuspenseQuery(getOrderByIdQueryOptions(orderId));
 
 	// Get cart products from the order
@@ -95,7 +103,10 @@ export function CheckoutOrderSummary({ orderId }: { orderId: string }) {
 
 			<CheckoutCouponForm />
 
-			<CheckoutOrderButton orderId={orderId} />
+			<CheckoutOrderButton
+				orderId={orderId}
+				stripePublishableKey={stripePublishableKey}
+			/>
 		</div>
 	);
 }

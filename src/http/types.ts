@@ -158,7 +158,9 @@ export interface ListOrderPaymentMethodsResponse {
 }
 
 export interface CreateOrderPaymentRequest
-	extends Pick<OrderPayment, "orderId" | "orderPaymentMethodId"> {}
+	extends Pick<OrderPayment, "orderId" | "orderPaymentMethodId"> {
+	stripePaymentMethodId?: string;
+}
 
 export interface CreateOrderPaymentResponse {
 	orderPayment: OrderPayment;
@@ -172,4 +174,16 @@ export interface CreatePaymentIntentRequest {
 export interface CreatePaymentIntentResponse {
 	clientSecret: string;
 	paymentIntentId: string;
+}
+
+export interface CreatePaymentMethodRequest {
+	cardNumber: string;
+	expiryMonth: number;
+	expiryYear: number;
+	cvc: string;
+	cardholderName: string;
+}
+
+export interface CreatePaymentMethodResponse {
+	paymentMethodId: string;
 }

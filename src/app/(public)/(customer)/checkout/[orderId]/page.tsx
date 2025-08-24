@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PageHeader } from "@/components/page-header";
+import { env } from "@/lib/env";
 import { getQueryClient } from "@/lib/tanstack-query/get-query-client";
 import { CheckoutCustomerForm } from "./checkout-customer-form";
 import { CheckoutOrderSummary } from "./checkout-order-summary";
@@ -37,11 +38,17 @@ export default async function CheckoutPage({
 					<CheckoutCustomerForm orderId={orderId} />
 					<CheckoutShippingAddressForm orderId={orderId} />
 					<CheckoutShippingMethodForm orderId={orderId} />
-					<CheckoutPaymentMethodForm orderId={orderId} />
+					<CheckoutPaymentMethodForm
+						orderId={orderId}
+						stripePublishableKey={env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+					/>
 				</div>
 
 				<Suspense fallback={<CheckoutOrderSummarySkeleton />}>
-					<CheckoutOrderSummary orderId={orderId} />
+					<CheckoutOrderSummary
+						orderId={orderId}
+						stripePublishableKey={env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+					/>
 				</Suspense>
 			</section>
 		</>

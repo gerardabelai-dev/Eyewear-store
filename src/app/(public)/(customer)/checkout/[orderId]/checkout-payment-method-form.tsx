@@ -1,32 +1,17 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
-import { Suspense, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { CreditCard, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import z from "zod";
-import { ERROR_CODES, ERROR_MESSAGES } from "@/app/api/contants/error-codes";
-import { Button } from "@/components/ui/button";
+import { StripePaymentForm } from "@/components/stripe/stripe-payment-form";
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Card, CardTitle } from "@/components/ui/card";
-import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from "@/components/ui/form";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
 	getOrderByIdQueryOptions,
 	getOrderPaymentMethodsQueryOptions,
@@ -34,26 +19,19 @@ import {
 	useCreatePaymentIntentMutation,
 } from "@/http";
 
-const formSchema = z.object({
-	payment: z.object({
-		orderPaymentMethodId: z.string(),
-	}),
-});
-
 interface CheckoutPaymentMethodFormProps {
 	orderId: string;
-	// TODO: define type
-	stripePromise: Promise<any>;
+	stripePublishableKey: string;
 }
 
 export function CheckoutPaymentMethodForm({
 	orderId,
+	stripePublishableKey,
 }: CheckoutPaymentMethodFormProps) {
 	const queryClient = useQueryClient();
-	const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(
-		null,
-	);
-	const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
+	const [, setStripeClientSecret] = useState<string | null>(null);
+	const [, setPaymentIntentId] = useState<string | null>(null);
+	const [paymentMethodId, setPaymentMethodId] = useState<string | null>(null);
 
 	const { mutate: createPaymentIntent, isPending: isCreatingPaymentIntent } =
 		useCreatePaymentIntentMutation({
@@ -64,152 +42,112 @@ export function CheckoutPaymentMethodForm({
 			},
 			onError: (error) => {
 				console.error(error);
+				toast.error("Erro ao criar intenção de pagamento");
 			},
 		});
-
-	const form = useForm<z.infer<typeof formSchema>>({
-		resolver: zodResolver(formSchema),
-		defaultValues: {
-			payment: {
-				orderPaymentMethodId: "",
-			},
-		},
-	});
-
-	const { data: order } = useQuery(getOrderByIdQueryOptions(orderId));
 
 	const { data: orderPaymentMethods = [] } = useQuery(
 		getOrderPaymentMethodsQueryOptions(),
 	);
 
-	const { mutate: updateOrderPaymentMethod, isPending } =
-		useCreateOrderPaymentMutation({
-			onSuccess: (data) => {
-				console.log(data);
-				// Invalidate order query to refresh checkout button state
-				queryClient.invalidateQueries(getOrderByIdQueryOptions(orderId));
-			},
-			onError: (error) => {
-				console.error(error);
-				switch (error.message) {
-					case ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT:
-						toast.error(
-							ERROR_MESSAGES[ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT],
-						);
-						break;
-					default:
-						toast.error(ERROR_MESSAGES[ERROR_CODES.UNEXPECTED_ERROR]);
-				}
-			},
-		});
+	const { mutate: updateOrderPaymentMethod } = useCreateOrderPaymentMutation({
+		onSuccess: (data) => {
+			console.log("Order payment updated:", data);
+			// Invalidate order query to refresh checkout button state
+			console.log("🔄 Invalidating order queries for orderId:", orderId);
+			queryClient.invalidateQueries(getOrderByIdQueryOptions(orderId));
+			// Also invalidate with exact query key pattern
+			queryClient.invalidateQueries({ queryKey: ["order", { id: orderId }] });
+			queryClient.invalidateQueries({ queryKey: ["order"] });
+			console.log("✅ Order queries invalidated");
+		},
+		onError: (error) => {
+			console.error(error);
+			toast.error("Erro ao atualizar método de pagamento");
+		},
+	});
 
 	useEffect(() => {
 		createPaymentIntent({ orderId });
-	}, []);
+	}, [orderId, createPaymentIntent]);
 
-	// TODO: remove this later when we have a way to create a payment intent
-	useEffect(() => {
-		if (order?.payment?.orderPaymentMethodId) {
-			// If order already has a payment method, use it
-			form.setValue(
-				"payment.orderPaymentMethodId",
-				order.payment.orderPaymentMethodId,
-				{ shouldValidate: true, shouldDirty: true, shouldTouch: true },
-			);
-		} else if (
-			orderPaymentMethods.length > 0 &&
-			!form.getValues("payment.orderPaymentMethodId")
-		) {
-			// If no existing payment method but we have options, set the first one
-			form.setValue("payment.orderPaymentMethodId", orderPaymentMethods[0].id, {
-				shouldValidate: true,
-				shouldDirty: true,
-				shouldTouch: true,
+	const handleCardDataChange = (_cardData: any, _isValid: boolean) => {
+		// Card data changes are handled internally by the StripePaymentForm
+		// This callback is kept for future use if needed
+	};
+
+	const handlePaymentMethodCreated = (paymentMethodId: string) => {
+		console.log("Payment method created:", paymentMethodId);
+		setPaymentMethodId(paymentMethodId);
+
+		// Find Credit Card payment method and update order
+		const creditCardMethod = orderPaymentMethods.find(
+			(method) => method.method === "Credit Card",
+		);
+
+		if (creditCardMethod) {
+			updateOrderPaymentMethod({
+				orderId,
+				orderPaymentMethodId: creditCardMethod.id,
+				stripePaymentMethodId: paymentMethodId,
 			});
 		}
-	}, [order, orderPaymentMethods, form]);
 
-	function onSubmit(values: z.infer<typeof formSchema>) {
-		updateOrderPaymentMethod({
-			orderId,
-			orderPaymentMethodId: values.payment.orderPaymentMethodId,
-		});
-	}
+		// Refresh the page data
+		queryClient.invalidateQueries(getOrderByIdQueryOptions(orderId));
+	};
+
+	const handlePaymentError = (error: string) => {
+		console.error("Payment method creation failed:", error);
+	};
 
 	return (
 		<Card className="p-8 space-y-8">
 			<CardTitle className="flex items-center gap-2">
-				Seu método de pagamento
+				<CreditCard className="w-5 h-5" />
+				Método de pagamento
 			</CardTitle>
 
 			{isCreatingPaymentIntent && (
-				<div>
-					<h2>Criando payment intent...</h2>
+				<div className="flex items-center gap-2 text-muted-foreground">
+					<Loader2 className="w-4 h-4 animate-spin" />
+					<span>Preparando pagamento...</span>
 				</div>
 			)}
 
-			{stripeClientSecret && !isCreatingPaymentIntent && paymentIntentId && (
-				<div className="space-y-2 text-sm">
-					<p>Stripe Client Secret: {stripeClientSecret}</p>
-					<p>Payment Intent ID: {paymentIntentId}</p>
+			{paymentMethodId && (
+				<div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+					<p className="text-green-800 font-medium">
+						✅ Cartão validado com sucesso!
+					</p>
 				</div>
 			)}
 
-			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-					<FormField
-						control={form.control}
-						name="payment.orderPaymentMethodId"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Método de pagamento</FormLabel>
-								<FormControl>
-									<Select value={field.value} onValueChange={field.onChange}>
-										<SelectTrigger>
-											<SelectValue placeholder="Selecione..." />
-										</SelectTrigger>
-										<SelectContent>
-											<Suspense
-												fallback={
-													<SelectItem value="loading">
-														<Skeleton className="h-10 w-full" />
-													</SelectItem>
-												}
-											>
-												{orderPaymentMethods.length === 0 && (
-													<SelectItem value="no-payment-methods">
-														Nenhum método de pagamento disponível
-													</SelectItem>
-												)}
-												{orderPaymentMethods?.map((orderPaymentMethod) => (
-													<SelectItem
-														key={orderPaymentMethod.id}
-														value={orderPaymentMethod.id}
-													>
-														{orderPaymentMethod.method}
-													</SelectItem>
-												))}
-											</Suspense>
-										</SelectContent>
-									</Select>
-								</FormControl>
-								<FormDescription>
-									Selecione o método de pagamento
-								</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<Button type="submit" disabled={isPending}>
-						{isPending ? (
-							<Loader2 className="w-4 h-4 animate-spin" />
-						) : (
-							"Salvar"
-						)}
-					</Button>
-				</form>
-			</Form>
+			{!isCreatingPaymentIntent && !paymentMethodId && (
+				<Accordion type="single" defaultValue="credit-card" className="w-full">
+					<AccordionItem value="credit-card">
+						<AccordionTrigger className="hover:no-underline">
+							<div className="flex items-center gap-3">
+								<CreditCard className="w-5 h-5" />
+								<div className="text-left">
+									<div className="font-medium">Cartão de Crédito</div>
+									<div className="text-sm text-muted-foreground">
+										Visa, Mastercard, American Express
+									</div>
+								</div>
+							</div>
+						</AccordionTrigger>
+						<AccordionContent className="pt-6">
+							<StripePaymentForm
+								publishableKey={stripePublishableKey}
+								onCardDataChange={handleCardDataChange}
+								onPaymentMethodCreated={handlePaymentMethodCreated}
+								onError={handlePaymentError}
+							/>
+						</AccordionContent>
+					</AccordionItem>
+				</Accordion>
+			)}
 		</Card>
 	);
 }

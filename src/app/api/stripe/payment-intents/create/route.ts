@@ -95,24 +95,57 @@ export async function POST(request: Request) {
 			},
 		});
 
-		// Update the order payment with Stripe information
-		// TODO: consider creating order payment here instead of updating it
+		// Create or update the order payment with Stripe information
+		let orderPaymentRecord: any;
+
 		if (orderFound.payment) {
-			const updatedOrderPayment = await db
+			// Update existing order payment
+			const [updatedOrderPayment] = await db
 				.update(orderPayment)
 				.set({
 					stripePaymentIntentId: paymentIntent.id,
 					stripeClientSecret: paymentIntent.client_secret,
 					totalPriceInCents: totalInCents,
 				})
-				.where(eq(orderPayment.id, orderFound.payment.id));
+				.where(eq(orderPayment.id, orderFound.payment.id))
+				.returning();
 
-			if (!updatedOrderPayment) {
+			orderPaymentRecord = updatedOrderPayment;
+		} else {
+			// Find Credit Card payment method
+			const creditCardMethod = await db.query.orderPaymentMethod.findFirst({
+				where: (orderPaymentMethod, { eq }) =>
+					eq(orderPaymentMethod.method, "Credit Card"),
+			});
+
+			if (!creditCardMethod) {
 				return NextResponse.json(
-					mapErrorCodes(ERROR_CODES.FAILED_TO_UPDATE_ORDER_PAYMENT),
-					{ status: HTTP_CODES.INTERNAL_SERVER_ERROR },
+					mapErrorCodes(ERROR_CODES.PAYMENT_METHOD_NOT_FOUND),
+					{ status: HTTP_CODES.NOT_FOUND },
 				);
 			}
+
+			// Create new order payment
+			const [newOrderPayment] = await db
+				.insert(orderPayment)
+				.values({
+					orderId: orderId,
+					orderPaymentMethodId: creditCardMethod.id,
+					stripePaymentIntentId: paymentIntent.id,
+					stripeClientSecret: paymentIntent.client_secret,
+					totalPriceInCents: totalInCents,
+					orderPaymentStatus: "pending",
+				})
+				.returning();
+
+			orderPaymentRecord = newOrderPayment;
+		}
+
+		if (!orderPaymentRecord) {
+			return NextResponse.json(
+				mapErrorCodes(ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT),
+				{ status: HTTP_CODES.INTERNAL_SERVER_ERROR },
+			);
 		}
 
 		return NextResponse.json({

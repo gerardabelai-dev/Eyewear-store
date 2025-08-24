@@ -13,8 +13,13 @@ export const useCreateOrderPaymentMutation = (options?: {
 		mutationFn: async (
 			data: CreateOrderPaymentRequest,
 		): Promise<CreateOrderPaymentResponse> => {
+			console.log("🔄 Sending order payment request:", data);
+
 			const response = await fetch("/api/order-payments/create-order-payment", {
 				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
 				body: JSON.stringify(data),
 			});
 

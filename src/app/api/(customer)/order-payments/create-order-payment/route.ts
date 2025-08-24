@@ -11,18 +11,26 @@ import { order, orderPayment, orderPaymentMethod } from "@/lib/db/schema";
 const createOrderPaymentSchema = z.object({
 	orderId: z.string(),
 	orderPaymentMethodId: z.string(),
+	stripePaymentMethodId: z.string().optional(),
 });
 
 export async function POST(request: Request) {
 	const body = await request.json();
+	console.log("📥 Received order payment request:", body);
 
 	const { success, error, data } = createOrderPaymentSchema.safeParse(body);
 
 	if (!success) {
+		console.log("❌ Validation failed:", error);
 		return mapInvalidZodResponse(error);
 	}
 
-	const { orderId, orderPaymentMethodId } = data;
+	const { orderId, orderPaymentMethodId, stripePaymentMethodId } = data;
+	console.log("✅ Parsed data:", {
+		orderId,
+		orderPaymentMethodId,
+		stripePaymentMethodId,
+	});
 
 	const orderFound = await db.query.order.findFirst({
 		where: eq(order.id, orderId),
@@ -38,15 +46,6 @@ export async function POST(request: Request) {
 		where: eq(orderPayment.orderId, orderId),
 	});
 
-	if (orderPaymentFound) {
-		return NextResponse.json(
-			mapErrorCodes(ERROR_CODES.ORDER_ALREADY_HAS_PAYMENT_METHOD),
-			{
-				status: HTTP_CODES.BAD_REQUEST,
-			},
-		);
-	}
-
 	const orderPaymentMethodFound = await db.query.orderPaymentMethod.findFirst({
 		where: eq(orderPaymentMethod.id, orderPaymentMethodId),
 	});
@@ -60,15 +59,43 @@ export async function POST(request: Request) {
 		);
 	}
 
-	const [orderPaymentCreated] = await db
-		.insert(orderPayment)
-		.values({
-			orderId,
-			orderPaymentMethodId,
-		})
-		.returning();
+	let orderPaymentResult: any;
 
-	if (!orderPaymentCreated) {
+	if (orderPaymentFound) {
+		// Update existing order payment
+		console.log("🔄 Updating existing order payment:", {
+			id: orderPaymentFound.id,
+			orderPaymentMethodId,
+			stripePaymentMethodId,
+		});
+
+		const [updatedOrderPayment] = await db
+			.update(orderPayment)
+			.set({
+				orderPaymentMethodId,
+				stripePaymentMethodId,
+				updatedAt: new Date(),
+			})
+			.where(eq(orderPayment.id, orderPaymentFound.id))
+			.returning();
+
+		console.log("✅ Updated order payment result:", updatedOrderPayment);
+		orderPaymentResult = updatedOrderPayment;
+	} else {
+		// Create new order payment
+		const [createdOrderPayment] = await db
+			.insert(orderPayment)
+			.values({
+				orderId,
+				orderPaymentMethodId,
+				stripePaymentMethodId,
+			})
+			.returning();
+
+		orderPaymentResult = createdOrderPayment;
+	}
+
+	if (!orderPaymentResult) {
 		return NextResponse.json(
 			mapErrorCodes(ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT),
 			{
@@ -78,6 +105,6 @@ export async function POST(request: Request) {
 	}
 
 	return NextResponse.json({
-		orderPayment: orderPaymentCreated,
+		orderPayment: orderPaymentResult,
 	});
 }

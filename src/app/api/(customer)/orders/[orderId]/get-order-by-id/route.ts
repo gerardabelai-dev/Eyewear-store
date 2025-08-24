@@ -6,7 +6,7 @@ import { HTTP_CODES } from "@/app/api/contants/http-codes";
 import { mapErrorCodes } from "@/app/api/utils/map-error-codes";
 import { mapInvalidZodResponse } from "@/app/api/utils/map-invalid-zod-response";
 import { db } from "@/lib/db";
-import { order } from "@/lib/db/schema";
+import { order, orderPayment } from "@/lib/db/schema";
 
 const getOrderByIdSchema = z.object({
 	orderId: z.string(),
@@ -54,13 +54,20 @@ export async function GET(
 					orderDeliveryMethod: true,
 				},
 			},
-			payment: {
-				with: {
-					orderPaymentMethod: true,
-				},
-			},
 		},
 	});
+
+	// Get the most recent payment record for this order
+	let mostRecentPayment = null;
+	if (orderFound) {
+		mostRecentPayment = await db.query.orderPayment.findFirst({
+			where: eq(orderPayment.orderId, orderId),
+			with: {
+				orderPaymentMethod: true,
+			},
+			orderBy: (orderPayment, { desc }) => [desc(orderPayment.updatedAt)],
+		});
+	}
 
 	if (!orderFound) {
 		return Response.json(
@@ -71,7 +78,19 @@ export async function GET(
 		);
 	}
 
+	// Attach the most recent payment to the order
+	const orderWithMostRecentPayment = {
+		...orderFound,
+		payment: mostRecentPayment,
+	};
+
+	console.log("📤 Returning order data:", {
+		orderId: orderFound.id,
+		hasPayment: !!mostRecentPayment,
+		paymentData: mostRecentPayment,
+	});
+
 	return NextResponse.json({
-		order: orderFound,
+		order: orderWithMostRecentPayment,
 	});
 }
