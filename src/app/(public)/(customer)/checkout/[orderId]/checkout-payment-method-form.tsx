@@ -6,18 +6,12 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { StripePaymentForm } from "@/components/stripe/stripe-payment-form";
 import {
-	Accordion,
-	AccordionContent,
-	AccordionItem,
-	AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Card, CardTitle } from "@/components/ui/card";
-import {
 	getOrderByIdQueryOptions,
 	getOrderPaymentMethodsQueryOptions,
 	useCreatePaymentIntentMutation,
 	useUpdateOrderPaymentMutation,
 } from "@/http";
+import { useCheckoutContext } from "./checkout-context";
 
 interface CheckoutPaymentMethodFormProps {
 	orderId: string;
@@ -29,9 +23,13 @@ export function CheckoutPaymentMethodForm({
 	stripePublishableKey,
 }: CheckoutPaymentMethodFormProps) {
 	const queryClient = useQueryClient();
+	const { goToNextStep } = useCheckoutContext();
 	const [, setStripeClientSecret] = useState<string | null>(null);
 	const [, setPaymentIntentId] = useState<string | null>(null);
 	const [paymentMethodId, setPaymentMethodId] = useState<string | null>(null);
+
+	// Get order data to check existing payment information
+	const { data: order } = useQuery(getOrderByIdQueryOptions(orderId));
 
 	const { mutate: createPaymentIntent, isPending: isCreatingPaymentIntent } =
 		useCreatePaymentIntentMutation({
@@ -60,6 +58,8 @@ export function CheckoutPaymentMethodForm({
 			queryClient.invalidateQueries({ queryKey: ["order", { id: orderId }] });
 			queryClient.invalidateQueries({ queryKey: ["order"] });
 			console.log("✅ Order queries invalidated");
+			// Move to next step after successful payment method setup
+			goToNextStep("payment-method");
 		},
 		onError: (error) => {
 			console.error(error);
@@ -68,8 +68,22 @@ export function CheckoutPaymentMethodForm({
 	});
 
 	useEffect(() => {
-		createPaymentIntent({ orderId });
-	}, [orderId, createPaymentIntent]);
+		// Only create payment intent if order doesn't already have one
+		if (order && !order.payment?.stripeClientSecret) {
+			console.log("🔄 Creating payment intent for order:", orderId);
+			createPaymentIntent({ orderId });
+		} else if (order?.payment?.stripeClientSecret) {
+			console.log("✅ Order already has payment intent, skipping creation");
+			setStripeClientSecret(order.payment.stripeClientSecret);
+			if (order.payment.stripePaymentIntentId) {
+				setPaymentIntentId(order.payment.stripePaymentIntentId);
+			}
+			// If order already has a payment method, set it as well
+			if (order.payment.stripePaymentMethodId) {
+				setPaymentMethodId(order.payment.stripePaymentMethodId);
+			}
+		}
+	}, [order, orderId, createPaymentIntent]);
 
 	const handleCardDataChange = (_cardData: any, _isValid: boolean) => {
 		// Card data changes are handled internally by the StripePaymentForm
@@ -102,12 +116,7 @@ export function CheckoutPaymentMethodForm({
 	};
 
 	return (
-		<Card className="p-8 space-y-8">
-			<CardTitle className="flex items-center gap-2">
-				<CreditCard className="w-5 h-5" />
-				Método de pagamento
-			</CardTitle>
-
+		<div className="space-y-6">
 			{isCreatingPaymentIntent && (
 				<div className="flex items-center gap-2 text-muted-foreground">
 					<Loader2 className="w-4 h-4 animate-spin" />
@@ -124,30 +133,24 @@ export function CheckoutPaymentMethodForm({
 			)}
 
 			{!isCreatingPaymentIntent && !paymentMethodId && (
-				<Accordion type="single" defaultValue="credit-card" className="w-full">
-					<AccordionItem value="credit-card">
-						<AccordionTrigger className="hover:no-underline">
-							<div className="flex items-center gap-3">
-								<CreditCard className="w-5 h-5" />
-								<div className="text-left">
-									<div className="font-medium">Cartão de Crédito</div>
-									<div className="text-sm text-muted-foreground">
-										Visa, Mastercard, American Express
-									</div>
-								</div>
+				<div className="space-y-4">
+					<div className="flex items-center gap-3 mb-4">
+						<CreditCard className="w-5 h-5" />
+						<div className="text-left">
+							<div className="font-medium">Cartão de Crédito</div>
+							<div className="text-sm text-muted-foreground">
+								Visa, Mastercard, American Express
 							</div>
-						</AccordionTrigger>
-						<AccordionContent className="pt-6">
-							<StripePaymentForm
-								publishableKey={stripePublishableKey}
-								onCardDataChange={handleCardDataChange}
-								onPaymentMethodCreated={handlePaymentMethodCreated}
-								onError={handlePaymentError}
-							/>
-						</AccordionContent>
-					</AccordionItem>
-				</Accordion>
+						</div>
+					</div>
+					<StripePaymentForm
+						publishableKey={stripePublishableKey}
+						onCardDataChange={handleCardDataChange}
+						onPaymentMethodCreated={handlePaymentMethodCreated}
+						onError={handlePaymentError}
+					/>
+				</div>
 			)}
-		</Card>
+		</div>
 	);
 }

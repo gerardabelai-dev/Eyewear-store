@@ -251,7 +251,7 @@ async function seedProduct() {
 		.values({
 			name: faker.commerce.productName(),
 			stock: faker.number.int({ min: 1, max: 100 }),
-			status: faker.helpers.arrayElement(schema.productStatus.enumValues),
+			status: "active",
 		})
 		.returning();
 
@@ -271,16 +271,18 @@ async function seedProduct() {
 	return product;
 }
 
-// Product image URLs
+// Product image URLs from CSV data
 const PRODUCT_IMAGE_URLS = [
-	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp",
-	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
-	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp",
-	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Chogath_5.jpg",
-	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg",
-	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Galio_1.jpg",
-	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Kennen_2.jpg",
-	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Quinn_1.jpg",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/artem-mihailov-5aKB1P_fcLw-unsplash.jpg",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/colin-lloyd-uGS733o4Ukk-unsplash.jpg",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/eyekeeper-eyekeeper-cbRGn25fqv8-unsplash.jpg",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-7WUyUtVcKSk-unsplash.jpg",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-7WUyUtVcKSk-unsplash.jpg",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-JT64dSDlBDc-unsplash.jpg",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-a179PlGs0EE-unsplash.jpg",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/redowan-dhrubo-1KEVqrKDyUs-unsplash.jpg",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/redowan-dhrubo-AHDpMKwCDhl-unsplash.jpg",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/xshades-sunglasses-RS-AetNFty8-unsplash.jpg",
 ];
 
 async function seedProductImage(productId: string) {

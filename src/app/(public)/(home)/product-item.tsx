@@ -88,8 +88,8 @@ export function ProductItem({
 			<div className={contentClassName}>
 				{showPrice && price ? (
 					<div className="flex gap-2">
-						<strong>{name}</strong>
-						<span>{price}</span>
+						<strong className="truncate">{name}</strong>
+						<span className="whitespace-nowrap">{price}</span>
 					</div>
 				) : (
 					<h3>{name}</h3>

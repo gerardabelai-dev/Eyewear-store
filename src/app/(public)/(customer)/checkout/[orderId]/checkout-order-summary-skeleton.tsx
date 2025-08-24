@@ -7,43 +7,43 @@ export function CheckoutOrderSummarySkeleton() {
 			<h2 className="text-lg font-bold">Resumo do pedido</h2>
 
 			<div className="flex gap-2 justify-between">
-				<Skeleton className="h-5 w-16" />
-				<Skeleton className="h-5 w-20" />
+				<Skeleton className="h-5 w-16 bg-muted-foreground/20" />
+				<Skeleton className="h-5 w-20 bg-muted-foreground/20" />
 			</div>
 
 			<Separator />
 
 			<div className="flex gap-2 justify-between">
-				<Skeleton className="h-5 w-12" />
-				<Skeleton className="h-5 w-20" />
+				<Skeleton className="h-5 w-12 bg-muted-foreground/20" />
+				<Skeleton className="h-5 w-20 bg-muted-foreground/20" />
 			</div>
 
 			<Separator />
 
 			<div className="flex gap-2 justify-between">
-				<Skeleton className="h-5 w-24" />
-				<Skeleton className="h-5 w-20" />
+				<Skeleton className="h-5 w-24 bg-muted-foreground/20" />
+				<Skeleton className="h-5 w-20 bg-muted-foreground/20" />
 			</div>
 
 			<Separator />
 
 			<div className="flex gap-2 justify-between">
-				<Skeleton className="h-5 w-10" />
-				<Skeleton className="h-5 w-20" />
+				<Skeleton className="h-5 w-10 bg-muted-foreground/20" />
+				<Skeleton className="h-5 w-20 bg-muted-foreground/20" />
 			</div>
 
 			<Separator />
 
 			{/* Coupon form skeleton */}
 			<div className="flex flex-col gap-2">
-				<Skeleton className="h-5 w-24" />
+				<Skeleton className="h-5 w-24 bg-muted-foreground/20" />
 				<div className="flex gap-2">
-					<Skeleton className="h-10 flex-1" />
-					<Skeleton className="h-10 w-20" />
+					<Skeleton className="h-10 flex-1 bg-muted-foreground/20" />
+					<Skeleton className="h-10 w-20 bg-muted-foreground/20" />
 				</div>
 			</div>
 
-			<Skeleton className="h-10 w-full" />
+			<Skeleton className="h-10 w-full bg-muted-foreground/20" />
 		</div>
 	);
 }

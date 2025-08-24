@@ -1,7 +1,14 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { HelpCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { GetCartResponse } from "@/http/types";
 import { calculateDiscountedPrice, formatPrice } from "@/lib/format-price";
 import { CreateOrderButton } from "./create-order-button";
@@ -29,45 +36,72 @@ export function CartSummary({ cartId }: { cartId: string }) {
 				return total + calculateItemTotal(item);
 			}, 0);
 
-	// For now, using fixed values for shipping and taxes
-	// These could be calculated based on delivery method, location, etc.
-	const shippingInCents = isEmpty ? 0 : 1000; // R$ 10,00
-	const taxesInCents = isEmpty ? 0 : 1000; // R$ 10,00
+	// Shipping and taxes will be calculated during checkout
+	const shippingInCents = 0;
+	const taxesInCents = 0;
 	const totalInCents = subtotalInCents + shippingInCents + taxesInCents;
 
 	return (
-		<div
-			className={`flex flex-col gap-4 bg-muted p-8 rounded h-fit sticky top-14 ${isEmpty ? "opacity-60" : ""}`}
-		>
-			<h2 className="text-lg font-bold">Resumo da compra</h2>
+		<TooltipProvider>
+			<div
+				className={`flex flex-col gap-4 bg-muted p-8 rounded h-fit sticky top-14 ${isEmpty ? "opacity-60" : ""}`}
+			>
+				<h2 className="text-lg font-bold">Resumo da compra</h2>
 
-			<div className="flex gap-2 justify-between">
-				<span>Subtotal</span>
-				<strong>{formatPrice(subtotalInCents)}</strong>
+				<div className="flex gap-2 justify-between">
+					<span>Subtotal</span>
+					<strong>{formatPrice(subtotalInCents)}</strong>
+				</div>
+
+				<Separator />
+
+				<div className="flex gap-2 justify-between">
+					<div className="flex items-center gap-1">
+						<span>Frete</span>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<HelpCircle className="size-4 text-muted-foreground cursor-help" />
+							</TooltipTrigger>
+							<TooltipContent>
+								<p>
+									O valor do frete será calculado no checkout com base no seu
+									endereço
+								</p>
+							</TooltipContent>
+						</Tooltip>
+					</div>
+					<strong>{formatPrice(shippingInCents)}</strong>
+				</div>
+
+				<Separator />
+
+				<div className="flex gap-2 justify-between">
+					<div className="flex items-center gap-1">
+						<span>Taxas e impostos</span>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<HelpCircle className="size-4 text-muted-foreground cursor-help" />
+							</TooltipTrigger>
+							<TooltipContent>
+								<p>
+									Taxas e impostos serão calculados no checkout conforme
+									aplicável
+								</p>
+							</TooltipContent>
+						</Tooltip>
+					</div>
+					<strong>{formatPrice(taxesInCents)}</strong>
+				</div>
+
+				<Separator />
+
+				<div className="flex gap-2 justify-between">
+					<span>Total</span>
+					<strong>{formatPrice(totalInCents)}</strong>
+				</div>
+
+				<CreateOrderButton cartId={cartId} disabled={isEmpty} />
 			</div>
-
-			<Separator />
-
-			<div className="flex gap-2 justify-between">
-				<span>Frete</span>
-				<strong>{formatPrice(shippingInCents)}</strong>
-			</div>
-
-			<Separator />
-
-			<div className="flex gap-2 justify-between">
-				<span>Taxas e impostos</span>
-				<strong>{formatPrice(taxesInCents)}</strong>
-			</div>
-
-			<Separator />
-
-			<div className="flex gap-2 justify-between">
-				<span>Total</span>
-				<strong>{formatPrice(totalInCents)}</strong>
-			</div>
-
-			<CreateOrderButton cartId={cartId} disabled={isEmpty} />
-		</div>
+		</TooltipProvider>
 	);
 }

@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import z from "zod";
 import { ERROR_CODES, ERROR_MESSAGES } from "@/app/api/contants/error-codes";
 import { Button } from "@/components/ui/button";
-import { Card, CardTitle } from "@/components/ui/card";
 import {
 	Form,
 	FormControl,
@@ -33,6 +32,7 @@ import {
 	getOrderDeliveryQueryOptions,
 	useUpdateOrderDeliveryMutation,
 } from "@/http";
+import { useCheckoutContext } from "./checkout-context";
 
 const formSchema = z.object({
 	shipping: z.object({
@@ -49,6 +49,7 @@ export function CheckoutShippingMethodForm({
 	orderId,
 }: CheckoutShippingMethodFormProps) {
 	const queryClient = useQueryClient();
+	const { goToNextStep } = useCheckoutContext();
 
 	const form = useForm<ShippingFormValues>({
 		resolver: zodResolver(formSchema),
@@ -73,6 +74,8 @@ export function CheckoutShippingMethodForm({
 				console.log(data);
 				// Invalidate order query to refresh checkout button state
 				queryClient.invalidateQueries(getOrderByIdQueryOptions(orderId));
+				// Move to next step after successful submission
+				goToNextStep("shipping-method");
 			},
 			onError: (error) => {
 				console.error(error);
@@ -116,66 +119,60 @@ export function CheckoutShippingMethodForm({
 	}
 
 	return (
-		<Card className="p-8 space-y-8">
-			<CardTitle className="flex items-center gap-2">
-				Seu método de envio
-			</CardTitle>
+		<Form {...form}>
+			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+				<FormField
+					control={form.control}
+					name="shipping.orderDeliveryMethodId"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Método de envio</FormLabel>
+							<FormControl>
+								<Select value={field.value} onValueChange={field.onChange}>
+									<SelectTrigger>
+										<SelectValue placeholder="Selecione..." />
+									</SelectTrigger>
+									<SelectContent>
+										<Suspense
+											fallback={
+												<SelectItem value="loading">
+													<Skeleton className="h-10 w-full" />
+												</SelectItem>
+											}
+										>
+											{orderDeliveryMethods.length === 0 && (
+												<SelectItem value="no-delivery-methods">
+													Nenhum método de envio disponível
+												</SelectItem>
+											)}
+											{orderDeliveryMethods?.map((orderDeliveryMethod) => (
+												<SelectItem
+													key={orderDeliveryMethod.id}
+													value={orderDeliveryMethod.id}
+												>
+													{orderDeliveryMethod.method}
+												</SelectItem>
+											))}
+										</Suspense>
+									</SelectContent>
+								</Select>
+							</FormControl>
+							<FormDescription>
+								Diferentes métodos de envio podem ter custos diferentes
+							</FormDescription>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
 
-			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-					<FormField
-						control={form.control}
-						name="shipping.orderDeliveryMethodId"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Método de envio</FormLabel>
-								<FormControl>
-									<Select value={field.value} onValueChange={field.onChange}>
-										<SelectTrigger>
-											<SelectValue placeholder="Selecione..." />
-										</SelectTrigger>
-										<SelectContent>
-											<Suspense
-												fallback={
-													<SelectItem value="loading">
-														<Skeleton className="h-10 w-full" />
-													</SelectItem>
-												}
-											>
-												{orderDeliveryMethods.length === 0 && (
-													<SelectItem value="no-delivery-methods">
-														Nenhum método de envio disponível
-													</SelectItem>
-												)}
-												{orderDeliveryMethods?.map((orderDeliveryMethod) => (
-													<SelectItem
-														key={orderDeliveryMethod.id}
-														value={orderDeliveryMethod.id}
-													>
-														{orderDeliveryMethod.method}
-													</SelectItem>
-												))}
-											</Suspense>
-										</SelectContent>
-									</Select>
-								</FormControl>
-								<FormDescription>
-									Diferentes métodos de envio podem ter custos diferentes
-								</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<Button type="submit" disabled={isPending}>
-						{isPending ? (
-							<Loader2 className="w-4 h-4 animate-spin" />
-						) : (
-							"Salvar"
-						)}
-					</Button>
-				</form>
-			</Form>
-		</Card>
+				<Button type="submit" disabled={isPending} className="w-full">
+					{isPending ? (
+						<Loader2 className="w-4 h-4 animate-spin" />
+					) : (
+						"Continuar"
+					)}
+				</Button>
+			</form>
+		</Form>
 	);
 }

@@ -238,6 +238,7 @@ export function CheckoutOrderButton({
 			size="lg"
 			disabled={isOrderPendingRequirements}
 			onClick={!isOrderPendingRequirements ? handleFinishOrder : undefined}
+			data-checkout-order-button
 		>
 			{isOrderPendingRequirements ? getButtonText() : "Finalizar compra"}
 		</Button>

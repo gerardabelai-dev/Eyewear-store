@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ERROR_CODES } from "@/app/api/contants/error-codes";
@@ -6,7 +6,7 @@ import { HTTP_CODES } from "@/app/api/contants/http-codes";
 import { mapErrorCodes } from "@/app/api/utils/map-error-codes";
 import { mapInvalidZodResponse } from "@/app/api/utils/map-invalid-zod-response";
 import { db } from "@/lib/db";
-import { cart } from "@/lib/db/schema";
+import { cart, cartProduct } from "@/lib/db/schema";
 
 const getCartByIdSchema = z.object({
 	cartId: z.string(),
@@ -29,6 +29,7 @@ export async function GET(
 		where: eq(cart.id, cartId),
 		with: {
 			cartProducts: {
+				orderBy: [asc(cartProduct.createdAt)],
 				with: {
 					product: {
 						with: {

@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import z from "zod";
 import { ERROR_CODES, ERROR_MESSAGES } from "@/app/api/contants/error-codes";
 import { Button } from "@/components/ui/button";
-import { Card, CardTitle } from "@/components/ui/card";
 import {
 	Form,
 	FormControl,
@@ -25,6 +24,7 @@ import {
 	useCreateCustomerMutation,
 	useUpdateOrderCustomerIdMutation,
 } from "@/http";
+import { useCheckoutContext } from "./checkout-context";
 
 const formSchema = z.object({
 	customer: z.object({
@@ -53,6 +53,7 @@ interface CheckoutCustomerFormProps {
 
 export function CheckoutCustomerForm({ orderId }: CheckoutCustomerFormProps) {
 	const queryClient = useQueryClient();
+	const { goToNextStep } = useCheckoutContext();
 
 	const form = useForm<CustomerFormValues>({
 		resolver: zodResolver(formSchema),
@@ -92,6 +93,8 @@ export function CheckoutCustomerForm({ orderId }: CheckoutCustomerFormProps) {
 			console.log(data);
 			// Invalidate order query to refresh checkout button state
 			queryClient.invalidateQueries(getOrderByIdQueryOptions(orderId));
+			// Move to next step after successful submission
+			goToNextStep("customer");
 		},
 		onError: (error) => {
 			console.error(error);
@@ -131,67 +134,65 @@ export function CheckoutCustomerForm({ orderId }: CheckoutCustomerFormProps) {
 	}
 
 	return (
-		<Card className="p-8 space-y-8">
-			<CardTitle className="flex items-center gap-2">
-				Suas informações
-			</CardTitle>
+		<Form {...form}>
+			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+				<FormField
+					control={form.control}
+					name="customer.fullName"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Seu nome completo</FormLabel>
+							<FormControl>
+								<Input {...field} placeholder="Victor Nogueira" />
+							</FormControl>
+							<FormDescription>Como devemos te chamar?</FormDescription>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
 
-			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-					<FormField
-						control={form.control}
-						name="customer.fullName"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Seu nome completo</FormLabel>
-								<FormControl>
-									<Input {...field} placeholder="Victor Nogueira" />
-								</FormControl>
-								<FormDescription>Como devemos te chamar?</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+				<FormField
+					control={form.control}
+					name="customer.email"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Seu melhor e-mail</FormLabel>
+							<FormControl>
+								<Input {...field} placeholder="victor@email.com" />
+							</FormControl>
+							<FormDescription>
+								Enviaremos e-mails com atualizações do seu pedido
+							</FormDescription>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
 
-					<FormField
-						control={form.control}
-						name="customer.email"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Seu melhor e-mail</FormLabel>
-								<FormControl>
-									<Input {...field} placeholder="victor@email.com" />
-								</FormControl>
-								<FormDescription>
-									Enviaremos e-mails com atualizações do seu pedido
-								</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+				<FormField
+					control={form.control}
+					name="customer.phone"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>WhatsApp</FormLabel>
+							<FormControl>
+								<Input {...field} placeholder="(11) 99999-9999" />
+							</FormControl>
+							<FormDescription>
+								Caso algum problema ocorra, entraremos em contato por aqui
+							</FormDescription>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
 
-					<FormField
-						control={form.control}
-						name="customer.phone"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>WhatsApp</FormLabel>
-								<FormControl>
-									<Input {...field} placeholder="(11) 99999-9999" />
-								</FormControl>
-								<FormDescription>
-									Caso algum problema ocorra, entraremos em contato por aqui
-								</FormDescription>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<Button type="submit" disabled={isPending}>
-						{isPending ? <Loader2 className="size-4 animate-spin" /> : "Salvar"}
-					</Button>
-				</form>
-			</Form>
-		</Card>
+				<Button type="submit" disabled={isPending} className="w-full">
+					{isPending ? (
+						<Loader2 className="size-4 animate-spin" />
+					) : (
+						"Continuar"
+					)}
+				</Button>
+			</form>
+		</Form>
 	);
 }

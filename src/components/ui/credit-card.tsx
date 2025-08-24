@@ -552,7 +552,7 @@ function CreditCard({
 					<Input
 						ref={cardNumberInputRef}
 						type="text"
-						placeholder="4242 4242 4242 4242 (Teste)"
+						placeholder="4242 4242 4242 4242"
 						value={currentValue.cardNumber}
 						onChange={handleCardNumberChange}
 						onFocus={() => handleFieldFocus("cardNumber")}
@@ -569,7 +569,7 @@ function CreditCard({
 					)}
 				</div>
 
-				<div className="grid grid-cols-3 gap-4">
+				<div className="grid grid-cols-2 gap-4">
 					<div>
 						<label className="block text-sm font-medium mb-2">Mês</label>
 						<Select
@@ -646,7 +646,7 @@ function CreditCard({
 							onFocus={handleCvvFocus}
 							onBlur={handleCvvBlur}
 							className={cn(
-								"font-mono text-center transition-all duration-200",
+								"font-mono text-center transition-all duration-200 max-w-16",
 								focusedField === "cvv" && "ring-2 ring-primary",
 								errors.cvv && "border-destructive",
 							)}

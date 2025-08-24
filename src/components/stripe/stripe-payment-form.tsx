@@ -11,7 +11,6 @@ import { CreditCard, type CreditCardValue } from "@/components/ui/credit-card";
 import {
 	Form,
 	FormControl,
-	FormDescription,
 	FormField,
 	FormItem,
 	FormLabel,
@@ -187,10 +186,6 @@ function PaymentForm({
 										className="w-full"
 									/>
 								</FormControl>
-								<FormDescription>
-									Para teste, use: 4242 4242 4242 4242 (Visa) ou 5555 5555 5555
-									4444 (Mastercard). Qualquer data futura e CVC válido.
-								</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
