@@ -84,6 +84,23 @@ export function CheckoutPaymentMethodForm({
 		}
 	}, [order, orderId, createPaymentIntent]);
 
+	// Focus cardholder name input when credit card form becomes visible
+	useEffect(() => {
+		if (!isCreatingPaymentIntent && !paymentMethodId) {
+			// Form is now visible, focus the first input with a delay to ensure rendering is complete
+			const timer = setTimeout(() => {
+				const cardholderInput = document.querySelector(
+					'[data-value="payment-method"] input[type="text"]',
+				) as HTMLInputElement;
+				if (cardholderInput) {
+					cardholderInput.focus();
+				}
+			}, 100);
+
+			return () => clearTimeout(timer);
+		}
+	}, [isCreatingPaymentIntent, paymentMethodId]);
+
 	const handleCardDataChange = (_cardData: any, _isValid: boolean) => {
 		// Card data changes are handled internally by the StripePaymentForm
 		// This callback is kept for future use if needed

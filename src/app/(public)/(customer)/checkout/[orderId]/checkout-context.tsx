@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import {
 	createContext,
 	type ReactNode,
@@ -7,6 +8,7 @@ import {
 	useEffect,
 	useState,
 } from "react";
+import { getOrderByIdQueryOptions } from "@/http";
 
 export type CheckoutStep =
 	| "customer"
@@ -21,6 +23,7 @@ interface CheckoutContextType {
 	goToNextStep: (currentStep: CheckoutStep) => void;
 	focusFirstInput: (step: CheckoutStep) => void;
 	focusOrderButton: () => void;
+	isStepDisabled: (step: CheckoutStep) => boolean;
 }
 
 const CheckoutContext = createContext<CheckoutContextType | null>(null);
@@ -36,6 +39,7 @@ export function useCheckoutContext() {
 interface CheckoutProviderProps {
 	children: ReactNode;
 	hasCustomer: boolean;
+	orderId: string;
 }
 
 const stepOrder: CheckoutStep[] = [
@@ -49,11 +53,15 @@ const stepOrder: CheckoutStep[] = [
 export function CheckoutProvider({
 	children,
 	hasCustomer,
+	orderId,
 }: CheckoutProviderProps) {
 	// Start with customer form open if no customer, otherwise all closed
 	const [activeStep, setActiveStep] = useState<CheckoutStep | null>(
 		hasCustomer ? null : "customer",
 	);
+
+	// Get order data to check which steps should be disabled
+	const { data: order } = useQuery(getOrderByIdQueryOptions(orderId));
 
 	const focusFirstInput = (step: CheckoutStep) => {
 		let selector = "";
@@ -69,7 +77,7 @@ export function CheckoutProvider({
 				selector = 'button[role="combobox"]'; // Select trigger
 				break;
 			case "payment-method":
-				selector = 'input[name="cardNumber"]'; // Stripe card number input
+				selector = '[data-value="payment-method"] input[type="text"]'; // First text input in payment method accordion
 				break;
 		}
 
@@ -87,6 +95,30 @@ export function CheckoutProvider({
 		) as HTMLElement;
 		if (button) {
 			button.focus();
+		}
+	};
+
+	const isStepDisabled = (step: CheckoutStep): boolean => {
+		if (!order) return false; // Don't disable if order data is not loaded yet
+
+		switch (step) {
+			case "customer":
+				// Disable if customer data exists (has customer and customer address)
+				return !!(order.customerId && order.customerAddressId);
+			case "shipping-address":
+				// Disable if customer address exists
+				return !!order.customerAddressId;
+			case "shipping-method":
+				// Disable if delivery method is selected
+				return !!order.delivery?.orderDeliveryMethodId;
+			case "payment-method":
+				// Disable if payment method is set up (has payment method and stripe payment method)
+				return !!(
+					order.payment?.orderPaymentMethodId &&
+					order.payment?.stripePaymentMethodId
+				);
+			default:
+				return false;
 		}
 	};
 
@@ -116,14 +148,23 @@ export function CheckoutProvider({
 		}
 	};
 
+	const handleSetActiveStep = (step: CheckoutStep | null) => {
+		// Don't allow setting disabled steps as active
+		if (step && isStepDisabled(step)) {
+			return;
+		}
+		setActiveStep(step);
+	};
+
 	return (
 		<CheckoutContext.Provider
 			value={{
 				activeStep,
-				setActiveStep,
+				setActiveStep: handleSetActiveStep,
 				goToNextStep,
 				focusFirstInput,
 				focusOrderButton,
+				isStepDisabled,
 			}}
 		>
 			{children}

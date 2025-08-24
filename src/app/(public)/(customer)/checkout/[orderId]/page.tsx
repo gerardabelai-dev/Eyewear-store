@@ -30,7 +30,7 @@ export default async function CheckoutPage({
 	const hasCustomer = !!orderData?.customerId;
 
 	return (
-		<CheckoutProvider hasCustomer={hasCustomer}>
+		<CheckoutProvider hasCustomer={hasCustomer} orderId={orderId}>
 			<PageHeader
 				title="Checkout"
 				description="Verifique seu pedido e finalize sua compra"

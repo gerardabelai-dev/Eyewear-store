@@ -70,9 +70,9 @@ export function CartProductImage({
 	const { imageSize } = useContext(CartProductContext);
 
 	const sizeClasses = {
-		sm: "w-32 md:w-48",
-		md: "w-48 md:w-72",
-		lg: "w-48 md:w-96",
+		sm: "w-32 min-w-32 md:w-48 md:min-w-48",
+		md: "w-48 min-w-48 md:w-72 md:min-w-72",
+		lg: "w-48 min-w-48 md:w-96 md:min-w-96",
 	};
 
 	const imageElement = imageUrl ? (
