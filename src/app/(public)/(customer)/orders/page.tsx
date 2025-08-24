@@ -37,7 +37,7 @@ export default function OrdersPage() {
 						<CartProduct.Image
 							imageUrl="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
 							alt="Óculos de grau"
-							href="/cart"
+							href="#"
 						/>
 
 						<CartProduct.Content>
@@ -58,7 +58,7 @@ export default function OrdersPage() {
 						<CartProduct.Image
 							imageUrl="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
 							alt="Óculos de grau"
-							href="/cart"
+							href="#"
 						/>
 
 						<CartProduct.Content>

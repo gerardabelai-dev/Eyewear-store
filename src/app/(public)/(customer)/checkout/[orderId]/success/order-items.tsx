@@ -36,7 +36,7 @@ export function OrderItems({ order }: OrderItemsProps) {
 							<CartProduct.Image
 								imageUrl={product?.images?.[0]?.imageUrl || ""}
 								alt={product?.name || "Produto"}
-								href="/cart"
+								href="#"
 								fallback={
 									<div className="w-full h-full bg-muted rounded flex items-center justify-center">
 										<span className="text-muted-foreground text-sm">
