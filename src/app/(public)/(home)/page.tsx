@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import { eq } from "drizzle-orm";
 import {
 	BadgeCheck,
@@ -226,7 +227,7 @@ const blogPostsData = [
 			"Guia de Óculos de Volta às Aulas: Encontrando os Óculos Certos para o Novo Ano Letivo",
 		href: "/cart",
 		image:
-			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp",
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/blogs/artem-mihailov-5aKB1P_fcLw-unsplash-vL8EAmmliVsMqxmNJEHi0iUNcL7fiS.jpg",
 	},
 	{
 		id: "blog-2",
@@ -234,29 +235,110 @@ const blogPostsData = [
 			"Da praia ao brunch: Como usar seus óculos de sol durante todo o verão",
 		href: "/cart",
 		image:
-			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Zyra_1.jpg",
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/blogs/becca-tapert-GnY_mW1Q6Xc-unsplash-Ttwh643sGghN5qSZuoXx2AoqugExI6.jpg",
 	},
 	{
 		id: "blog-3",
 		title: "Como limpar sua flanela para óculos da maneira correta",
 		href: "/cart",
 		image:
-			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Quinn_1.jpg",
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/blogs/mehrab-chi-pg78watFkw0-unsplash-9IVcuUGCtGGLMqU5lyV4Ps2y2OVee6.jpg",
 	},
 ];
+
+// Set a consistent seed for faker to ensure the same names are generated each time
+faker.seed(12345);
 
 const customerReviewsData = [
 	{
 		id: "review-1",
-		name: "John Doe",
+		name: faker.person.fullName(),
 		image:
-			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Chogath_5.jpg",
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/reviews/zeelool-glasses--zu-M0NVnqo-unsplash-QLaPxkVlvESa2jcCVIRuI6w7yV4qNW.jpg",
 	},
 	{
 		id: "review-2",
-		name: "Jane Smith",
+		name: faker.person.fullName(),
 		image:
-			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Kennen_2.jpg",
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/reviews/zeelool-glasses-08E_4V_uHtQ-unsplash-HGb11Z54767fWvMBT927CoxPLV6iWb.jpg",
+	},
+	{
+		id: "review-3",
+		name: faker.person.fullName(),
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/reviews/zeelool-glasses-32UtlKnKkWA-unsplash-1pW5AYtcj8V0tnz71AUT9wWdYBGbcq.jpg",
+	},
+	{
+		id: "review-4",
+		name: faker.person.fullName(),
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/reviews/zeelool-glasses-4Z6JZHafP_c-unsplash-Q12NP2hUPoMHYsMstg5RuFMGd31kx2.jpg",
+	},
+	{
+		id: "review-5",
+		name: faker.person.fullName(),
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/reviews/zeelool-glasses-7qsdLxXtJfg-unsplash-QpOQDn5VIRFlKMvFOvzoKDCdduaanm.jpg",
+	},
+	{
+		id: "review-6",
+		name: faker.person.fullName(),
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/reviews/zeelool-glasses-9nbzZ8ZimU0-unsplash-SlSnWkTgclfiBoY13vLad0C6UEP1nE.jpg",
+	},
+	{
+		id: "review-7",
+		name: faker.person.fullName(),
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/reviews/zeelool-glasses-AbeC2NzyCAw-unsplash-dyo26RJJYgAz7wROoqaZsF2ylIOOMW.jpg",
+	},
+	{
+		id: "review-8",
+		name: faker.person.fullName(),
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/reviews/zeelool-glasses-JM1NtaVl6Pg-unsplash-DwPWLAwg5wq88xoQKquyx0DOGvxO1z.jpg",
+	},
+	{
+		id: "review-9",
+		name: faker.person.fullName(),
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/reviews/zeelool-glasses-VUQmxlzP77w-unsplash-2a5LpdMzVDJpmKXrYz8DZhEYCFHxXJ.jpg",
+	},
+	{
+		id: "review-10",
+		name: faker.person.fullName(),
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/reviews/zeelool-glasses-T8OZ1Ug0hQY-unsplash-rlEzj2tztVFPGqajlXTDIBcnaxi3Xq.jpg",
+	},
+	{
+		id: "review-11",
+		name: faker.person.fullName(),
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/reviews/zeelool-glasses-aShmUdodJ3w-unsplash-WF2QNTPEiWczBhb6ZTjCp0uw52v8cl.jpg",
+	},
+	{
+		id: "review-12",
+		name: faker.person.fullName(),
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/reviews/zeelool-glasses-f93dxS2W9vU-unsplash-KET1n7VXGNBNDZlfFJ1tlyC8ZUlPP6.jpg",
+	},
+	{
+		id: "review-13",
+		name: faker.person.fullName(),
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/reviews/zeelool-glasses-trsE5rHBjvs-unsplash-QDwFEiTdepqkmJ1aMIp5UO10FgKby9.jpg",
+	},
+	{
+		id: "review-14",
+		name: faker.person.fullName(),
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/reviews/zeelool-glasses-yAMzhbNmLSk-unsplash-Cj7qSydZ1Ok8ToVnTtPZRlB4ORunJ4.jpg",
+	},
+	{
+		id: "review-15",
+		name: faker.person.fullName(),
+		image:
+			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/reviews/zeelool-glasses-z70QhrZ03Bo-unsplash-PMgHWe5vVKSs163MZWDly41Qt4ifIL.jpg",
 	},
 ];
 
@@ -590,8 +672,9 @@ export default async function HomePage() {
 
 				<div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
 					<Marquee pauseOnHover className="[--duration:40s]">
-						{Array.from({ length: 10 }).map((_, index) => {
-							const review = customerReviewsData[0]; // Use first review data
+						{Array.from({ length: 12 }).map((_, index) => {
+							const review =
+								customerReviewsData[index % customerReviewsData.length];
 							return (
 								<div
 									key={`marquee1-${index}`}
@@ -604,6 +687,8 @@ export default async function HomePage() {
 										quality={75}
 										fill
 										sizes="208px"
+										unoptimized={false}
+										priority={false}
 									/>
 
 									<div className="flex items-center gap-2 absolute bottom-2 left-2 transition-transform duration-300 hover:scale-105">
@@ -617,8 +702,9 @@ export default async function HomePage() {
 						})}
 					</Marquee>
 					<Marquee reverse pauseOnHover className="[--duration:40s]">
-						{Array.from({ length: 10 }).map((_, index) => {
-							const review = customerReviewsData[1]; // Use second review data
+						{Array.from({ length: 12 }).map((_, index) => {
+							const reviewIndex = (index + 9) % customerReviewsData.length; // Offset to show different reviews
+							const review = customerReviewsData[reviewIndex];
 							return (
 								<div
 									key={`marquee2-${index}`}
@@ -631,6 +717,8 @@ export default async function HomePage() {
 										quality={75}
 										fill
 										sizes="208px"
+										unoptimized={false}
+										priority={false}
 									/>
 
 									<div className="flex items-center gap-2 absolute bottom-2 left-2 transition-transform duration-300 hover:scale-105">

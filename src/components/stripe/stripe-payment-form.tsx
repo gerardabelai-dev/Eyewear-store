@@ -112,8 +112,18 @@ function PaymentForm({
 		},
 		onError: (error) => {
 			console.error("Payment method creation error:", error);
-			onError?.(error.message || "Erro ao processar cartão");
-			toast.error(error.message || "Erro ao processar cartão");
+			// Handle the error gracefully without throwing
+			const errorMessage = error.message || "Erro ao processar cartão";
+
+			// Call the onError callback if provided
+			try {
+				onError?.(errorMessage);
+			} catch (callbackError) {
+				console.error("Error in onError callback:", callbackError);
+			}
+
+			// Show user-friendly toast message
+			toast.error(errorMessage);
 			setIsProcessing(false);
 		},
 	});
@@ -153,16 +163,22 @@ function PaymentForm({
 	};
 
 	const onSubmit = async (data: CreditCardFormData) => {
-		setIsProcessing(true);
+		try {
+			setIsProcessing(true);
 
-		// Create payment method using the mutation hook
-		createPaymentMethod({
-			cardNumber: data.cardNumber.replace(/\s/g, ""),
-			expiryMonth: parseInt(data.expiryMonth),
-			expiryYear: parseInt(data.expiryYear),
-			cvc: data.cvv,
-			cardholderName: data.cardholderName,
-		});
+			// Create payment method using the mutation hook
+			createPaymentMethod({
+				cardNumber: data.cardNumber.replace(/\s/g, ""),
+				expiryMonth: parseInt(data.expiryMonth),
+				expiryYear: parseInt(data.expiryYear),
+				cvc: data.cvv,
+				cardholderName: data.cardholderName,
+			});
+		} catch (error) {
+			console.error("Error in onSubmit:", error);
+			setIsProcessing(false);
+			toast.error("Erro ao processar cartão");
+		}
 	};
 
 	return (
