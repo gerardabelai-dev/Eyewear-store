@@ -5,7 +5,7 @@ function CartItemSkeleton() {
 	return (
 		<li className="flex gap-4">
 			{/* Product Image Skeleton */}
-			<div className="relative w-48 md:w-96 h-full aspect-video">
+			<div className="relative w-48 md:w-72 h-full aspect-video">
 				<Skeleton className="w-full h-full rounded" />
 			</div>
 
@@ -26,7 +26,7 @@ function CartItemSkeleton() {
 				</div>
 
 				{/* Mobile Quantity and Delete Button */}
-				<div className="flex md:hidden gap-2 items-center">
+				<div className="flex md:hidden gap-2 items-start">
 					<Skeleton className="h-10 w-24" />
 					<Skeleton className="h-10 w-10" />
 				</div>
@@ -39,7 +39,7 @@ function CartItemSkeleton() {
 			</div>
 
 			{/* Desktop Quantity Selector */}
-			<div className="ml-auto hidden md:flex items-center gap-2">
+			<div className="ml-auto hidden md:flex items-start gap-2">
 				<Skeleton className="h-10 w-24" />
 			</div>
 

@@ -1,8 +1,9 @@
+"use client";
+
 import { CheckIcon } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
+import { CartProduct } from "@/components/ui/cart-product";
 import { Separator } from "@/components/ui/separator";
 import {
 	Timeline,
@@ -32,80 +33,44 @@ export default function OrdersPage() {
 				{/* Cart items */}
 				<ul className="flex flex-col gap-4">
 					{/* Product 1 */}
-					<li className="flex gap-4">
-						<Link
+					<CartProduct productId="ekko-order-1" imageSize="lg">
+						<CartProduct.Image
+							imageUrl="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
+							alt="Óculos de grau"
 							href="/cart"
-							className="relative w-48 md:w-96 h-full aspect-video"
-						>
-							<Image
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
-								alt="Óculos de grau"
-								className="object-cover rounded"
-								quality={75}
-								fill
-							/>
-						</Link>
+						/>
 
-						<div className="flex flex-col justify-between gap-2">
-							<div className="flex flex-col gap-2">
-								<h2 className="text-lg font-bold">Ekko</h2>
-								<span className="text-sm text-muted-foreground">
-									Gatinho | Metal
-								</span>
-								<strong className="text-md">R$ 100,00</strong>
-							</div>
-							<div className="flex flex-col md:flex-row md:items-center gap-2">
-								<span className="text-sm text-muted-foreground">
-									Quantidade: 1
-								</span>
+						<CartProduct.Content>
+							<CartProduct.Header>
+								<CartProduct.Name name="Ekko" />
+								<CartProduct.Description description="Gatinho | Metal" />
+								<CartProduct.Price priceInCents={10000} />
+							</CartProduct.Header>
 
-								<Separator className="hidden md:block" orientation="vertical" />
-
-								<span className="text-sm text-muted-foreground">
-									Preço: R$ 100,00
-								</span>
-							</div>
-						</div>
-					</li>
+							<CartProduct.QuantityDisplay quantity={1} unitPrice={10000} />
+						</CartProduct.Content>
+					</CartProduct>
 
 					<Separator className="my-6" />
 
 					{/* Product 2 */}
-					<li className="flex gap-4">
-						<Link
+					<CartProduct productId="ekko-order-2" imageSize="lg">
+						<CartProduct.Image
+							imageUrl="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
+							alt="Óculos de grau"
 							href="/cart"
-							className="relative w-48 md:w-96 h-full aspect-video"
-						>
-							<Image
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg"
-								alt="Óculos de grau"
-								className="object-cover rounded"
-								quality={75}
-								fill
-							/>
-						</Link>
+						/>
 
-						<div className="flex flex-col justify-between gap-2">
-							<div className="flex flex-col gap-2">
-								<h2 className="text-lg font-bold">Ekko</h2>
-								<span className="text-sm text-muted-foreground">
-									Gatinho | Metal
-								</span>
-								<strong className="text-md">R$ 100,00</strong>
-							</div>
-							<div className="flex flex-col md:flex-row md:items-center gap-2">
-								<span className="text-sm text-muted-foreground">
-									Quantidade: 1
-								</span>
+						<CartProduct.Content>
+							<CartProduct.Header>
+								<CartProduct.Name name="Ekko" />
+								<CartProduct.Description description="Gatinho | Metal" />
+								<CartProduct.Price priceInCents={10000} />
+							</CartProduct.Header>
 
-								<Separator className="hidden md:block" orientation="vertical" />
-
-								<span className="text-sm text-muted-foreground">
-									Preço: R$ 100,00
-								</span>
-							</div>
-						</div>
-					</li>
+							<CartProduct.QuantityDisplay quantity={1} unitPrice={10000} />
+						</CartProduct.Content>
+					</CartProduct>
 
 					<Separator className="my-6" />
 

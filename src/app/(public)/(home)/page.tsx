@@ -279,6 +279,7 @@ export default async function HomePage() {
 					src="https://s.ygstatic.com/image/promotion/back-to-school-sale/back-to-school-sale--home-l.1920.db40a014-bac.jpg"
 					alt="Hero Image"
 					fill
+					sizes="100vw"
 					className="object-cover hidden md:block"
 				/>
 
@@ -287,6 +288,7 @@ export default async function HomePage() {
 					src="https://s.ygstatic.com/image/promotion/back-to-school-sale/back-to-school-sale--home-s.528.db40a014-36a.jpg"
 					alt="Hero Image"
 					fill
+					sizes="100vw"
 					className="object-cover block md:hidden"
 				/>
 
@@ -566,6 +568,7 @@ export default async function HomePage() {
 									className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
 									quality={75}
 									fill
+									sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
 								/>
 							</div>
 							<h3 className="text-lg font-bold">{post.title}</h3>
@@ -600,6 +603,7 @@ export default async function HomePage() {
 										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
 										quality={75}
 										fill
+										sizes="208px"
 									/>
 
 									<div className="flex items-center gap-2 absolute bottom-2 left-2 transition-transform duration-300 hover:scale-105">
@@ -626,6 +630,7 @@ export default async function HomePage() {
 										className="object-cover rounded transition-transform duration-300 hover:scale-105 hover:cursor-pointer"
 										quality={75}
 										fill
+										sizes="208px"
 									/>
 
 									<div className="flex items-center gap-2 absolute bottom-2 left-2 transition-transform duration-300 hover:scale-105">

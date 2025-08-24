@@ -1,17 +1,14 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Check, Minus, Plus, Trash2 } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { CartProduct } from "@/components/ui/cart-product";
 import { Separator } from "@/components/ui/separator";
 import {
 	useRemoveProductFromCart,
 	useUpdateCartProductQuantity,
 } from "@/http/cart/mutations";
 import type { GetCartResponse } from "@/http/types";
-import { calculateDiscountedPrice, formatPrice } from "@/lib/format-price";
+import { calculateDiscountedPrice } from "@/lib/format-price";
 
 import { getCartQueryOptions } from "./get-cart-query-options";
 
@@ -72,135 +69,62 @@ function CartItem({ item, cartId }: { item: CartItemData; cartId: string }) {
 		handleQuantityChange(quantity - 1);
 	};
 
+	const isLoading =
+		updateQuantityMutation.isPending || removeProductMutation.isPending;
+
 	return (
-		<li className="flex gap-4">
-			<Link
+		<CartProduct productId={product.id} imageSize="md">
+			<CartProduct.Image
+				imageUrl={imageUrl}
+				alt={product.name}
 				href={`/products/${product.id}`}
-				className="relative w-48 md:min-w-72 h-full aspect-video"
-			>
-				<Image
-					src={imageUrl}
-					alt={product.name}
-					className="object-cover rounded"
-					quality={75}
-					fill
-				/>
-			</Link>
+			/>
 
-			<div className="flex flex-col justify-between gap-2">
-				<div className="flex flex-col gap-2">
-					<h2 className="text-lg font-bold">{product.name}</h2>
+			<CartProduct.Content>
+				<CartProduct.Header>
+					<CartProduct.Name name={product.name} />
 					{product.description && (
-						<span className="text-sm text-muted-foreground">
-							{product.description}
-						</span>
+						<CartProduct.Description description={product.description} />
 					)}
-					<div className="flex items-center gap-2">
-						{productPrice.discountPercentage > 0 ? (
-							<>
-								<strong className="text-md">
-									{formatPrice(discountedPrice)}
-								</strong>
-								<span className="text-sm text-muted-foreground line-through">
-									{formatPrice(productPrice.priceInCents)}
-								</span>
-							</>
-						) : (
-							<strong className="text-md">
-								{formatPrice(productPrice.priceInCents)}
-							</strong>
-						)}
-					</div>
-				</div>
+					<CartProduct.Price
+						priceInCents={discountedPrice}
+						originalPriceInCents={productPrice.priceInCents}
+						discountPercentage={productPrice.discountPercentage}
+					/>
+				</CartProduct.Header>
 
-				<div className="flex md:hidden gap-2 items-center">
-					<div className="flex items-center gap-2 border rounded-md">
-						<Button
-							variant="ghost"
-							size="icon"
-							onClick={handleDecrement}
-							disabled={
-								updateQuantityMutation.isPending ||
-								removeProductMutation.isPending
-							}
-							className="h-8 w-8 p-0"
-						>
-							<Minus className="size-3" />
-						</Button>
-						<span className="text-sm font-mono w-8 text-center">
-							{quantity}
-						</span>
-						<Button
-							variant="ghost"
-							size="icon"
-							onClick={handleIncrement}
-							disabled={
-								updateQuantityMutation.isPending || quantity >= product.stock
-							}
-							className="h-8 w-8 p-0"
-						>
-							<Plus className="size-3" />
-						</Button>
-					</div>
+				{/* Mobile Actions */}
+				<CartProduct.Actions mobileLayout>
+					<CartProduct.QuantityControls
+						quantity={quantity}
+						maxQuantity={product.stock}
+						onIncrement={handleIncrement}
+						onDecrement={handleDecrement}
+						disabled={isLoading}
+					/>
+					<CartProduct.Delete
+						onDelete={handleRemoveProduct}
+						disabled={isLoading}
+						mobileLayout
+					/>
+				</CartProduct.Actions>
 
-					<Button
-						variant="ghost"
-						size="icon"
-						onClick={handleRemoveProduct}
-						disabled={removeProductMutation.isPending}
-						className="flex items-center justify-center p-0"
-					>
-						<Trash2 className="size-4" />
-					</Button>
-				</div>
+				<CartProduct.Stock stock={product.stock} />
+			</CartProduct.Content>
 
-				<div className="flex items-center gap-2">
-					<Check className="size-4 text-emerald-500" />
-					<span className="text-sm text-muted-foreground">
-						{product.stock > 0 ? "Em estoque" : "Fora de estoque"}
-					</span>
-				</div>
-			</div>
+			{/* Desktop Actions */}
+			<CartProduct.Actions>
+				<CartProduct.QuantityControls
+					quantity={quantity}
+					maxQuantity={product.stock}
+					onIncrement={handleIncrement}
+					onDecrement={handleDecrement}
+					disabled={isLoading}
+				/>
+			</CartProduct.Actions>
 
-			<div className="ml-auto hidden md:flex items-center gap-2">
-				<div className="flex items-center gap-2 border rounded-md">
-					<Button
-						variant="ghost"
-						size="icon"
-						onClick={handleDecrement}
-						disabled={
-							updateQuantityMutation.isPending ||
-							removeProductMutation.isPending
-						}
-						className="h-8 w-8 p-0"
-					>
-						<Minus className="size-3" />
-					</Button>
-					<span className="text-sm font-mono w-8 text-center">{quantity}</span>
-					<Button
-						variant="ghost"
-						size="icon"
-						onClick={handleIncrement}
-						disabled={
-							updateQuantityMutation.isPending || quantity >= product.stock
-						}
-						className="h-8 w-8 p-0"
-					>
-						<Plus className="size-3" />
-					</Button>
-				</div>
-			</div>
-
-			<Button
-				variant="ghost"
-				size="icon"
-				className="hidden md:flex items-center justify-center p-0"
-				onClick={handleRemoveProduct}
-				disabled={removeProductMutation.isPending}
-			>
-				<Trash2 className="size-4" />
-			</Button>
-		</li>
+			<CartProduct.Delete onDelete={handleRemoveProduct} disabled={isLoading} />
+		</CartProduct>
 	);
 }
 
