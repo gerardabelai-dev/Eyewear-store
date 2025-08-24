@@ -2,7 +2,7 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, CreditCard, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { StripePaymentForm } from "@/components/stripe/stripe-payment-form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -28,6 +28,7 @@ export function CheckoutPaymentMethodForm({
 	const [, setStripeClientSecret] = useState<string | null>(null);
 	const [, setPaymentIntentId] = useState<string | null>(null);
 	const [paymentMethodId, setPaymentMethodId] = useState<string | null>(null);
+	const paymentIntentCreationAttempted = useRef(false);
 
 	// Get order data to check existing payment information
 	const { data: order } = useQuery(getOrderByIdQueryOptions(orderId));
@@ -38,10 +39,15 @@ export function CheckoutPaymentMethodForm({
 				console.log("💰 Payment intent created:", data);
 				setStripeClientSecret(data.clientSecret);
 				setPaymentIntentId(data.paymentIntentId);
+				paymentIntentCreationAttempted.current = true;
 			},
 			onError: (error) => {
-				console.error(error);
-				toast.error("Erro ao criar intenção de pagamento");
+				console.error("Payment intent creation error:", error);
+				paymentIntentCreationAttempted.current = true; // Mark as attempted even on error
+				// Don't show error toast for "already has payment intent" error
+				if (error.message !== "ORDER_ALREADY_HAS_STRIPE_PAYMENT_INTENT") {
+					toast.error("Erro ao criar intenção de pagamento");
+				}
 			},
 		});
 
@@ -69,17 +75,18 @@ export function CheckoutPaymentMethodForm({
 		},
 	});
 
-	useEffect(() => {
-		// Only create payment intent if order doesn't already have one
-		if (
-			order &&
-			!order.payment?.stripeClientSecret &&
-			!isCreatingPaymentIntent
-		) {
+	const handlePaymentIntentCreation = useCallback(() => {
+		if (!paymentIntentCreationAttempted.current && !isCreatingPaymentIntent) {
 			console.log("🔄 Creating payment intent for order:", orderId);
 			createPaymentIntent({ orderId });
-		} else if (order?.payment?.stripeClientSecret) {
-			console.log("✅ Order already has payment intent, skipping creation");
+		}
+	}, [orderId, createPaymentIntent, isCreatingPaymentIntent]);
+
+	useEffect(() => {
+		if (!order) return;
+
+		if (order.payment?.stripeClientSecret) {
+			console.log("✅ Order already has payment intent, using existing");
 			setStripeClientSecret(order.payment.stripeClientSecret);
 			if (order.payment.stripePaymentIntentId) {
 				setPaymentIntentId(order.payment.stripePaymentIntentId);
@@ -88,14 +95,16 @@ export function CheckoutPaymentMethodForm({
 			if (order.payment.stripePaymentMethodId) {
 				setPaymentMethodId(order.payment.stripePaymentMethodId);
 			}
+			paymentIntentCreationAttempted.current = true;
+		} else {
+			// Only create payment intent if we haven't attempted it yet
+			handlePaymentIntentCreation();
 		}
 	}, [
 		order?.payment?.stripeClientSecret,
 		order?.payment?.stripePaymentIntentId,
 		order?.payment?.stripePaymentMethodId,
-		orderId,
-		createPaymentIntent,
-		isCreatingPaymentIntent,
+		handlePaymentIntentCreation,
 	]);
 
 	// Focus cardholder name input when credit card form becomes visible
