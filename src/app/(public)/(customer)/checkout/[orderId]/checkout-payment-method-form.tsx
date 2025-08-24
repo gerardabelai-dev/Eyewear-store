@@ -54,11 +54,14 @@ export function CheckoutPaymentMethodForm({
 			console.log("Order payment updated:", data);
 			// Invalidate order query to refresh checkout button state
 			console.log("🔄 Invalidating order queries for orderId:", orderId);
-			queryClient.invalidateQueries(getOrderByIdQueryOptions(orderId));
+			queryClient.invalidateQueries({
+				queryKey: getOrderByIdQueryOptions(orderId).queryKey,
+				exact: true,
+			});
 			console.log("✅ Order queries invalidated");
 			// Move to next step after successful payment method setup with slight delay
 			// to ensure query invalidation completes before focusing
-			setTimeout(() => goToNextStep("payment-method"), 50);
+			setTimeout(() => goToNextStep("payment-method"), 100);
 		},
 		onError: (error) => {
 			console.error(error);
@@ -68,7 +71,11 @@ export function CheckoutPaymentMethodForm({
 
 	useEffect(() => {
 		// Only create payment intent if order doesn't already have one
-		if (order && !order.payment?.stripeClientSecret) {
+		if (
+			order &&
+			!order.payment?.stripeClientSecret &&
+			!isCreatingPaymentIntent
+		) {
 			console.log("🔄 Creating payment intent for order:", orderId);
 			createPaymentIntent({ orderId });
 		} else if (order?.payment?.stripeClientSecret) {
@@ -82,7 +89,14 @@ export function CheckoutPaymentMethodForm({
 				setPaymentMethodId(order.payment.stripePaymentMethodId);
 			}
 		}
-	}, [order, orderId, createPaymentIntent]);
+	}, [
+		order?.payment?.stripeClientSecret,
+		order?.payment?.stripePaymentIntentId,
+		order?.payment?.stripePaymentMethodId,
+		orderId,
+		createPaymentIntent,
+		isCreatingPaymentIntent,
+	]);
 
 	// Focus cardholder name input when credit card form becomes visible
 	useEffect(() => {
@@ -123,8 +137,8 @@ export function CheckoutPaymentMethodForm({
 			});
 		}
 
-		// Refresh the page data
-		queryClient.invalidateQueries(getOrderByIdQueryOptions(orderId));
+		// Note: Query invalidation is handled in the updateOrderPaymentMethod success callback
+		// to avoid duplicate invalidations
 	};
 
 	const handlePaymentError = (error: string) => {

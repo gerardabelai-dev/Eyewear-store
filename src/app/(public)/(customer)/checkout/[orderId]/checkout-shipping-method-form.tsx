@@ -73,10 +73,16 @@ export function CheckoutShippingMethodForm({
 			onSuccess: (data) => {
 				console.log(data);
 				// Invalidate both order and order delivery queries to refresh data
-				queryClient.invalidateQueries(getOrderByIdQueryOptions(orderId));
-				queryClient.invalidateQueries(getOrderDeliveryQueryOptions(orderId));
-				// Move to next step after successful submission
-				goToNextStep("shipping-method");
+				queryClient.invalidateQueries({
+					queryKey: getOrderByIdQueryOptions(orderId).queryKey,
+					exact: true,
+				});
+				queryClient.invalidateQueries({
+					queryKey: getOrderDeliveryQueryOptions(orderId).queryKey,
+					exact: true,
+				});
+				// Move to next step after successful submission with slight delay
+				setTimeout(() => goToNextStep("shipping-method"), 50);
 			},
 			onError: (error) => {
 				console.error(error);
@@ -95,27 +101,33 @@ export function CheckoutShippingMethodForm({
 	useEffect(() => {
 		if (orderDelivery?.orderDeliveryMethodId) {
 			// If order already has a delivery method selected, use it
-			form.reset({
-				shipping: {
-					orderDeliveryMethodId: orderDelivery.orderDeliveryMethodId,
-				},
-			});
+			const currentValue = form.getValues("shipping.orderDeliveryMethodId");
+			if (currentValue !== orderDelivery.orderDeliveryMethodId) {
+				form.reset({
+					shipping: {
+						orderDeliveryMethodId: orderDelivery.orderDeliveryMethodId,
+					},
+				});
+			}
 		} else if (
 			orderDeliveryMethods.length > 0 &&
 			!form.getValues("shipping.orderDeliveryMethodId")
 		) {
 			// If no delivery method is selected and methods are available, select the first one
 			const firstMethodId = orderDeliveryMethods[0].id;
-			form.reset({
-				shipping: {
-					orderDeliveryMethodId: firstMethodId,
-				},
-			});
+			const currentValue = form.getValues("shipping.orderDeliveryMethodId");
+			if (currentValue !== firstMethodId) {
+				form.reset({
+					shipping: {
+						orderDeliveryMethodId: firstMethodId,
+					},
+				});
+			}
 
 			// Note: We don't auto-submit here to avoid errors on page load
 			// User can submit manually if they want to save the selection
 		}
-	}, [orderDelivery, orderDeliveryMethods, form]);
+	}, [orderDelivery?.orderDeliveryMethodId, orderDeliveryMethods, form]);
 
 	function onSubmit(values: ShippingFormValues) {
 		updateOrderDeliveryMethod({

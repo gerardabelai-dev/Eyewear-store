@@ -125,7 +125,13 @@ export function CheckoutAccordionForms({
 					</div>
 				</AccordionTrigger>
 				<AccordionContent className="px-6 pb-6">
-					<CheckoutShippingMethodForm orderId={orderId} />
+					{isStepAccessible("shipping-method") ? (
+						<CheckoutShippingMethodForm orderId={orderId} />
+					) : (
+						<div className="text-muted-foreground text-sm">
+							Complete as etapas anteriores para acessar o método de envio
+						</div>
+					)}
 				</AccordionContent>
 			</AccordionItem>
 
@@ -158,12 +164,18 @@ export function CheckoutAccordionForms({
 					</div>
 				</AccordionTrigger>
 				<AccordionContent className="px-6 pb-6">
-					<CheckoutPaymentMethodForm
-						orderId={orderId}
-						stripePublishableKey={
-							process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ""
-						}
-					/>
+					{isStepAccessible("payment-method") ? (
+						<CheckoutPaymentMethodForm
+							orderId={orderId}
+							stripePublishableKey={
+								process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ""
+							}
+						/>
+					) : (
+						<div className="text-muted-foreground text-sm">
+							Complete as etapas anteriores para acessar o pagamento
+						</div>
+					)}
 				</AccordionContent>
 			</AccordionItem>
 		</Accordion>
