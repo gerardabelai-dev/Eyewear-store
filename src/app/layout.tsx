@@ -32,6 +32,7 @@ export const metadata: Metadata = {
 		shortcut: "/drvista-favicon.svg",
 		apple: "/drvista-favicon.svg",
 	},
+	viewport: "width=device-width, initial-scale=1, maximum-scale=1",
 };
 
 export default function RootLayout({
