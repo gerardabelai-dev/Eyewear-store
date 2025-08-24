@@ -1,6 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, Libre_Baskerville, Lora } from "next/font/google";
-import Head from "next/head";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -35,6 +34,13 @@ export const metadata: Metadata = {
 	},
 };
 
+export const viewport: Viewport = {
+	width: "device-width",
+	initialScale: 1,
+	maximumScale: 1,
+	viewportFit: "cover",
+};
+
 export default function RootLayout({
 	children,
 }: {
@@ -42,12 +48,6 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<Head>
-				<meta
-					name="viewport"
-					content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-				/>
-			</Head>
 			<body
 				className={cn(
 					"min-h-screen bg-background antialiased",
