@@ -462,17 +462,19 @@ function CreditCard({
 								{currentValue.cardNumber || "•••• •••• •••• ••••"}
 							</div>
 
-							{/* Bottom row: cardholder - expires - vendor logo */}
-							<div className="flex justify-between items-end">
-								<div className="flex-1">
-									<div className="text-xs opacity-70 uppercase font-medium">
-										Portador
-									</div>
-									<div className="font-bold text-sm">
-										{currentValue.cardholderName || "SEU NOME"}
-									</div>
+							{/* Cardholder name - full width */}
+							<div>
+								<div className="text-xs opacity-70 uppercase font-medium">
+									Portador
 								</div>
-								<div className="flex-1 text-center">
+								<div className="font-bold text-sm">
+									{currentValue.cardholderName || "SEU NOME"}
+								</div>
+							</div>
+
+							{/* Bottom row: validity date - vendor logo */}
+							<div className="flex justify-between items-end">
+								<div>
 									<div className="text-xs opacity-70 uppercase font-medium">
 										Validade
 									</div>
@@ -482,7 +484,7 @@ function CreditCard({
 											: "MM/AA"}
 									</div>
 								</div>
-								<div className="flex-1 flex justify-end">
+								<div className="flex justify-end">
 									{showVendor && CardIcons[cardType]}
 								</div>
 							</div>

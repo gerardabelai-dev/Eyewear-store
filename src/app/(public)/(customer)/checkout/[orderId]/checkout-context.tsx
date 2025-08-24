@@ -101,11 +101,14 @@ export function CheckoutProvider({
 		const currentIndex = stepOrder.indexOf(currentStep);
 		const nextStep = stepOrder[currentIndex + 1];
 
+		// Scroll to top of page after form submission
+		window.scrollTo({ top: 0, behavior: "smooth" });
+
 		if (nextStep === "complete") {
 			// All forms completed, close all accordions
 			setActiveStep(null);
-			// Focus will be handled by focusOrderButton
-			setTimeout(() => focusOrderButton(), 100);
+			// Focus will be handled by focusOrderButton with longer delay to ensure re-renders complete
+			setTimeout(() => focusOrderButton(), 200);
 		} else if (nextStep) {
 			setActiveStep(nextStep);
 			// Focus first input of next form

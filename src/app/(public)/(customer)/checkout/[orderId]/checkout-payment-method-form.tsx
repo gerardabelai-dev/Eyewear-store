@@ -1,10 +1,11 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CreditCard, Loader2 } from "lucide-react";
+import { Check, CreditCard, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { StripePaymentForm } from "@/components/stripe/stripe-payment-form";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
 	getOrderByIdQueryOptions,
 	getOrderPaymentMethodsQueryOptions,
@@ -54,12 +55,10 @@ export function CheckoutPaymentMethodForm({
 			// Invalidate order query to refresh checkout button state
 			console.log("🔄 Invalidating order queries for orderId:", orderId);
 			queryClient.invalidateQueries(getOrderByIdQueryOptions(orderId));
-			// Also invalidate with exact query key pattern
-			queryClient.invalidateQueries({ queryKey: ["order", { id: orderId }] });
-			queryClient.invalidateQueries({ queryKey: ["order"] });
 			console.log("✅ Order queries invalidated");
-			// Move to next step after successful payment method setup
-			goToNextStep("payment-method");
+			// Move to next step after successful payment method setup with slight delay
+			// to ensure query invalidation completes before focusing
+			setTimeout(() => goToNextStep("payment-method"), 50);
 		},
 		onError: (error) => {
 			console.error(error);
@@ -125,11 +124,12 @@ export function CheckoutPaymentMethodForm({
 			)}
 
 			{paymentMethodId && (
-				<div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-					<p className="text-green-800 font-medium">
-						✅ Cartão validado com sucesso!
-					</p>
-				</div>
+				<Alert className="bg-primary/10 border-primary/20 text-primary">
+					<Check className="h-4 w-4" />
+					<AlertDescription className="text-primary font-medium">
+						Cartão validado com sucesso!
+					</AlertDescription>
+				</Alert>
 			)}
 
 			{!isCreatingPaymentIntent && !paymentMethodId && (
