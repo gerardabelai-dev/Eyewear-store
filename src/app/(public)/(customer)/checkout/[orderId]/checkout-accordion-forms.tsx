@@ -19,7 +19,8 @@ interface CheckoutAccordionFormsProps {
 export function CheckoutAccordionForms({
 	orderId,
 }: CheckoutAccordionFormsProps) {
-	const { activeStep, setActiveStep, isStepDisabled } = useCheckoutContext();
+	const { activeStep, setActiveStep, isStepCompleted, isStepAccessible } =
+		useCheckoutContext();
 
 	return (
 		<Accordion
@@ -31,21 +32,23 @@ export function CheckoutAccordionForms({
 		>
 			<AccordionItem
 				value="customer"
-				className={`border rounded-lg ${isStepDisabled("customer") ? "opacity-75" : ""}`}
+				className={`border rounded-lg ${!isStepAccessible("customer") ? "opacity-50" : ""}`}
 			>
 				<AccordionTrigger
 					className="px-6 py-4 hover:no-underline"
-					disabled={isStepDisabled("customer")}
+					disabled={!isStepAccessible("customer")}
 				>
 					<div className="flex items-center gap-3">
 						<div
 							className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-								isStepDisabled("customer")
+								isStepCompleted("customer")
 									? "bg-primary text-primary-foreground"
-									: "bg-primary/10"
+									: isStepAccessible("customer")
+										? "bg-primary/10 text-primary"
+										: "bg-muted text-muted-foreground"
 							}`}
 						>
-							{isStepDisabled("customer") ? "✓" : "1"}
+							{isStepCompleted("customer") ? "✓" : "1"}
 						</div>
 						<div className="text-left">
 							<div className="font-medium">Suas informações</div>
@@ -62,21 +65,23 @@ export function CheckoutAccordionForms({
 
 			<AccordionItem
 				value="shipping-address"
-				className={`border rounded-lg ${isStepDisabled("shipping-address") ? "opacity-75" : ""}`}
+				className={`border rounded-lg ${!isStepAccessible("shipping-address") ? "opacity-50" : ""}`}
 			>
 				<AccordionTrigger
 					className="px-6 py-4 hover:no-underline"
-					disabled={isStepDisabled("shipping-address")}
+					disabled={!isStepAccessible("shipping-address")}
 				>
 					<div className="flex items-center gap-3">
 						<div
 							className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-								isStepDisabled("shipping-address")
+								isStepCompleted("shipping-address")
 									? "bg-primary text-primary-foreground"
-									: "bg-primary/10"
+									: isStepAccessible("shipping-address")
+										? "bg-primary/10 text-primary"
+										: "bg-muted text-muted-foreground"
 							}`}
 						>
-							{isStepDisabled("shipping-address") ? "✓" : "2"}
+							{isStepCompleted("shipping-address") ? "✓" : "2"}
 						</div>
 						<div className="text-left">
 							<div className="font-medium">Endereço de entrega</div>
@@ -93,21 +98,23 @@ export function CheckoutAccordionForms({
 
 			<AccordionItem
 				value="shipping-method"
-				className={`border rounded-lg ${isStepDisabled("shipping-method") ? "opacity-75" : ""}`}
+				className={`border rounded-lg ${!isStepAccessible("shipping-method") ? "opacity-50" : ""}`}
 			>
 				<AccordionTrigger
 					className="px-6 py-4 hover:no-underline"
-					disabled={isStepDisabled("shipping-method")}
+					disabled={!isStepAccessible("shipping-method")}
 				>
 					<div className="flex items-center gap-3">
 						<div
 							className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-								isStepDisabled("shipping-method")
+								isStepCompleted("shipping-method")
 									? "bg-primary text-primary-foreground"
-									: "bg-primary/10"
+									: isStepAccessible("shipping-method")
+										? "bg-primary/10 text-primary"
+										: "bg-muted text-muted-foreground"
 							}`}
 						>
-							{isStepDisabled("shipping-method") ? "✓" : "3"}
+							{isStepCompleted("shipping-method") ? "✓" : "3"}
 						</div>
 						<div className="text-left">
 							<div className="font-medium">Método de envio</div>
@@ -124,21 +131,23 @@ export function CheckoutAccordionForms({
 
 			<AccordionItem
 				value="payment-method"
-				className={`border rounded-lg last:border-b ${isStepDisabled("payment-method") ? "opacity-75" : ""}`}
+				className={`border rounded-lg last:border-b ${!isStepAccessible("payment-method") ? "opacity-50" : ""}`}
 			>
 				<AccordionTrigger
 					className="px-6 py-4 hover:no-underline"
-					disabled={isStepDisabled("payment-method")}
+					disabled={!isStepAccessible("payment-method")}
 				>
 					<div className="flex items-center gap-3">
 						<div
 							className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-								isStepDisabled("payment-method")
+								isStepCompleted("payment-method")
 									? "bg-primary text-primary-foreground"
-									: "bg-primary/10"
+									: isStepAccessible("payment-method")
+										? "bg-primary/10 text-primary"
+										: "bg-muted text-muted-foreground"
 							}`}
 						>
-							{isStepDisabled("payment-method") ? "✓" : "4"}
+							{isStepCompleted("payment-method") ? "✓" : "4"}
 						</div>
 						<div className="text-left">
 							<div className="font-medium">Método de pagamento</div>

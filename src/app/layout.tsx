@@ -24,9 +24,9 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "Dr. Vista - Plataforma de Autenticação Segura",
+	title: "Dr. Vista - Óculos Online com Qualidade e Estilo",
 	description:
-		"Sistema administrativo moderno com autenticação segura e interface intuitiva para gestão completa",
+		"Encontre os óculos perfeitos na Dr. Vista. Óculos de grau, sol e leitura com lentes de alta qualidade, frete grátis e garantia. Compre online com segurança e receba em casa.",
 	icons: {
 		icon: "/drvista-favicon.svg",
 		shortcut: "/drvista-favicon.svg",

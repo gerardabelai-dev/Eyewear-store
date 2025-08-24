@@ -24,6 +24,8 @@ interface CheckoutContextType {
 	focusFirstInput: (step: CheckoutStep) => void;
 	focusOrderButton: () => void;
 	isStepDisabled: (step: CheckoutStep) => boolean;
+	isStepCompleted: (step: CheckoutStep) => boolean;
+	isStepAccessible: (step: CheckoutStep) => boolean;
 }
 
 const CheckoutContext = createContext<CheckoutContextType | null>(null);
@@ -55,10 +57,8 @@ export function CheckoutProvider({
 	hasCustomer,
 	orderId,
 }: CheckoutProviderProps) {
-	// Start with customer form open if no customer, otherwise all closed
-	const [activeStep, setActiveStep] = useState<CheckoutStep | null>(
-		hasCustomer ? null : "customer",
-	);
+	// Always start with customer form open (first accordion)
+	const [activeStep, setActiveStep] = useState<CheckoutStep | null>("customer");
 
 	// Get order data to check which steps should be disabled
 	const { data: order } = useQuery(getOrderByIdQueryOptions(orderId));
@@ -98,21 +98,21 @@ export function CheckoutProvider({
 		}
 	};
 
-	const isStepDisabled = (step: CheckoutStep): boolean => {
-		if (!order) return false; // Don't disable if order data is not loaded yet
+	const isStepCompleted = (step: CheckoutStep): boolean => {
+		if (!order) return false;
 
 		switch (step) {
 			case "customer":
-				// Disable if customer data exists (has customer and customer address)
-				return !!(order.customerId && order.customerAddressId);
+				// Completed if customer data exists
+				return !!order.customerId;
 			case "shipping-address":
-				// Disable if customer address exists
+				// Completed if customer address exists
 				return !!order.customerAddressId;
 			case "shipping-method":
-				// Disable if delivery method is selected
+				// Completed if delivery method is selected
 				return !!order.delivery?.orderDeliveryMethodId;
 			case "payment-method":
-				// Disable if payment method is set up (has payment method and stripe payment method)
+				// Completed if payment method is set up
 				return !!(
 					order.payment?.orderPaymentMethodId &&
 					order.payment?.stripePaymentMethodId
@@ -120,6 +120,29 @@ export function CheckoutProvider({
 			default:
 				return false;
 		}
+	};
+
+	const isStepAccessible = (step: CheckoutStep): boolean => {
+		if (!order) return step === "customer"; // Only customer step accessible initially
+
+		const stepIndex = stepOrder.indexOf(step);
+
+		// First step is always accessible
+		if (stepIndex === 0) return true;
+
+		// Check if all previous steps are completed
+		for (let i = 0; i < stepIndex; i++) {
+			if (!isStepCompleted(stepOrder[i])) {
+				return false;
+			}
+		}
+
+		return true;
+	};
+
+	const isStepDisabled = (step: CheckoutStep): boolean => {
+		// Step is disabled if it's not accessible or if it's completed
+		return !isStepAccessible(step);
 	};
 
 	// Focus first input when customer form opens initially
@@ -149,8 +172,8 @@ export function CheckoutProvider({
 	};
 
 	const handleSetActiveStep = (step: CheckoutStep | null) => {
-		// Don't allow setting disabled steps as active
-		if (step && isStepDisabled(step)) {
+		// Don't allow setting inaccessible steps as active
+		if (step && !isStepAccessible(step)) {
 			return;
 		}
 		setActiveStep(step);
@@ -165,6 +188,8 @@ export function CheckoutProvider({
 				focusFirstInput,
 				focusOrderButton,
 				isStepDisabled,
+				isStepCompleted,
+				isStepAccessible,
 			}}
 		>
 			{children}
