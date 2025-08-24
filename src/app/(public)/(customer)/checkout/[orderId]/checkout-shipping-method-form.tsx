@@ -31,7 +31,7 @@ import {
 	getOrderByIdQueryOptions,
 	getOrderDeliveryMethodsQueryOptions,
 	getOrderDeliveryQueryOptions,
-	useCreateOrderDeliveryMutation,
+	useUpdateOrderDeliveryMutation,
 } from "@/http";
 
 const formSchema = z.object({
@@ -67,8 +67,8 @@ export function CheckoutShippingMethodForm({
 		getOrderDeliveryMethodsQueryOptions(),
 	);
 
-	const { mutate: createOrderDeliveryMethod, isPending } =
-		useCreateOrderDeliveryMutation({
+	const { mutate: updateOrderDeliveryMethod, isPending } =
+		useUpdateOrderDeliveryMutation({
 			onSuccess: (data) => {
 				console.log(data);
 				// Invalidate order query to refresh checkout button state
@@ -109,7 +109,7 @@ export function CheckoutShippingMethodForm({
 	}, [orderDelivery, orderDeliveryMethods, form]);
 
 	function onSubmit(values: ShippingFormValues) {
-		createOrderDeliveryMethod({
+		updateOrderDeliveryMethod({
 			orderId,
 			orderDeliveryMethodId: values.shipping.orderDeliveryMethodId,
 		});

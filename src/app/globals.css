@@ -338,6 +338,7 @@
 	background-color: var(--primary) !important;
 	border-color: var(--primary) !important;
 	color: var(--primary-foreground) !important;
+	max-width: fit-content;
 }
 
 [data-sonner-toast][data-type="success"] [data-icon] {

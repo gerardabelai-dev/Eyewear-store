@@ -7,7 +7,13 @@ import { ERROR_CODES, ERROR_MESSAGES } from "@/app/api/contants/error-codes";
 import { Button } from "@/components/ui/button";
 import { useCreateOrderFromCartMutation } from "@/http";
 
-export function CreateOrderButton({ cartId }: { cartId: string }) {
+export function CreateOrderButton({
+	cartId,
+	disabled = false,
+}: {
+	cartId: string;
+	disabled?: boolean;
+}) {
 	const router = useRouter();
 
 	// TODO: improve tanstack cache handling and optimistic ui updates
@@ -32,7 +38,7 @@ export function CreateOrderButton({ cartId }: { cartId: string }) {
 			variant="vibrant"
 			className="w-full"
 			size="lg"
-			disabled={isPending}
+			disabled={isPending || disabled}
 			onClick={() => createOrder({ cartId })}
 		>
 			{isPending ? (

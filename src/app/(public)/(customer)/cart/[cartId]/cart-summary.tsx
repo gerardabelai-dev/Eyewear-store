@@ -20,23 +20,25 @@ function calculateItemTotal(item: CartItemData): number {
 export function CartSummary({ cartId }: { cartId: string }) {
 	const { data } = useSuspenseQuery(getCartQueryOptions(cartId));
 
-	if (!data.items || data.items.length === 0) {
-		return null;
-	}
+	const isEmpty = !data.items || data.items.length === 0;
 
 	// Calculate subtotal from all cart items
-	const subtotalInCents = data.items.reduce((total, item: CartItemData) => {
-		return total + calculateItemTotal(item);
-	}, 0);
+	const subtotalInCents = isEmpty
+		? 0
+		: data.items.reduce((total, item: CartItemData) => {
+				return total + calculateItemTotal(item);
+			}, 0);
 
 	// For now, using fixed values for shipping and taxes
 	// These could be calculated based on delivery method, location, etc.
-	const shippingInCents = 1000; // R$ 10,00
-	const taxesInCents = 1000; // R$ 10,00
+	const shippingInCents = isEmpty ? 0 : 1000; // R$ 10,00
+	const taxesInCents = isEmpty ? 0 : 1000; // R$ 10,00
 	const totalInCents = subtotalInCents + shippingInCents + taxesInCents;
 
 	return (
-		<div className="flex flex-col gap-4 bg-muted p-8 rounded h-fit sticky top-14">
+		<div
+			className={`flex flex-col gap-4 bg-muted p-8 rounded h-fit sticky top-14 ${isEmpty ? "opacity-60" : ""}`}
+		>
 			<h2 className="text-lg font-bold">Resumo da compra</h2>
 
 			<div className="flex gap-2 justify-between">
@@ -65,7 +67,7 @@ export function CartSummary({ cartId }: { cartId: string }) {
 				<strong>{formatPrice(totalInCents)}</strong>
 			</div>
 
-			<CreateOrderButton cartId={cartId} />
+			<CreateOrderButton cartId={cartId} disabled={isEmpty} />
 		</div>
 	);
 }

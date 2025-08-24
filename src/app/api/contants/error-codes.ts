@@ -13,10 +13,13 @@ export const ERROR_CODES = {
 	FAILED_TO_CREATE_CART: "FAILED_TO_CREATE_CART",
 	FAILED_TO_ADD_PRODUCT_TO_CART: "FAILED_TO_ADD_PRODUCT_TO_CART",
 	FAILED_TO_REMOVE_PRODUCT_FROM_CART: "FAILED_TO_REMOVE_PRODUCT_FROM_CART",
+	FAILED_TO_UPDATE_CART_PRODUCT_QUANTITY:
+		"FAILED_TO_UPDATE_CART_PRODUCT_QUANTITY",
 
 	// Product
 	PRODUCT_NOT_FOUND: "PRODUCT_NOT_FOUND",
 	PRODUCT_PRICE_NOT_FOUND: "PRODUCT_PRICE_NOT_FOUND",
+	INSUFFICIENT_STOCK: "INSUFFICIENT_STOCK",
 
 	// Order
 	FAILED_TO_CREATE_ORDER: "FAILED_TO_CREATE_ORDER",
@@ -78,10 +81,13 @@ export const ERROR_MESSAGES = {
 		"Houve um erro ao adicionar o produto ao carrinho",
 	[ERROR_CODES.FAILED_TO_REMOVE_PRODUCT_FROM_CART]:
 		"Houve um erro ao remover o produto do carrinho",
+	[ERROR_CODES.FAILED_TO_UPDATE_CART_PRODUCT_QUANTITY]:
+		"Houve um erro ao atualizar a quantidade do produto no carrinho",
 
 	// Product
 	[ERROR_CODES.PRODUCT_NOT_FOUND]: "Produto não encontrado",
 	[ERROR_CODES.PRODUCT_PRICE_NOT_FOUND]: "Preço do produto não encontrado",
+	[ERROR_CODES.INSUFFICIENT_STOCK]: "Estoque insuficiente para este produto",
 
 	// Order
 	[ERROR_CODES.FAILED_TO_CREATE_ORDER]: "Houve um erro ao criar o pedido",

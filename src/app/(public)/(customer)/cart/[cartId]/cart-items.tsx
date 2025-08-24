@@ -1,19 +1,15 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Check, Trash2 } from "lucide-react";
+import { Check, Minus, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { useRemoveProductFromCart } from "@/http/cart/mutations";
+import {
+	useRemoveProductFromCart,
+	useUpdateCartProductQuantity,
+} from "@/http/cart/mutations";
 import type { GetCartResponse } from "@/http/types";
 import { calculateDiscountedPrice, formatPrice } from "@/lib/format-price";
 
@@ -27,6 +23,7 @@ function CartItem({ item, cartId }: { item: CartItemData; cartId: string }) {
 	const quantity = item.quantity;
 
 	const removeProductMutation = useRemoveProductFromCart();
+	const updateQuantityMutation = useUpdateCartProductQuantity();
 
 	// Get the first product image or use a placeholder
 	const imageUrl =
@@ -54,11 +51,32 @@ function CartItem({ item, cartId }: { item: CartItemData; cartId: string }) {
 		);
 	};
 
+	const handleQuantityChange = (newQuantity: number) => {
+		if (newQuantity <= 0) {
+			handleRemoveProduct();
+			return;
+		}
+
+		updateQuantityMutation.mutate({
+			cartId,
+			productId: product.id,
+			quantity: newQuantity,
+		});
+	};
+
+	const handleIncrement = () => {
+		handleQuantityChange(quantity + 1);
+	};
+
+	const handleDecrement = () => {
+		handleQuantityChange(quantity - 1);
+	};
+
 	return (
 		<li className="flex gap-4">
 			<Link
 				href={`/products/${product.id}`}
-				className="relative w-48 md:w-96 h-full aspect-video"
+				className="relative w-48 md:min-w-72 h-full aspect-video"
 			>
 				<Image
 					src={imageUrl}
@@ -95,19 +113,35 @@ function CartItem({ item, cartId }: { item: CartItemData; cartId: string }) {
 					</div>
 				</div>
 
-				<div className="flex md:hidden gap-2">
-					<Select defaultValue={quantity.toString()}>
-						<SelectTrigger id={`quantity-${item.id}`}>
-							<SelectValue placeholder="Selecione a quantidade" />
-						</SelectTrigger>
-						<SelectContent>
-							{[1, 2, 3, 4, 5].map((num) => (
-								<SelectItem key={num} value={num.toString()}>
-									{num}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
+				<div className="flex md:hidden gap-2 items-center">
+					<div className="flex items-center gap-2 border rounded-md">
+						<Button
+							variant="ghost"
+							size="icon"
+							onClick={handleDecrement}
+							disabled={
+								updateQuantityMutation.isPending ||
+								removeProductMutation.isPending
+							}
+							className="h-8 w-8 p-0"
+						>
+							<Minus className="size-3" />
+						</Button>
+						<span className="text-sm font-mono w-8 text-center">
+							{quantity}
+						</span>
+						<Button
+							variant="ghost"
+							size="icon"
+							onClick={handleIncrement}
+							disabled={
+								updateQuantityMutation.isPending || quantity >= product.stock
+							}
+							className="h-8 w-8 p-0"
+						>
+							<Plus className="size-3" />
+						</Button>
+					</div>
 
 					<Button
 						variant="ghost"
@@ -128,19 +162,33 @@ function CartItem({ item, cartId }: { item: CartItemData; cartId: string }) {
 				</div>
 			</div>
 
-			<div className="*:not-first:mt-2 ml-auto hidden md:block">
-				<Select defaultValue={quantity.toString()}>
-					<SelectTrigger id={`quantity-desktop-${item.id}`}>
-						<SelectValue placeholder="Selecione a quantidade" />
-					</SelectTrigger>
-					<SelectContent>
-						{[1, 2, 3, 4, 5].map((num) => (
-							<SelectItem key={num} value={num.toString()}>
-								{num}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
+			<div className="ml-auto hidden md:flex items-center gap-2">
+				<div className="flex items-center gap-2 border rounded-md">
+					<Button
+						variant="ghost"
+						size="icon"
+						onClick={handleDecrement}
+						disabled={
+							updateQuantityMutation.isPending ||
+							removeProductMutation.isPending
+						}
+						className="h-8 w-8 p-0"
+					>
+						<Minus className="size-3" />
+					</Button>
+					<span className="text-sm font-mono w-8 text-center">{quantity}</span>
+					<Button
+						variant="ghost"
+						size="icon"
+						onClick={handleIncrement}
+						disabled={
+							updateQuantityMutation.isPending || quantity >= product.stock
+						}
+						className="h-8 w-8 p-0"
+					>
+						<Plus className="size-3" />
+					</Button>
+				</div>
 			</div>
 
 			<Button

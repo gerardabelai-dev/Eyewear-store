@@ -1,6 +1,7 @@
 // Export all query options and mutations from centralized API
 
 // Cart
+export * from "./cart/mutations";
 export * from "./cart/queries";
 // Customer Addresses
 export * from "./customer-addresses/mutations";

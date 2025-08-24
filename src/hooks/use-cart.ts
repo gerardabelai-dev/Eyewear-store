@@ -15,7 +15,7 @@ export const useCart = () => {
 	const addProductToCartMutation = useAddProductToCart();
 
 	const addItem = useCallback(
-		async (item: CartItem) => {
+		async (item: CartItem): Promise<{ cartId: string }> => {
 			let activeCartId = cartId;
 
 			// If no cartId exists, create a new cart first
@@ -44,6 +44,8 @@ export const useCart = () => {
 					productId: item.productId,
 					quantity: item.quantity,
 				});
+
+				return { cartId: activeCartId };
 			} catch (error) {
 				console.error("Cart: Failed to add product to cart", error);
 				throw error;

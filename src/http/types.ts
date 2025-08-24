@@ -48,6 +48,15 @@ export interface RemoveProductFromCartResponse {
 	message: string;
 }
 
+export interface UpdateCartProductQuantityRequest {
+	productId: string;
+	quantity: number;
+}
+
+export interface UpdateCartProductQuantityResponse {
+	cartProduct: CartProduct;
+}
+
 export interface GetCartResponse extends Cart {
 	items: Array<
 		CartProduct & {
@@ -152,6 +161,13 @@ export interface CreateOrderDeliveryResponse {
 	orderDelivery: OrderDelivery;
 }
 
+export interface UpdateOrderDeliveryRequest
+	extends Pick<OrderDelivery, "orderId" | "orderDeliveryMethodId"> {}
+
+export interface UpdateOrderDeliveryResponse {
+	orderDelivery: OrderDelivery;
+}
+
 // Order Payment Types
 export interface ListOrderPaymentMethodsResponse {
 	orderPaymentMethods: OrderPaymentMethod[];
@@ -163,6 +179,15 @@ export interface CreateOrderPaymentRequest
 }
 
 export interface CreateOrderPaymentResponse {
+	orderPayment: OrderPayment;
+}
+
+export interface UpdateOrderPaymentRequest
+	extends Pick<OrderPayment, "orderId" | "orderPaymentMethodId"> {
+	stripePaymentMethodId?: string;
+}
+
+export interface UpdateOrderPaymentResponse {
 	orderPayment: OrderPayment;
 }
 

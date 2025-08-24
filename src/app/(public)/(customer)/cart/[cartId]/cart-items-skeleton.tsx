@@ -10,7 +10,7 @@ function CartItemSkeleton() {
 			</div>
 
 			{/* Product Details Skeleton */}
-			<div className="flex flex-col justify-between gap-2 flex-1">
+			<div className="flex flex-col justify-between gap-2">
 				<div className="flex flex-col gap-2">
 					{/* Product Name */}
 					<Skeleton className="h-7 w-48" />
@@ -26,7 +26,7 @@ function CartItemSkeleton() {
 				</div>
 
 				{/* Mobile Quantity and Delete Button */}
-				<div className="flex md:hidden gap-2">
+				<div className="flex md:hidden gap-2 items-center">
 					<Skeleton className="h-10 w-24" />
 					<Skeleton className="h-10 w-10" />
 				</div>
@@ -39,14 +39,12 @@ function CartItemSkeleton() {
 			</div>
 
 			{/* Desktop Quantity Selector */}
-			<div className="hidden md:block">
+			<div className="ml-auto hidden md:flex items-center gap-2">
 				<Skeleton className="h-10 w-24" />
 			</div>
 
 			{/* Desktop Delete Button */}
-			<div className="hidden md:block">
-				<Skeleton className="h-10 w-10" />
-			</div>
+			<Skeleton className="hidden md:block h-10 w-10" />
 		</li>
 	);
 }

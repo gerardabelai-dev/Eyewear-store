@@ -207,29 +207,29 @@ const validateCreditCard = (
 
 	// Validate cardholder name
 	if (!value.cardholderName?.trim()) {
-		errors.cardholderName = "Cardholder name is required";
+		errors.cardholderName = "Nome do portador é obrigatório";
 	} else if (value.cardholderName.trim().length < 2) {
-		errors.cardholderName = "Name must be at least 2 characters";
+		errors.cardholderName = "Nome deve ter pelo menos 2 caracteres";
 	}
 
 	// Validate card number
 	const cleanCardNumber = value.cardNumber?.replace(/\s/g, "") || "";
 	if (!cleanCardNumber) {
-		errors.cardNumber = "Card number is required";
+		errors.cardNumber = "Número do cartão é obrigatório";
 	} else if (cleanCardNumber.length < 13 || cleanCardNumber.length > 19) {
-		errors.cardNumber = "Invalid card number length";
+		errors.cardNumber = "Número do cartão inválido";
 	} else if (!/^\d+$/.test(cleanCardNumber)) {
-		errors.cardNumber = "Card number must contain only digits";
+		errors.cardNumber = "Número do cartão deve conter apenas dígitos";
 	}
 
 	// Validate expiry month
 	if (!value.expiryMonth?.trim()) {
-		errors.expiryMonth = "Expiry month is required";
+		errors.expiryMonth = "Mês de vencimento é obrigatório";
 	}
 
 	// Validate expiry year
 	if (!value.expiryYear?.trim()) {
-		errors.expiryYear = "Expiry year is required";
+		errors.expiryYear = "Ano de vencimento é obrigatório";
 	} else if (value.expiryMonth && value.expiryYear) {
 		const currentDate = new Date();
 		const currentYear = currentDate.getFullYear();
@@ -241,7 +241,7 @@ const validateCreditCard = (
 			expiryYear < currentYear ||
 			(expiryYear === currentYear && expiryMonth < currentMonth)
 		) {
-			errors.expiryYear = "Card has expired";
+			errors.expiryYear = "Cartão vencido";
 		}
 	}
 
@@ -249,11 +249,11 @@ const validateCreditCard = (
 	const cardType = getCardType(value.cardNumber || "");
 	const expectedCvvLength = cardType === "amex" ? 4 : 3;
 	if (!value.cvv?.trim()) {
-		errors.cvv = `${cvvLabel} is required`;
+		errors.cvv = `${cvvLabel} é obrigatório`;
 	} else if (value.cvv.length !== expectedCvvLength) {
-		errors.cvv = `${cvvLabel} must be ${expectedCvvLength} digits`;
+		errors.cvv = `${cvvLabel} deve ter ${expectedCvvLength} dígitos`;
 	} else if (!/^\d+$/.test(value.cvv)) {
-		errors.cvv = `${cvvLabel} must contain only digits`;
+		errors.cvv = `${cvvLabel} deve conter apenas dígitos`;
 	}
 
 	return errors;
@@ -466,20 +466,20 @@ function CreditCard({
 							<div className="flex justify-between items-end">
 								<div className="flex-1">
 									<div className="text-xs opacity-70 uppercase font-medium">
-										Card Holder
+										Portador
 									</div>
 									<div className="font-bold text-sm">
-										{currentValue.cardholderName || "YOUR NAME"}
+										{currentValue.cardholderName || "SEU NOME"}
 									</div>
 								</div>
 								<div className="flex-1 text-center">
 									<div className="text-xs opacity-70 uppercase font-medium">
-										Expires
+										Validade
 									</div>
 									<div className="font-bold text-sm">
 										{currentValue.expiryMonth && currentValue.expiryYear
 											? `${currentValue.expiryMonth}/${currentValue.expiryYear.slice(-2)}`
-											: "MM/YY"}
+											: "MM/AA"}
 									</div>
 								</div>
 								<div className="flex-1 flex justify-end">
@@ -511,7 +511,7 @@ function CreditCard({
 						</div>
 
 						<div className="text-xs opacity-60 text-center font-medium">
-							This card is protected by advanced security features
+							Este cartão é protegido por recursos avançados de segurança
 						</div>
 					</Card>
 				</motion.div>
@@ -520,12 +520,12 @@ function CreditCard({
 			<div className="space-y-4">
 				<div>
 					<label className="block text-sm font-medium mb-2">
-						Cardholder Name
+						Nome do Portador
 					</label>
 					<Input
 						ref={cardholderInputRef}
 						type="text"
-						placeholder="John Doe"
+						placeholder="João Silva"
 						value={currentValue.cardholderName}
 						onChange={(e) =>
 							handleInputChange("cardholderName", e.target.value.toUpperCase())
@@ -546,7 +546,9 @@ function CreditCard({
 				</div>
 
 				<div>
-					<label className="block text-sm font-medium mb-2">Card Number</label>
+					<label className="block text-sm font-medium mb-2">
+						Número do Cartão
+					</label>
 					<Input
 						ref={cardNumberInputRef}
 						type="text"
@@ -569,7 +571,7 @@ function CreditCard({
 
 				<div className="grid grid-cols-3 gap-4">
 					<div>
-						<label className="block text-sm font-medium mb-2">Month</label>
+						<label className="block text-sm font-medium mb-2">Mês</label>
 						<Select
 							value={currentValue.expiryMonth}
 							onValueChange={(value) => handleInputChange("expiryMonth", value)}
@@ -599,7 +601,7 @@ function CreditCard({
 					</div>
 
 					<div>
-						<label className="block text-sm font-medium mb-2">Year</label>
+						<label className="block text-sm font-medium mb-2">Ano</label>
 						<Select
 							value={currentValue.expiryYear}
 							onValueChange={(value) => handleInputChange("expiryYear", value)}
@@ -611,7 +613,7 @@ function CreditCard({
 									errors.expiryYear && "border-destructive",
 								)}
 							>
-								<SelectValue placeholder="YYYY" />
+								<SelectValue placeholder="AAAA" />
 							</SelectTrigger>
 							<SelectContent>
 								{years.map((year) => (

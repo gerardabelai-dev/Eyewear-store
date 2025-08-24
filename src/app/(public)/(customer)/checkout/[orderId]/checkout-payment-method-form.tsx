@@ -15,8 +15,8 @@ import { Card, CardTitle } from "@/components/ui/card";
 import {
 	getOrderByIdQueryOptions,
 	getOrderPaymentMethodsQueryOptions,
-	useCreateOrderPaymentMutation,
 	useCreatePaymentIntentMutation,
+	useUpdateOrderPaymentMutation,
 } from "@/http";
 
 interface CheckoutPaymentMethodFormProps {
@@ -50,7 +50,7 @@ export function CheckoutPaymentMethodForm({
 		getOrderPaymentMethodsQueryOptions(),
 	);
 
-	const { mutate: updateOrderPaymentMethod } = useCreateOrderPaymentMutation({
+	const { mutate: updateOrderPaymentMethod } = useUpdateOrderPaymentMutation({
 		onSuccess: (data) => {
 			console.log("Order payment updated:", data);
 			// Invalidate order query to refresh checkout button state

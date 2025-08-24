@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function CheckoutOrderSummarySkeleton() {
 	return (
 		<div className="flex flex-col gap-4 bg-muted p-8 rounded h-fit sticky top-14">
-			<Skeleton className="h-6 w-36" />
+			<h2 className="text-lg font-bold">Resumo do pedido</h2>
 
 			<div className="flex gap-2 justify-between">
 				<Skeleton className="h-5 w-16" />

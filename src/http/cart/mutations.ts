@@ -6,6 +6,7 @@ import type {
 	AddProductToCartResponse,
 	CreateCartResponse,
 	RemoveProductFromCartResponse,
+	UpdateCartProductQuantityResponse,
 } from "@/http/types";
 
 export const useCreateCart = () => {
@@ -107,6 +108,46 @@ export const useRemoveProductFromCart = () => {
 			if (!response.ok) {
 				console.error(response);
 				throw new Error(ERROR_CODES.FAILED_TO_REMOVE_PRODUCT_FROM_CART);
+			}
+
+			return await response.json();
+		},
+		onSuccess: (_, variables) => {
+			// Invalidate cart query to refetch updated cart data
+			queryClient.invalidateQueries({
+				queryKey: QUERY_KEYS.cart(variables.cartId),
+			});
+		},
+	});
+};
+
+export const useUpdateCartProductQuantity = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({
+			cartId,
+			productId,
+			quantity,
+		}: {
+			cartId: string;
+			productId: string;
+			quantity: number;
+		}): Promise<UpdateCartProductQuantityResponse> => {
+			const response = await fetch(
+				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts/${cartId}/update-quantity`,
+				{
+					method: "PATCH",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ productId, quantity }),
+				},
+			);
+
+			if (!response.ok) {
+				console.error(response);
+				throw new Error(ERROR_CODES.FAILED_TO_UPDATE_CART_PRODUCT_QUANTITY);
 			}
 
 			return await response.json();

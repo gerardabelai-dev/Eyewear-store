@@ -1,6 +1,8 @@
 "use client";
 
+import { ExternalLinkIcon } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { toast } from "sonner";
 import { useCart } from "@/hooks/use-cart";
 
@@ -31,11 +33,25 @@ export function ProductItem({
 
 	const handleClick = async () => {
 		try {
-			await addItem({
+			const result = await addItem({
 				productId: id,
 				quantity: 1,
 			});
-			toast.success(`${name} adicionado ao carrinho!`);
+
+			// Show toast with clickable link to cart using the actual cart ID
+			toast.success(
+				<p className="flex items-center whitespace-nowrap">
+					{name.split(" ")[0]}&nbsp;adicionado&nbsp;ao&nbsp;
+					<Link
+						href={`/cart/${result.cartId}`}
+						className="flex items-center gap-2 text-primary-foreground whitespace-nowrap font-bold underline underline-offset-4 hover:opacity-70"
+						onClick={() => toast.dismiss()}
+					>
+						<span>carrinho</span>
+						<ExternalLinkIcon className="size-4" />
+					</Link>
+				</p>,
+			);
 		} catch (error) {
 			console.error("Failed to add item to cart:", error);
 			toast.error("Erro ao adicionar produto ao carrinho");

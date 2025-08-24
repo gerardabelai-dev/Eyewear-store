@@ -26,23 +26,37 @@ export const getOrderDeliveryQueryOptions = (orderId: string) =>
 	queryOptions({
 		queryKey: QUERY_KEYS.orderDelivery(orderId),
 		queryFn: async () => {
-			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_WEB_URL}/api/orders/${orderId}/get-order-delivery`,
-			);
+			try {
+				const response = await fetch(
+					`${process.env.NEXT_PUBLIC_WEB_URL}/api/orders/${orderId}/get-order-delivery`,
+				);
 
-			// If delivery doesn't exist yet (404), return null instead of throwing
-			if (response.status === 404) {
+				// If delivery doesn't exist yet (404), return null instead of throwing
+				if (response.status === 404) {
+					return null;
+				}
+
+				if (!response.ok) {
+					console.error(
+						"Order delivery fetch failed:",
+						response.status,
+						response.statusText,
+					);
+					// For other HTTP errors, still return null to avoid breaking the UI
+					return null;
+				}
+
+				const { orderDelivery } =
+					(await response.json()) as GetOrderDeliveryResponse;
+
+				return orderDelivery;
+			} catch (error) {
+				// If it's a network error or fetch fails, return null gracefully
+				console.warn("Order delivery query failed, returning null:", error);
 				return null;
 			}
-
-			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.ORDER_DELIVERY_NOT_FOUND);
-			}
-
-			const { orderDelivery } =
-				(await response.json()) as GetOrderDeliveryResponse;
-
-			return orderDelivery;
 		},
+		retry: false, // Don't retry since missing delivery is expected initially
+		staleTime: 1000 * 60 * 5, // 5 minutes
+		refetchOnWindowFocus: false, // Avoid unnecessary refetches
 	});
