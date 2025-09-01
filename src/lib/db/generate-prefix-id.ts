@@ -33,6 +33,10 @@ const tableNameToPrefix = {
 	// Cart
 	cart: "crt",
 	cartProduct: "crp",
+
+	// Collection
+	collection: "col",
+	collectionProduct: "cop",
 };
 
 const nanoid = customAlphabet("0123456789abcdefghijklmnopqrstuvwxyz", 6);

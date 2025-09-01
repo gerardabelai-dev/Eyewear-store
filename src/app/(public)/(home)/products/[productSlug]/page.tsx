@@ -1,0 +1,178 @@
+import { PlusIcon } from "lucide-react";
+import Image from "next/image";
+import { Accordion as AccordionPrimitive } from "radix-ui";
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+} from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { ColorVariantPicker } from "./color-variant-picker";
+
+const accordionItems = [
+	{
+		id: "1",
+		title: "Como escolher o tamanho ideal dos óculos?",
+		content:
+			"Para escolher o tamanho ideal, meça a largura do seu rosto e compare com as medidas do produto. Nossos óculos possuem medidas padronizadas: largura da lente, ponte e haste. Consulte nosso guia de medidas ou entre em contato para orientação personalizada.",
+	},
+	{
+		id: "2",
+		title: "Qual é a garantia dos óculos?",
+		content:
+			"Oferecemos 12 meses de garantia contra defeitos de fabricação nas armações e 6 meses nas lentes. A garantia cobre quebras por defeito do material, mas não inclui danos por mau uso ou acidentes.",
+	},
+	{
+		id: "3",
+		title: "Vocês fazem lentes com grau?",
+		content:
+			"Sim, trabalhamos com lentes oftálmicas de alta qualidade. Aceitamos receitas para miopia, hipermetropia, astigmatismo e presbiopia. Também oferecemos lentes multifocais, antirreflexo e com proteção UV.",
+	},
+	{
+		id: "4",
+		title: "Como funciona a troca e devolução?",
+		content:
+			"Você tem 30 dias para trocar ou devolver o produto. Os óculos devem estar em perfeito estado, com embalagem original. Para lentes com grau, a troca só é aceita em caso de erro na confecção. Frete de devolução por nossa conta.",
+	},
+];
+
+export default async function ProductPage({
+	params,
+}: {
+	params: Promise<{ productSlug: string }>;
+}) {
+	const { productSlug } = await params;
+	console.log(productSlug);
+	return (
+		<div className="max-w-7xl mx-auto lg:p-4 p-2">
+			<section className="grid grid-cols-1 lg:grid-cols-[1fr_500px] gap-4">
+				{/* Product Images Left Scrollable Column */}
+				<div className="flex flex-col gap-4">
+					<div className="grid grid-cols-2 gap-4">
+						<div className="relative w-full h-96 overflow-hidden">
+							<Image
+								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-7WUyUtVcKSk-unsplash.jpg"
+								alt="Product Image"
+								fill
+								className="object-cover rounded"
+								quality={75}
+							/>
+						</div>
+						<div className="relative w-full h-96 overflow-hidden">
+							<Image
+								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-7WUyUtVcKSk-unsplash.jpg"
+								alt="Product Image"
+								fill
+								className="object-cover rounded"
+								quality={75}
+							/>
+						</div>
+						<div className="relative w-full h-96 overflow-hidden">
+							<Image
+								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-7WUyUtVcKSk-unsplash.jpg"
+								alt="Product Image"
+								fill
+								className="object-cover rounded"
+								quality={75}
+							/>
+						</div>
+						<div className="relative w-full h-96 overflow-hidden">
+							<Image
+								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-7WUyUtVcKSk-unsplash.jpg"
+								alt="Product Image"
+								fill
+								className="object-cover rounded"
+								quality={75}
+							/>
+						</div>
+					</div>
+					<div className="relative w-full h-[900px] overflow-hidden">
+						<Image
+							src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-7WUyUtVcKSk-unsplash.jpg"
+							alt="Product Image"
+							fill
+							className="object-cover rounded"
+							quality={75}
+						/>
+					</div>
+					<p className="text-md text-foreground text-pretty">
+						Esse redondo bold da linha archt mistura presença e elegância,
+						incorporando traços de modelos muito queridos pela nossa comunidade.
+						A ponte francesa proporciona maior conforto e traz um encaixe mais
+						provável para diferentes tipos de narizes, enquanto os pinos
+						frontais acrescentam mais uma informação para esse modelo cheio de
+						detalhes.
+					</p>
+				</div>
+
+				{/* Product Info Sticky Right Column */}
+				<div className="flex flex-col gap-4 bg-muted p-8 rounded h-fit sticky top-14">
+					<div className="flex flex-col">
+						<div className="flex items-center justify-between gap-4">
+							<h2 className="text-lg font-bold">Product Name</h2>
+							<strong className="text-lg font-bold">R$100</strong>
+						</div>
+						<p className="text-sm text-muted-foreground uppercase">
+							INCLUI LENTES DE GRAU LEVE
+						</p>
+					</div>
+
+					{/* Color Variant Picker */}
+					<div className="flex flex-col gap-2">
+						<Label htmlFor="color-variant-select">Cores da Armação</Label>
+
+						<fieldset aria-label="Escolha uma cor" className="mt-2">
+							<div className="flex items-center gap-x-3">
+								<ColorVariantPicker
+									label="Vermelho"
+									value="red"
+									colors={["black", "rose-300"]}
+								/>
+								<ColorVariantPicker
+									label="Azul"
+									value="blue"
+									colors={["black", "blue-300"]}
+								/>
+								<ColorVariantPicker
+									label="Verde"
+									value="green"
+									colors={["black", "green-300"]}
+								/>
+							</div>
+						</fieldset>
+					</div>
+
+					{/* User Actions */}
+					<div className="flex flex-col gap-2">
+						<Button size="lg" className="w-full" variant="vibrant">
+							Escolher lentes e comprar
+						</Button>
+					</div>
+
+					<div className="flex flex-col gap-2">
+						<Accordion type="single" collapsible className="w-full">
+							{accordionItems.map((item) => (
+								<AccordionItem value={item.id} key={item.id} className="py-2">
+									<AccordionPrimitive.Header className="flex">
+										<AccordionPrimitive.Trigger className="focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-center justify-between gap-4 rounded-md py-2 text-left text-sm text-[15px] leading-6 font-semibold transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&>svg>path:last-child]:origin-center [&>svg>path:last-child]:transition-all [&>svg>path:last-child]:duration-200 [&[data-state=open]>svg]:rotate-180 [&[data-state=open]>svg>path:last-child]:rotate-90 [&[data-state=open]>svg>path:last-child]:opacity-0">
+											{item.title}
+											<PlusIcon
+												size={16}
+												className="pointer-events-none shrink-0 opacity-60 transition-transform duration-200"
+												aria-hidden="true"
+											/>
+										</AccordionPrimitive.Trigger>
+									</AccordionPrimitive.Header>
+									<AccordionContent className="text-muted-foreground pb-2">
+										{item.content}
+									</AccordionContent>
+								</AccordionItem>
+							))}
+						</Accordion>
+					</div>
+				</div>
+			</section>
+		</div>
+	);
+}

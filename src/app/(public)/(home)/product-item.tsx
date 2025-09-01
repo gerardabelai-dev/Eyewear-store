@@ -10,6 +10,7 @@ interface ProductItemProps {
 	id: string;
 	name: string;
 	price?: string;
+	href: string;
 	image: string;
 	alt?: string;
 	showPrice?: boolean;
@@ -22,6 +23,7 @@ export function ProductItem({
 	id,
 	name,
 	price,
+	href,
 	image,
 	alt,
 	showPrice = true,
@@ -58,7 +60,7 @@ export function ProductItem({
 		}
 	};
 
-	const handleKeyDown = (event: React.KeyboardEvent) => {
+	const _handleKeyDown = (event: React.KeyboardEvent) => {
 		if (event.key === "Enter" || event.key === " ") {
 			event.preventDefault();
 			handleClick();
@@ -68,12 +70,13 @@ export function ProductItem({
 	const isLoading = isCreatingCart || isAddingProduct;
 
 	return (
-		<div
+		<Link
 			className={`${className} cursor-pointer transition-transform duration-200 hover:scale-[1.02] ${isLoading ? "opacity-50 pointer-events-none" : ""}`}
-			onClick={handleClick}
-			onKeyDown={handleKeyDown}
+			// onClick={handleClick}
+			// onKeyDown={handleKeyDown}
 			role="button"
 			tabIndex={0}
+			href={href}
 		>
 			<div className={imageClassName}>
 				<Image
@@ -95,6 +98,6 @@ export function ProductItem({
 					<h3>{name}</h3>
 				)}
 			</div>
-		</div>
+		</Link>
 	);
 }

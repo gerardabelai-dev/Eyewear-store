@@ -118,6 +118,7 @@ export const product = pgTable("product", {
 		.primaryKey()
 		.$defaultFn(() => generatePrefixId("product")),
 	name: text("name").notNull(),
+	slug: text("slug"),
 	description: text("description"),
 	stock: integer("stock").notNull().default(0),
 	status: productStatus("status").notNull().default("active"),
@@ -167,6 +168,31 @@ export const categorySecondary = pgTable("categorySecondary", {
 		.notNull()
 		.references(() => category.id, { onDelete: "set null" }),
 	name: text("name").notNull(),
+	...timestamps,
+});
+
+// Collection
+export const collection = pgTable("collection", {
+	id: text("id")
+		.primaryKey()
+		.$defaultFn(() => generatePrefixId("collection")),
+	name: text("name").notNull(),
+	slug: text("slug"),
+	description: text("description"),
+	isActive: boolean("isActive").notNull().default(false),
+	...timestamps,
+});
+
+export const collectionProduct = pgTable("collectionProduct", {
+	id: text("id")
+		.primaryKey()
+		.$defaultFn(() => generatePrefixId("collectionProduct")),
+	collectionId: text("collectionId")
+		.notNull()
+		.references(() => collection.id, { onDelete: "set null" }),
+	productId: text("productId")
+		.notNull()
+		.references(() => product.id, { onDelete: "set null" }),
 	...timestamps,
 });
 

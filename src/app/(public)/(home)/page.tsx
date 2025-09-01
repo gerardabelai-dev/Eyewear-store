@@ -70,6 +70,7 @@ async function getFeaturedProducts(): Promise<ProductWithDetails[]> {
 	}
 }
 
+// TODO: move this to API route and fetch it with tanstack prefetch SSR query
 async function getCollectionProducts(): Promise<ProductWithDetails[]> {
 	try {
 		const products = await db.query.product.findMany({
@@ -89,136 +90,16 @@ async function getCollectionProducts(): Promise<ProductWithDetails[]> {
 		return products.map((product) => ({
 			id: product.id,
 			name: product.name,
+			slug: product.slug,
 			price: formatPrice(product.productPrice[0]?.priceInCents || 0),
 			image: product.images[0]?.imageUrl || "/placeholder-product.jpg",
-			href: `/products/${product.id}`,
+			href: `/products/${product.slug}`,
 		}));
 	} catch (error) {
 		console.error("Error fetching collection products:", error);
 		return [];
 	}
 }
-
-// Mock product data - fallback for sections not yet connected to DB
-const collectionsData: ProductWithDetails[] = [
-	{
-		id: "grau",
-		name: "Óculos de Grau",
-		price: "R$ 199,00",
-		href: "/cart/crt_4nfsqo",
-		image:
-			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp",
-	},
-	{
-		id: "sol",
-		name: "Óculos de Sol",
-		price: "R$ 149,00",
-		href: "/cart",
-		image:
-			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp",
-	},
-	{
-		id: "luz-azul",
-		name: "Óculos Luz Azul",
-		price: "R$ 179,00",
-		href: "/cart",
-		image:
-			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp",
-	},
-	{
-		id: "leitura",
-		name: "Óculos de Leitura",
-		price: "R$ 129,00",
-		href: "/cart",
-		image:
-			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057069-akali.webp",
-	},
-];
-
-const featuredProductsData = Array.from({ length: 8 }, (_, index) => ({
-	id: `featured-${index + 1}`,
-	name: "Ubell",
-	price: "$39",
-	href: "/cart",
-	image:
-		"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057080-aatrox.webp",
-}));
-
-const bestSellersGrauData = Array.from({ length: 8 }, (_, index) => ({
-	id: `grau-${index + 1}`,
-	name: "Ubell",
-	price: "$39",
-	href: "/cart",
-	image:
-		"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/Ekko_19-aMxeQmF3jpz4kB3aadSfsCEDTmCNxj.jpg",
-}));
-
-const bestSellersSolData = [
-	{
-		id: "sol-1",
-		name: "Ray-Ban",
-		price: "$89",
-		href: "/cart",
-		image:
-			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
-	},
-	{
-		id: "sol-2",
-		name: "Oakley",
-		price: "$99",
-		href: "/cart",
-		image:
-			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
-	},
-	{
-		id: "sol-3",
-		name: "Persol",
-		price: "$79",
-		href: "/cart",
-		image:
-			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
-	},
-	{
-		id: "sol-4",
-		name: "Maui Jim",
-		price: "$109",
-		href: "/cart",
-		image:
-			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
-	},
-	{
-		id: "sol-5",
-		name: "Gucci",
-		price: "$199",
-		href: "/cart",
-		image:
-			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
-	},
-	{
-		id: "sol-6",
-		name: "Prada",
-		price: "$159",
-		href: "/cart",
-		image:
-			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
-	},
-	{
-		id: "sol-7",
-		name: "Versace",
-		price: "$179",
-		href: "/cart",
-		image:
-			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
-	},
-	{
-		id: "sol-8",
-		name: "Tom Ford",
-		price: "$149",
-		href: "/cart",
-		image:
-			"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/1752986057077-ahri.webp",
-	},
-];
 
 const blogPostsData = [
 	{
@@ -351,7 +232,8 @@ export default async function HomePage() {
 
 	// Use fetched data or fallback to mock data
 	const collectionsToShow =
-		collectionProducts.length > 0 ? collectionProducts : collectionsData;
+		collectionProducts.length > 0 ? collectionProducts : [];
+
 	return (
 		<>
 			{/* Hero Section */}
@@ -495,6 +377,7 @@ export default async function HomePage() {
 							name={collection.name}
 							price={collection.price}
 							image={collection.image}
+							href={collection.href}
 							showPrice={collectionProducts.length > 0}
 							imageClassName="relative h-48 md:h-32 w-full aspect-video rounded"
 						/>
@@ -521,27 +404,17 @@ export default async function HomePage() {
 					</div>
 				</div>
 				<div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-full md:w-fit mx-auto">
-					{featuredProducts.length > 0
-						? featuredProducts.map((product) => (
-								<ProductItem
-									key={product.id}
-									id={product.id}
-									name={product.name}
-									price={product.price}
-									image={product.image}
-									alt="Produto em destaque"
-								/>
-							))
-						: featuredProductsData.map((product) => (
-								<ProductItem
-									key={product.id}
-									id={product.id}
-									name={product.name}
-									price={product.price}
-									image={product.image}
-									alt="Óculos de grau"
-								/>
-							))}
+					{featuredProducts.map((product) => (
+						<ProductItem
+							key={product.id}
+							id={product.id}
+							name={product.name}
+							price={product.price}
+							href={product.href}
+							image={product.image}
+							alt="Produto em destaque"
+						/>
+					))}
 				</div>
 				<div className="flex flex-col md:flex-row gap-2">
 					<Button variant="outline">Mais Óculos de Grau</Button>
@@ -568,27 +441,17 @@ export default async function HomePage() {
 							Lentes de alto índice 1,61 grátis com 100% de proteção UV
 						</p>
 						<div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-full md:w-fit mx-auto">
-							{featuredProducts.length > 0
-								? featuredProducts.map((product) => (
-										<ProductItem
-											key={`grau-${product.id}`}
-											id={product.id}
-											name={product.name}
-											price={product.price}
-											image={product.image}
-											alt="Óculos de grau"
-										/>
-									))
-								: bestSellersGrauData.map((product) => (
-										<ProductItem
-											key={product.id}
-											id={product.id}
-											name={product.name}
-											price={product.price}
-											image={product.image}
-											alt="Óculos de grau"
-										/>
-									))}
+							{featuredProducts.map((product) => (
+								<ProductItem
+									key={`grau-${product.id}`}
+									id={product.id}
+									name={product.name}
+									price={product.price}
+									href={product.href}
+									image={product.image}
+									alt="Óculos de grau"
+								/>
+							))}
 						</div>
 					</TabsContent>
 
@@ -598,27 +461,17 @@ export default async function HomePage() {
 							proteção UV
 						</p>
 						<div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-full md:w-fit mx-auto">
-							{featuredProducts.length > 0
-								? featuredProducts.map((product) => (
-										<ProductItem
-											key={`sol-${product.id}`}
-											id={product.id}
-											name={product.name}
-											price={product.price}
-											image={product.image}
-											alt="Óculos de sol"
-										/>
-									))
-								: bestSellersSolData.map((product) => (
-										<ProductItem
-											key={product.id}
-											id={product.id}
-											name={product.name}
-											price={product.price}
-											image={product.image}
-											alt="Óculos de sol"
-										/>
-									))}
+							{featuredProducts.map((product) => (
+								<ProductItem
+									key={`sol-${product.id}`}
+									id={product.id}
+									name={product.name}
+									price={product.price}
+									href={product.href}
+									image={product.image}
+									alt="Óculos de sol"
+								/>
+							))}
 						</div>
 					</TabsContent>
 				</Tabs>

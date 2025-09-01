@@ -246,10 +246,14 @@ async function seedCustomerAddress(customerId: string, userId: string) {
 async function seedProduct() {
 	console.info("📦 Creating product...");
 
+	const productName = faker.commerce.productName();
+	const productSlug = productName.toLowerCase().replace(/ /g, "-");
+
 	const [product] = await seedDb
 		.insert(schema.product)
 		.values({
-			name: faker.commerce.productName(),
+			name: productName,
+			slug: productSlug,
 			stock: faker.number.int({ min: 1, max: 100 }),
 			status: "active",
 		})
@@ -279,9 +283,7 @@ const PRODUCT_IMAGE_URLS = [
 	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-7WUyUtVcKSk-unsplash.jpg",
 	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-7WUyUtVcKSk-unsplash.jpg",
 	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-JT64dSDlBDc-unsplash.jpg",
-	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-a179PlGs0EE-unsplash.jpg",
 	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/redowan-dhrubo-1KEVqrKDyUs-unsplash.jpg",
-	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/redowan-dhrubo-AHDpMKwCDhl-unsplash.jpg",
 	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/xshades-sunglasses-RS-AetNFty8-unsplash.jpg",
 ];
 
