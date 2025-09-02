@@ -48,7 +48,7 @@ const accordionItems = [
 const customerReviews = [
 	{
 		id: 1,
-		rating: 5,
+		rating: 4,
 		content: `
       <p>Estes óculos são exatamente o que eu precisava! O design é perfeito e a qualidade das lentes é excepcional. Super confortáveis para usar o dia todo. Recomendo!</p>
     `,
@@ -60,7 +60,7 @@ const customerReviews = [
 	},
 	{
 		id: 2,
-		rating: 5,
+		rating: 3,
 		content: `
       <p>Impressionado com a qualidade destes óculos. A armação é muito bem acabada e as lentes são cristalinas. Ficaram perfeitos no meu rosto e a proteção UV é excelente. Vale cada centavo investido!</p>
     `,
@@ -72,7 +72,7 @@ const customerReviews = [
 	},
 	{
 		id: 3,
-		rating: 4,
+		rating: 2,
 		content: `
       <p>Muito satisfeito com estes óculos. O estilo é moderno e combina com tudo. Única sugestão seria ter mais opções de cores disponíveis. No geral, excelente compra!</p>
     `,
@@ -93,7 +93,127 @@ export default async function ProductPage({
 	console.log(productSlug);
 	return (
 		<div className="max-w-7xl mx-auto flex flex-col gap-8 lg:p-4 p-2">
-			<section className="grid grid-cols-1 lg:grid-cols-[1fr_500px] gap-4">
+			{/* Mobile Layout */}
+			<div className="lg:hidden flex flex-col gap-6">
+				{/* Mobile: Product Name and Price */}
+				<div className="flex flex-col">
+					<div className="flex items-center justify-between gap-4">
+						<h2 className="text-lg font-bold">Product Name</h2>
+						<strong className="text-lg font-bold">R$100</strong>
+					</div>
+					<p className="text-sm text-muted-foreground uppercase">
+						INCLUI LENTES DE GRAU LEVE
+					</p>
+				</div>
+
+				{/* Mobile: Product Images Carousel */}
+				<Carousel className="w-full">
+					<CarouselContent>
+						{Array.from({ length: 5 }).map((_, index) => (
+							<CarouselItem key={index}>
+								<div className="relative w-full h-80 overflow-hidden">
+									<Image
+										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-7WUyUtVcKSk-unsplash.jpg"
+										alt={`Product Image ${index + 1}`}
+										fill
+										className="object-cover rounded"
+										quality={75}
+									/>
+								</div>
+							</CarouselItem>
+						))}
+					</CarouselContent>
+					<CarouselPrevious />
+					<CarouselNext />
+				</Carousel>
+
+				{/* Mobile: Color Variant Picker */}
+				<div className="flex flex-col gap-2">
+					<Label htmlFor="color-variant-select">Cores da Armação</Label>
+					<fieldset aria-label="Escolha uma cor" className="mt-2">
+						<div className="flex items-center gap-x-3">
+							<ColorVariantPicker
+								label="Vermelho"
+								value="red"
+								colorVariant="black-rose-300"
+							/>
+							<ColorVariantPicker
+								label="Azul"
+								value="blue"
+								colorVariant="black-blue-300"
+							/>
+							<ColorVariantPicker
+								label="Verde"
+								value="green"
+								colorVariant="black-green-300"
+							/>
+						</div>
+					</fieldset>
+				</div>
+
+				{/* Mobile: User Actions */}
+				<div className="flex flex-col gap-2">
+					<Button size="lg" className="w-full" variant="vibrant">
+						Escolher lentes e comprar
+					</Button>
+				</div>
+
+				{/* Mobile: Product FAQ */}
+				<div className="flex flex-col gap-2">
+					<Accordion type="single" collapsible className="w-full">
+						{accordionItems.map((item) => (
+							<AccordionItem value={item.id} key={item.id} className="py-2">
+								<AccordionPrimitive.Header className="flex">
+									<AccordionPrimitive.Trigger className="focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-center justify-between gap-4 rounded-md py-2 text-left text-sm text-[15px] leading-6 font-semibold transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&>svg>path:last-child]:origin-center [&>svg>path:last-child]:transition-all [&>svg>path:last-child]:duration-200 [&[data-state=open]>svg]:rotate-180 [&[data-state=open]>svg>path:last-child]:rotate-90 [&[data-state=open]>svg>path:last-child]:opacity-0">
+										{item.title}
+										<PlusIcon
+											size={16}
+											className="pointer-events-none shrink-0 opacity-60 transition-transform duration-200"
+											aria-hidden="true"
+										/>
+									</AccordionPrimitive.Trigger>
+								</AccordionPrimitive.Header>
+								<AccordionContent className="text-muted-foreground pb-2">
+									{item.content}
+								</AccordionContent>
+							</AccordionItem>
+						))}
+					</Accordion>
+				</div>
+
+				{/* Mobile: Product Description */}
+				<p className="text-md text-foreground text-pretty">
+					Esse redondo bold da linha archt mistura presença e elegância,
+					incorporando traços de modelos muito queridos pela nossa comunidade. A
+					ponte francesa proporciona maior conforto e traz um encaixe mais
+					provável para diferentes tipos de narizes, enquanto os pinos frontais
+					acrescentam mais uma informação para esse modelo cheio de detalhes.
+				</p>
+
+				{/* Mobile: Second Carousel */}
+				<Carousel className="w-full">
+					<CarouselContent>
+						{Array.from({ length: 5 }).map((_, index) => (
+							<CarouselItem key={index}>
+								<div className="relative w-full h-80 overflow-hidden">
+									<Image
+										src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-7WUyUtVcKSk-unsplash.jpg"
+										alt={`Product Image ${index + 1}`}
+										fill
+										className="object-cover rounded"
+										quality={75}
+									/>
+								</div>
+							</CarouselItem>
+						))}
+					</CarouselContent>
+					<CarouselPrevious />
+					<CarouselNext />
+				</Carousel>
+			</div>
+
+			{/* Desktop Layout */}
+			<section className="hidden lg:grid grid-cols-1 lg:grid-cols-[1fr_500px] gap-4">
 				{/* Product Images Left Scrollable Column */}
 				<div className="flex flex-col gap-4">
 					<div className="grid grid-cols-2 gap-4">
@@ -295,10 +415,10 @@ export default async function ProductPage({
 							</div>
 						</div>
 
-						<Carousel className="w-full max-w-5xl mx-auto">
-							<CarouselContent className="-ml-4">
+						<Carousel className="w-full max-w-3xs md:max-w-5xl mx-auto">
+							<CarouselContent className="lg:-ml-4">
 								{Array.from({ length: 6 }).map((_, index) => (
-									<CarouselItem key={index} className="pl-4 basis-1/3">
+									<CarouselItem key={index} className="lg:pl-4 lg:basis-1/3">
 										<div className="relative w-full h-80 overflow-hidden">
 											<Image
 												src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/reviews/zeelool-glasses-VUQmxlzP77w-unsplash-2a5LpdMzVDJpmKXrYz8DZhEYCFHxXJ.jpg"
