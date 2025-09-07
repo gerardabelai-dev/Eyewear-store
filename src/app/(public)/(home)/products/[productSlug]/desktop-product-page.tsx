@@ -21,6 +21,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { getProductBySlugQueryOptions } from "@/http/products/queries";
 import { ColorVariantPicker } from "./color-variant-picker";
+import { LensSelectionDrawer } from "./lens-selection-drawer";
 import { ProductInfo } from "./product-info";
 import { ProductInfoSkeleton } from "./product-info-skeleton";
 
@@ -186,9 +187,24 @@ export function DesktopProductPage({
 
 				{/* User Actions */}
 				<div className="flex flex-col gap-2">
-					<Button size="lg" className="w-full" variant="vibrant">
-						Escolher lentes e comprar
-					</Button>
+					<LensSelectionDrawer
+						trigger={
+							<Button size="lg" className="w-full" variant="vibrant">
+								Escolher lentes e comprar
+							</Button>
+						}
+						onLensSelect={(lensId, prescriptionId, finishId) => {
+							console.log(
+								"Selected lens:",
+								lensId,
+								"Prescription:",
+								prescriptionId,
+								"Finish:",
+								finishId,
+							);
+							// TODO: Handle lens selection logic
+						}}
+					/>
 				</div>
 			</div>
 		</section>
