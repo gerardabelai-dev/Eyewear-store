@@ -13,4 +13,7 @@ export const QUERY_KEYS = {
 
 	// Order Payment Methods
 	orderPaymentMethods: () => ["orderPaymentMethods"] as const,
+
+	// Product
+	product: (productSlug: string) => ["product", { slug: productSlug }] as const,
 } as const;

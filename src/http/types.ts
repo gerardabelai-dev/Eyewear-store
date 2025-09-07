@@ -212,3 +212,11 @@ export interface CreatePaymentMethodRequest {
 export interface CreatePaymentMethodResponse {
 	paymentMethodId: string;
 }
+
+// Product Types
+export interface GetProductBySlugResponse {
+	product: Product & {
+		productPrice: ProductPrice[];
+		images: ProductImage[];
+	};
+}

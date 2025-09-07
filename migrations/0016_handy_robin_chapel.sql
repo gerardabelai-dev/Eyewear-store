@@ -1,0 +1,1 @@
+ALTER TABLE "productImage" ADD COLUMN "isDefault" boolean DEFAULT false NOT NULL;

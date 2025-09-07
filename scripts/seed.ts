@@ -254,6 +254,9 @@ async function seedProduct() {
 		.values({
 			name: productName,
 			slug: productSlug,
+			subtitle: "INCLUI LENTES DE GRAU LEVE",
+			description:
+				"Esse redondo bold da linha archt mistura presença e elegância, incorporando traços de modelos muito queridos pela nossa comunidade. A ponte francesa proporciona maior conforto e traz um encaixe mais provável para diferentes tipos de narizes, enquanto os pinos frontais acrescentam mais uma informação para esse modelo cheio de detalhes.",
 			stock: faker.number.int({ min: 1, max: 100 }),
 			status: "active",
 		})
@@ -281,35 +284,49 @@ const PRODUCT_IMAGE_URLS = [
 	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/colin-lloyd-uGS733o4Ukk-unsplash.jpg",
 	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/eyekeeper-eyekeeper-cbRGn25fqv8-unsplash.jpg",
 	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-7WUyUtVcKSk-unsplash.jpg",
-	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-7WUyUtVcKSk-unsplash.jpg",
-	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-JT64dSDlBDc-unsplash.jpg",
 	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/redowan-dhrubo-1KEVqrKDyUs-unsplash.jpg",
 	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/xshades-sunglasses-RS-AetNFty8-unsplash.jpg",
+	// Add some variety by repeating working URLs
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/artem-mihailov-5aKB1P_fcLw-unsplash.jpg",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/colin-lloyd-uGS733o4Ukk-unsplash.jpg",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/eyekeeper-eyekeeper-cbRGn25fqv8-unsplash.jpg",
+	"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/glassesshop-7WUyUtVcKSk-unsplash.jpg",
 ];
 
 async function seedProductImage(productId: string) {
-	console.info(`🖼️  Creating product image for product ID: ${productId}...`);
+	console.info(`🖼️  Creating product images for product ID: ${productId}...`);
 
-	const [productImage] = await seedDb
-		.insert(schema.productImage)
-		.values({
-			productId,
-			imageUrl: faker.helpers.arrayElement(PRODUCT_IMAGE_URLS),
-		})
-		.returning();
+	// Create 3-5 images per product, with the first one being the default
+	const imageCount = faker.number.int({ min: 3, max: 5 });
+	const productImages = [];
+
+	for (let i = 0; i < imageCount; i++) {
+		const [productImage] = await seedDb
+			.insert(schema.productImage)
+			.values({
+				productId,
+				imageUrl: faker.helpers.arrayElement(PRODUCT_IMAGE_URLS),
+				isDefault: i === 0, // First image is the default
+			})
+			.returning();
+
+		productImages.push(productImage);
+
+		await seedActivity({
+			type: "productImage.created",
+			actorId: "system",
+			actorType: "system",
+			metadata: {
+				content: productImage,
+			},
+		});
+	}
 
 	console.info(
-		`✅ Product image created successfully with ID: ${productImage.id}`,
+		`✅ ${imageCount} product images created successfully for product ${productId}`,
 	);
 
-	await seedActivity({
-		type: "productImage.created",
-		actorId: "system",
-		actorType: "system",
-		metadata: {
-			content: productImage,
-		},
-	});
+	return productImages;
 }
 
 async function seedProductPrice(productId: string) {

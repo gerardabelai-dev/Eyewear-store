@@ -119,6 +119,7 @@ export const product = pgTable("product", {
 		.$defaultFn(() => generatePrefixId("product")),
 	name: text("name").notNull(),
 	slug: text("slug"),
+	subtitle: text("subtitle"),
 	description: text("description"),
 	stock: integer("stock").notNull().default(0),
 	status: productStatus("status").notNull().default("active"),
@@ -133,6 +134,7 @@ export const productImage = pgTable("productImage", {
 		.notNull()
 		.references(() => product.id, { onDelete: "set null" }),
 	imageUrl: text("imageUrl").notNull(),
+	isDefault: boolean("isDefault").notNull().default(false),
 	...timestamps,
 });
 
