@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ERROR_CODES } from "@/app/api/contants/error-codes";
@@ -119,41 +119,113 @@ export async function POST(
 			}),
 		);
 
-		const createdCartProducts = [];
+		// Check if this exact combination already exists in the cart
+		const existingGroups = await db.query.cartProduct.findMany({
+			where: and(
+				eq(cartProduct.cartId, cartId),
+				eq(cartProduct.productId, glassesProductId),
+				eq(cartProduct.parentProductId, null),
+			),
+		});
 
-		// Add glasses product to cart
-		const [glassesCartProduct] = await db
-			.insert(cartProduct)
-			.values({
-				cartId,
-				productId: glassesProductId,
-				productPriceId: glassesProduct.productPrice[0].id,
-				quantity,
-				parentProductId: null, // Glasses is the parent product
-			})
-			.returning();
+		const updatedCartProducts = [];
+		let isExistingCombination = false;
 
-		createdCartProducts.push(glassesCartProduct);
+		// For each existing glasses item, check if it has the same lens combination
+		for (const existingGlasses of existingGroups) {
+			if (!existingGlasses.groupId) continue;
 
-		// Add each lens product to cart with glasses as parent
-		for (const { product: lensProduct, price: lensPrice } of lensProducts) {
-			const [lensCartProduct] = await db
+			const existingLensOptions = await db.query.cartProduct.findMany({
+				where: and(
+					eq(cartProduct.cartId, cartId),
+					eq(cartProduct.groupId, existingGlasses.groupId),
+					eq(cartProduct.parentProductId, glassesProductId),
+				),
+			});
+
+			// Create sorted arrays of lens product IDs for comparison
+			const existingLensIds = existingLensOptions
+				.map((lens) => lens.productId)
+				.sort();
+			const newLensIds = lensProductIds.slice().sort();
+
+			// Check if the lens combinations are identical
+			if (JSON.stringify(existingLensIds) === JSON.stringify(newLensIds)) {
+				// Identical combination found - update quantity
+				const [updatedGlasses] = await db
+					.update(cartProduct)
+					.set({
+						quantity: existingGlasses.quantity + quantity,
+						updatedAt: new Date(),
+					})
+					.where(eq(cartProduct.id, existingGlasses.id))
+					.returning();
+
+				updatedCartProducts.push(updatedGlasses);
+
+				// Also update lens option quantities
+				for (const existingLens of existingLensOptions) {
+					const [updatedLens] = await db
+						.update(cartProduct)
+						.set({
+							quantity: existingLens.quantity + quantity,
+							updatedAt: new Date(),
+						})
+						.where(eq(cartProduct.id, existingLens.id))
+						.returning();
+
+					updatedCartProducts.push(updatedLens);
+				}
+
+				isExistingCombination = true;
+				break;
+			}
+		}
+
+		// If no identical combination exists, create new items
+		if (!isExistingCombination) {
+			// Generate a unique group ID for this combination
+			const groupId = `grp_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+
+			// Add glasses product to cart
+			const [glassesCartProduct] = await db
 				.insert(cartProduct)
 				.values({
 					cartId,
-					productId: lensProduct.id,
-					productPriceId: lensPrice.id,
+					productId: glassesProductId,
+					productPriceId: glassesProduct.productPrice[0].id,
 					quantity,
-					parentProductId: glassesProductId, // Reference the glasses product
+					parentProductId: null, // Glasses is the parent product
+					groupId, // Assign group ID
 				})
 				.returning();
 
-			createdCartProducts.push(lensCartProduct);
+			updatedCartProducts.push(glassesCartProduct);
+
+			// Add each lens product to cart with glasses as parent
+			for (const { product: lensProduct, price: lensPrice } of lensProducts) {
+				const [lensCartProduct] = await db
+					.insert(cartProduct)
+					.values({
+						cartId,
+						productId: lensProduct.id,
+						productPriceId: lensPrice.id,
+						quantity,
+						parentProductId: glassesProductId, // Reference the glasses product
+						groupId, // Same group ID as the glasses
+					})
+					.returning();
+
+				updatedCartProducts.push(lensCartProduct);
+			}
 		}
 
 		return NextResponse.json({
-			cartProducts: createdCartProducts,
-			message: `Added glasses with ${lensProductIds.length} lens options to cart`,
+			cartProducts: updatedCartProducts,
+			message: isExistingCombination
+				? `Updated quantity for existing glasses with ${lensProductIds.length} lens options`
+				: `Added glasses with ${lensProductIds.length} lens options to cart`,
+			isExistingCombination,
 		});
 	} catch (error) {
 		console.error("Error adding glasses with lenses to cart:", error);

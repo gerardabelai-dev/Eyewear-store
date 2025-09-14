@@ -1,0 +1,1 @@
+ALTER TABLE "cartProduct" ADD COLUMN "groupId" text;

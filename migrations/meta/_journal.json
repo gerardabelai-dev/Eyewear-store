@@ -134,6 +134,13 @@
       "when": 1757881310841,
       "tag": "0018_slimy_loners",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1757882893489,
+      "tag": "0019_useful_runaways",
+      "breakpoints": true
     }
   ]
 }

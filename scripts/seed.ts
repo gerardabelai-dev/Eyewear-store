@@ -52,6 +52,10 @@ async function clearDatabase() {
 	await seedDb.delete(schema.customerAddress);
 	await seedDb.delete(schema.customer);
 
+	// Clear collection tables (must be before product)
+	await seedDb.delete(schema.collectionProduct);
+	await seedDb.delete(schema.collection);
+
 	// Clear product-related tables
 	await seedDb.delete(schema.productPrice);
 	await seedDb.delete(schema.productImage);
@@ -60,10 +64,6 @@ async function clearDatabase() {
 	// Clear category tables
 	await seedDb.delete(schema.categorySecondary);
 	await seedDb.delete(schema.category);
-
-	// Clear collection tables
-	await seedDb.delete(schema.collectionProduct);
-	await seedDb.delete(schema.collection);
 
 	// Clear order method tables
 	await seedDb.delete(schema.orderDeliveryMethod);
@@ -537,21 +537,21 @@ async function seedLensProducts(collections: {
 			slug: "com-grau",
 			description:
 				"Lentes monofocais para correção de miopia, hipermetropia ou astigmatismo",
-			price: 0,
+			price: 15000, // R$ 150.00 in cents
 		},
 		{
 			name: "Sem grau | com filtro de luz azul",
 			slug: "sem-grau-com-filtro-de-luz-azul",
 			description:
 				"Lentes sem grau ideais para quem está à procura de estilo e mais conforto visual. Perfeito para quem não desgruda os olhos das telas",
-			price: 0,
+			price: 8000, // R$ 80.00 in cents
 		},
 		{
 			name: "Sem grau | apenas a armação",
 			slug: "sem-grau-apenas-armacao",
 			description:
 				"Armação acompanhada de lentes de demonstração feitas de acrílico e não recomendadas para o uso diário",
-			price: 0,
+			price: 0, // Free - just the frame
 		},
 	];
 

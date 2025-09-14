@@ -60,33 +60,66 @@ export async function DELETE(
 			});
 		}
 
-		// Check if product exists in cart
-		const existingCartProduct = await db.query.cartProduct.findFirst({
+		// Get the item to be deleted (includes groupId if it exists)
+		const itemToDelete = await db.query.cartProduct.findFirst({
 			where: and(
 				eq(cartProduct.cartId, cartId),
 				eq(cartProduct.productId, productId),
 			),
 		});
 
-		if (!existingCartProduct) {
+		if (!itemToDelete) {
 			return Response.json(mapErrorCodes(ERROR_CODES.PRODUCT_NOT_FOUND), {
 				status: HTTP_CODES.NOT_FOUND,
 			});
 		}
 
-		// Remove product from cart
-		await db
-			.delete(cartProduct)
-			.where(
-				and(
-					eq(cartProduct.cartId, cartId),
-					eq(cartProduct.productId, productId),
-				),
+		let deletedSubProducts: any[] = [];
+
+		if (itemToDelete.groupId) {
+			// If item has groupId, delete all items in the same group
+			const allGroupItems = await db
+				.delete(cartProduct)
+				.where(
+					and(
+						eq(cartProduct.cartId, cartId),
+						eq(cartProduct.groupId, itemToDelete.groupId),
+					),
+				)
+				.returning();
+
+			deletedSubProducts = allGroupItems.filter(
+				(item) => item.id !== itemToDelete.id,
 			);
+		} else {
+			// Legacy approach: remove the main product and its sub-products
+			await db
+				.delete(cartProduct)
+				.where(
+					and(
+						eq(cartProduct.cartId, cartId),
+						eq(cartProduct.productId, productId),
+					),
+				);
+
+			// Also remove all sub-products (lens options) that have this product as parent
+			deletedSubProducts = await db
+				.delete(cartProduct)
+				.where(
+					and(
+						eq(cartProduct.cartId, cartId),
+						eq(cartProduct.parentProductId, productId),
+					),
+				)
+				.returning();
+		}
+
+		const totalItemsRemoved = 1 + deletedSubProducts.length;
 
 		return NextResponse.json({
 			success: true,
-			message: "Product removed from cart successfully",
+			message: `Product and ${deletedSubProducts.length} lens options removed from cart successfully`,
+			itemsRemoved: totalItemsRemoved,
 		});
 	} catch (error) {
 		console.error("Error removing product from cart:", error);

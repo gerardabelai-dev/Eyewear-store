@@ -222,6 +222,7 @@ export const cartProduct = pgTable("cartProduct", {
 	parentProductId: text("parentProductId").references(() => product.id, {
 		onDelete: "set null",
 	}),
+	groupId: text("groupId"), // Groups related cart items (glasses + lens options)
 	quantity: integer("quantity").notNull().default(1),
 	...timestamps,
 });

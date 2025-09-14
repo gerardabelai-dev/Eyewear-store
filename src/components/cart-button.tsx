@@ -50,10 +50,10 @@ function CartButtonWithData({ cartId }: { cartId: string }) {
 		);
 	}
 
-	const itemCount = cart.items.reduce(
-		(total, item) => total + item.quantity,
-		0,
-	);
+	// Only count parent products (glasses), not lens sub-options
+	const itemCount = cart.items
+		.filter((item) => !item.parentProductId) // Only count items without parent (glasses)
+		.reduce((total, item) => total + item.quantity, 0);
 
 	return (
 		<Link href={ROUTES.CART(cartId)}>
