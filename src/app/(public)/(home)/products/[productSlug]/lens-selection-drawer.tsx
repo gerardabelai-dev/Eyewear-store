@@ -126,7 +126,11 @@ export function LensSelectionDrawer({
 	const handleLensSelect = (lensId: string) => {
 		setSelectedLens(lensId);
 
-		if (lensId === "com-grau") {
+		if (
+			lensId === "com-grau" ||
+			lensId === "sem-grau-filtro" ||
+			lensId === "sem-grau-armacao"
+		) {
 			setCurrentStep("prescription-selection");
 		} else {
 			// For non-prescription lenses, complete the selection
@@ -152,10 +156,11 @@ export function LensSelectionDrawer({
 	const handleBack = () => {
 		if (currentStep === "finish-selection") {
 			setCurrentStep("prescription-selection");
-			// Keep selectedPrescription
+			// Keep selectedPrescription when going back to prescription selection
 		} else if (currentStep === "prescription-selection") {
 			setCurrentStep("lens-selection");
 			setSelectedPrescription(null);
+			setSelectedLens(null);
 		}
 	};
 
