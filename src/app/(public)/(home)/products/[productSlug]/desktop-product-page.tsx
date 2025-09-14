@@ -50,8 +50,8 @@ export function DesktopProductPage({
 		<section className="hidden lg:grid grid-cols-1 lg:grid-cols-[1fr_500px] gap-4">
 			{/* Product Images Left Scrollable Column */}
 			<div className="flex flex-col gap-4">
-				{/* Grid of smaller images */}
-				{otherImages.length > 0 && (
+				{/* Grid of smaller images - only show if there are at least 3 images */}
+				{otherImages.length >= 2 && (
 					<div className="grid grid-cols-2 gap-4">
 						{otherImages.slice(0, 4).map((image, index) => (
 							<div
@@ -68,15 +68,6 @@ export function DesktopProductPage({
 								/>
 							</div>
 						))}
-						{/* Fill remaining slots with placeholder if needed */}
-						{Array.from({ length: Math.max(0, 4 - otherImages.length) }).map(
-							(_, index) => (
-								<div
-									key={`placeholder-${index}`}
-									className="relative w-full h-96 overflow-hidden bg-transparent rounded"
-								/>
-							),
-						)}
 					</div>
 				)}
 
