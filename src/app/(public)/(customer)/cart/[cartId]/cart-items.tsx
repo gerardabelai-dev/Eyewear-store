@@ -146,7 +146,7 @@ function CartItem({
 			<CartProduct.Image
 				imageUrl={imageUrl}
 				alt={product.name}
-				href={`/products/${product.id}`}
+				href={`/products/${product.slug}`}
 			/>
 
 			<CartProduct.Content>

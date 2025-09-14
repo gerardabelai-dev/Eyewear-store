@@ -62,7 +62,7 @@ async function getFeaturedProducts(): Promise<ProductWithDetails[]> {
 			name: product.name,
 			price: formatPrice(product.productPrice[0]?.priceInCents || 0),
 			image: product.images[0]?.imageUrl || "/placeholder-product.jpg",
-			href: `/products/${product.id}`,
+			href: `/products/${product.slug}`,
 		}));
 	} catch (error) {
 		console.error("Error fetching featured products:", error);
