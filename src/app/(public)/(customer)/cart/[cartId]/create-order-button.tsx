@@ -3,7 +3,6 @@
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ERROR_CODES, ERROR_MESSAGES } from "@/app/api/contants/error-codes";
 import { Button } from "@/components/ui/button";
 import { useCreateOrderFromCartMutation } from "@/http";
 
@@ -23,13 +22,8 @@ export function CreateOrderButton({
 		},
 		onError: (error) => {
 			console.error(error);
-			switch (error.message) {
-				case ERROR_CODES.FAILED_TO_CREATE_ORDER:
-					toast.error(ERROR_MESSAGES[ERROR_CODES.FAILED_TO_CREATE_ORDER]);
-					break;
-				default:
-					toast.error(ERROR_MESSAGES[ERROR_CODES.UNEXPECTED_ERROR]);
-			}
+			// Show the actual error message from the backend
+			toast.error(error.message);
 		},
 	});
 

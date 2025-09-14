@@ -6,6 +6,7 @@ import type {
 	UpdateOrderDeliveryRequest,
 	UpdateOrderDeliveryResponse,
 } from "@/http/types";
+import { handleApiError } from "@/lib/utils/handle-api-error";
 
 export const useCreateOrderDeliveryMutation = (options?: {
 	onSuccess?: (data: CreateOrderDeliveryResponse) => void;
@@ -24,8 +25,10 @@ export const useCreateOrderDeliveryMutation = (options?: {
 			);
 
 			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_CREATE_ORDER_DELIVERY);
+				await handleApiError(
+					response,
+					ERROR_CODES.FAILED_TO_CREATE_ORDER_DELIVERY,
+				);
 			}
 
 			return await response.json();
@@ -53,8 +56,10 @@ export const useUpdateOrderDeliveryMutation = (options?: {
 			);
 
 			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_CREATE_ORDER_DELIVERY);
+				await handleApiError(
+					response,
+					ERROR_CODES.FAILED_TO_CREATE_ORDER_DELIVERY,
+				);
 			}
 
 			return await response.json();

@@ -571,8 +571,8 @@ function CreditCard({
 					)}
 				</div>
 
-				<div className="grid grid-cols-2 gap-4">
-					<div>
+				<div className="flex gap-2 max-w-[14rem]">
+					<div className="w-20">
 						<label className="block text-sm font-medium mb-2">Mês</label>
 						<Select
 							value={currentValue.expiryMonth}
@@ -602,7 +602,7 @@ function CreditCard({
 						)}
 					</div>
 
-					<div>
+					<div className="w-28">
 						<label className="block text-sm font-medium mb-2">Ano</label>
 						<Select
 							value={currentValue.expiryYear}
@@ -632,7 +632,7 @@ function CreditCard({
 						)}
 					</div>
 
-					<div>
+					<div className="w-20">
 						<label className="block text-sm font-medium mb-2">{cvvLabel}</label>
 						<Input
 							ref={cvvInputRef}
@@ -648,7 +648,7 @@ function CreditCard({
 							onFocus={handleCvvFocus}
 							onBlur={handleCvvBlur}
 							className={cn(
-								"font-mono text-center transition-all duration-200 max-w-16",
+								"font-mono text-center transition-all duration-200",
 								focusedField === "cvv" && "ring-2 ring-primary",
 								errors.cvv && "border-destructive",
 							)}

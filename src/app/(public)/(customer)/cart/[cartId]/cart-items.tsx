@@ -16,17 +16,14 @@ import {
 } from "@/http/cart/mutations";
 import type { GetCartResponse } from "@/http/types";
 import { calculateDiscountedPrice, formatPrice } from "@/lib/format-price";
+import {
+	type GroupedCartItem,
+	groupCartItems,
+} from "@/lib/utils/group-cart-items";
 
 import { getCartQueryOptions } from "./get-cart-query-options";
 
 type CartItemData = GetCartResponse["items"][0];
-
-interface GroupedCartItem {
-	glasses: CartItemData;
-	lensOptions: CartItemData[];
-	totalQuantity: number;
-	combinationKey: string;
-}
 
 function LensOption({ item }: { item: CartItemData }) {
 	// Calculate lens option price
@@ -62,7 +59,7 @@ function CartItem({
 	groupedItem,
 	cartId,
 }: {
-	groupedItem: GroupedCartItem;
+	groupedItem: GroupedCartItem<CartItemData>;
 	cartId: string;
 }) {
 	const item = groupedItem.glasses; // Use the glasses item for main display
@@ -127,6 +124,7 @@ function CartItem({
 			cartId,
 			productId: product.id,
 			quantity: newQuantity,
+			groupId: item.groupId || undefined,
 		});
 	};
 
@@ -224,83 +222,8 @@ export function CartItems({ cartId }: { cartId: string }) {
 		);
 	}
 
-	// Group items by groupId (glasses + lens combinations)
-	const groupMap = new Map<string, GroupedCartItem>();
-	const processedItems = new Set<string>();
-
-	data.items.forEach((item: CartItemData) => {
-		// Skip if already processed
-		if (processedItems.has(item.id)) return;
-
-		// If this is a parent product (glasses) with a groupId
-		if (!item.parentProductId && item.groupId) {
-			const lensOptions = data.items.filter(
-				(otherItem: CartItemData) =>
-					otherItem.groupId === item.groupId && otherItem.parentProductId,
-			);
-
-			// Mark all items in this group as processed
-			lensOptions.forEach((lensOption) => {
-				processedItems.add(lensOption.id);
-			});
-
-			// Check if this group already exists (for quantity aggregation)
-			if (groupMap.has(item.groupId)) {
-				// Add to existing group
-				const existing = groupMap.get(item.groupId);
-				if (existing) {
-					existing.totalQuantity += item.quantity;
-				}
-			} else {
-				// Create new group
-				groupMap.set(item.groupId, {
-					glasses: item,
-					lensOptions,
-					totalQuantity: item.quantity,
-					combinationKey: item.groupId,
-				});
-			}
-
-			processedItems.add(item.id);
-		}
-		// Handle glasses without groupId (legacy data or orphaned items)
-		else if (!item.parentProductId && !item.groupId) {
-			const lensOptions = data.items.filter(
-				(otherItem: CartItemData) =>
-					otherItem.parentProductId === item.product.id && !otherItem.groupId,
-			);
-
-			// Mark lens options as processed
-			lensOptions.forEach((lensOption) => {
-				processedItems.add(lensOption.id);
-			});
-
-			const legacyKey = `legacy:${item.id}`;
-			groupMap.set(legacyKey, {
-				glasses: item,
-				lensOptions,
-				totalQuantity: item.quantity,
-				combinationKey: legacyKey,
-			});
-
-			processedItems.add(item.id);
-		}
-	});
-
-	// Handle any remaining orphaned lens options
-	data.items.forEach((item: CartItemData) => {
-		if (!processedItems.has(item.id) && item.parentProductId) {
-			const orphanKey = `orphan:${item.id}`;
-			groupMap.set(orphanKey, {
-				glasses: item,
-				lensOptions: [],
-				totalQuantity: item.quantity,
-				combinationKey: orphanKey,
-			});
-		}
-	});
-
-	const groupedItems = Array.from(groupMap.values());
+	// Group items using the shared utility
+	const groupedItems = groupCartItems(data.items);
 
 	return (
 		<ul className="flex flex-col gap-4">

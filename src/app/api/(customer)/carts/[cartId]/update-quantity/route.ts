@@ -15,6 +15,7 @@ const updateCartProductQuantityParamsSchema = z.object({
 const updateCartProductQuantityBodySchema = z.object({
 	productId: z.string(),
 	quantity: z.number().int().positive(),
+	groupId: z.string().optional(),
 });
 
 type UpdateCartProductQuantityParams = z.infer<
@@ -47,7 +48,7 @@ export async function PATCH(
 	}
 
 	const { cartId } = paramsData;
-	const { productId, quantity } = bodyData;
+	const { productId, quantity, groupId } = bodyData;
 
 	try {
 		// Check if cart exists
@@ -80,11 +81,18 @@ export async function PATCH(
 		}
 
 		// Check if product exists in cart
+		const whereConditions = [
+			eq(cartProduct.cartId, cartId),
+			eq(cartProduct.productId, productId),
+		];
+
+		// If groupId is provided, use it to find the specific instance
+		if (groupId) {
+			whereConditions.push(eq(cartProduct.groupId, groupId));
+		}
+
 		const existingCartProduct = await db.query.cartProduct.findFirst({
-			where: and(
-				eq(cartProduct.cartId, cartId),
-				eq(cartProduct.productId, productId),
-			),
+			where: and(...whereConditions),
 		});
 
 		if (!existingCartProduct) {

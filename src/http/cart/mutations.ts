@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ERROR_CODES } from "@/app/api/contants/error-codes";
 import { QUERY_KEYS } from "@/http/query-keys";
-
 import type {
 	AddProductToCartResponse,
 	CreateCartResponse,
 	RemoveProductFromCartResponse,
 	UpdateCartProductQuantityResponse,
 } from "@/http/types";
+import { handleApiError } from "@/lib/utils/handle-api-error";
 
 export const useCreateCart = () => {
 	const queryClient = useQueryClient();
@@ -25,8 +25,7 @@ export const useCreateCart = () => {
 			);
 
 			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_CREATE_CART);
+				await handleApiError(response, ERROR_CODES.FAILED_TO_CREATE_CART);
 			}
 
 			return await response.json();
@@ -70,8 +69,10 @@ export const useAddProductToCart = () => {
 			);
 
 			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_ADD_PRODUCT_TO_CART);
+				await handleApiError(
+					response,
+					ERROR_CODES.FAILED_TO_ADD_PRODUCT_TO_CART,
+				);
 			}
 
 			return await response.json();
@@ -116,8 +117,10 @@ export const useAddGlassesWithLensesToCart = () => {
 			);
 
 			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_ADD_PRODUCT_TO_CART);
+				await handleApiError(
+					response,
+					ERROR_CODES.FAILED_TO_ADD_PRODUCT_TO_CART,
+				);
 			}
 
 			return await response.json();
@@ -154,8 +157,10 @@ export const useRemoveProductFromCart = () => {
 			);
 
 			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_REMOVE_PRODUCT_FROM_CART);
+				await handleApiError(
+					response,
+					ERROR_CODES.FAILED_TO_REMOVE_PRODUCT_FROM_CART,
+				);
 			}
 
 			return await response.json();
@@ -177,10 +182,12 @@ export const useUpdateCartProductQuantity = () => {
 			cartId,
 			productId,
 			quantity,
+			groupId,
 		}: {
 			cartId: string;
 			productId: string;
 			quantity: number;
+			groupId?: string;
 		}): Promise<UpdateCartProductQuantityResponse> => {
 			const response = await fetch(
 				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts/${cartId}/update-quantity`,
@@ -189,13 +196,15 @@ export const useUpdateCartProductQuantity = () => {
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({ productId, quantity }),
+					body: JSON.stringify({ productId, quantity, groupId }),
 				},
 			);
 
 			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_UPDATE_CART_PRODUCT_QUANTITY);
+				await handleApiError(
+					response,
+					ERROR_CODES.FAILED_TO_UPDATE_CART_PRODUCT_QUANTITY,
+				);
 			}
 
 			return await response.json();

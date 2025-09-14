@@ -57,8 +57,9 @@ export function CheckoutProvider({
 	hasCustomer,
 	orderId,
 }: CheckoutProviderProps) {
-	// Always start with customer form open (first accordion)
-	const [activeStep, setActiveStep] = useState<CheckoutStep | null>("customer");
+	// Start with null, will be set based on completion status
+	const [activeStep, setActiveStep] = useState<CheckoutStep | null>(null);
+	const [hasInitialized, setHasInitialized] = useState(false);
 
 	// Get order data to check which steps should be disabled
 	const { data: order } = useQuery(getOrderByIdQueryOptions(orderId));
@@ -77,7 +78,9 @@ export function CheckoutProvider({
 				selector = 'button[role="combobox"]'; // Select trigger
 				break;
 			case "payment-method":
-				selector = '[data-value="payment-method"] input[type="text"]'; // First text input in payment method accordion
+				// Focus the cardholder name input in the credit card form
+				selector =
+					'input[placeholder="João Silva"], input[placeholder="SEU NOME"]';
 				break;
 		}
 
@@ -145,12 +148,42 @@ export function CheckoutProvider({
 		return !isStepAccessible(step);
 	};
 
-	// Focus first input when customer form opens initially
+	// Initialize the active step based on completion status when order data loads
 	useEffect(() => {
-		if (!hasCustomer && activeStep === "customer") {
+		if (!order || hasInitialized) return;
+
+		// Find the first incomplete step
+		let firstIncompleteStep: CheckoutStep | null = null;
+		for (const step of stepOrder) {
+			if (step === "complete") continue; // Skip the 'complete' pseudo-step
+
+			if (!isStepCompleted(step) && isStepAccessible(step)) {
+				firstIncompleteStep = step;
+				break;
+			}
+		}
+
+		// If all steps are completed, focus the order button
+		if (!firstIncompleteStep) {
+			setActiveStep(null); // Close all accordions
+			// Give time for the UI to render before focusing
+			setTimeout(() => focusOrderButton(), 300);
+		} else {
+			// Open the first incomplete step
+			setActiveStep(firstIncompleteStep);
+			// Focus the first input in that step
+			setTimeout(() => focusFirstInput(firstIncompleteStep), 300);
+		}
+
+		setHasInitialized(true);
+	}, [order, hasInitialized]);
+
+	// Focus first input when customer form opens initially (for new customers)
+	useEffect(() => {
+		if (!hasCustomer && activeStep === "customer" && hasInitialized) {
 			setTimeout(() => focusFirstInput("customer"), 100);
 		}
-	}, [hasCustomer, activeStep]);
+	}, [hasCustomer, activeStep, hasInitialized]);
 
 	const goToNextStep = (currentStep: CheckoutStep) => {
 		const currentIndex = stepOrder.indexOf(currentStep);

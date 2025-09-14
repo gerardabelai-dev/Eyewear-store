@@ -832,35 +832,52 @@ async function seedOrder({
 	return order;
 }
 
-async function seedOrderDeliveryMethod() {
-	console.info("🚚 Creating order delivery method...");
+async function seedOrderDeliveryMethods() {
+	console.info("🚚 Creating order delivery methods...");
 
-	const [orderDeliveryMethod] = await seedDb
-		.insert(schema.orderDeliveryMethod)
-		.values({
-			method: faker.helpers.arrayElement([
-				"Standard Delivery",
-				"Express Delivery",
-				"Overnight Delivery",
-			]),
-			costInCents: faker.number.int({ min: 500, max: 2000 }),
-		})
-		.returning();
-
-	console.info(
-		`✅ Order delivery method created successfully with ID: ${orderDeliveryMethod.id}`,
-	);
-
-	await seedActivity({
-		type: "orderDeliveryMethod.created",
-		actorId: "system",
-		actorType: "system",
-		metadata: {
-			content: orderDeliveryMethod,
+	const deliveryMethods = [
+		{
+			method: "Entrega Padrão",
+			costInCents: 1500, // R$ 15.00
 		},
-	});
+		{
+			method: "Entrega Expressa",
+			costInCents: 2500, // R$ 25.00
+		},
+		{
+			method: "Entrega no Mesmo Dia",
+			costInCents: 4000, // R$ 40.00
+		},
+	];
 
-	return orderDeliveryMethod;
+	const createdMethods = [];
+
+	for (const methodData of deliveryMethods) {
+		const [orderDeliveryMethod] = await seedDb
+			.insert(schema.orderDeliveryMethod)
+			.values({
+				method: methodData.method,
+				costInCents: methodData.costInCents,
+			})
+			.returning();
+
+		console.info(
+			`✅ Order delivery method created successfully: ${orderDeliveryMethod.method} - R$ ${(orderDeliveryMethod.costInCents / 100).toFixed(2)}`,
+		);
+
+		await seedActivity({
+			type: "orderDeliveryMethod.created",
+			actorId: "system",
+			actorType: "system",
+			metadata: {
+				content: orderDeliveryMethod,
+			},
+		});
+
+		createdMethods.push(orderDeliveryMethod);
+	}
+
+	return createdMethods;
 }
 
 async function seedOrderPaymentMethods() {
@@ -918,25 +935,28 @@ async function seedOrderPaymentMethods() {
 	return paymentMethods;
 }
 
-async function seedOrderDelivery({
+async function _seedOrderDelivery({
 	orderId,
-	orderDeliveryMethodId,
+	orderDeliveryMethods,
 }: {
 	orderId: string;
-	orderDeliveryMethodId: string;
+	orderDeliveryMethods: any[];
 }) {
 	console.info(`🚚 Creating order delivery for order ID: ${orderId}...`);
+
+	// Select a random delivery method for this order
+	const selectedMethod = faker.helpers.arrayElement(orderDeliveryMethods);
 
 	const [orderDelivery] = await seedDb
 		.insert(schema.orderDelivery)
 		.values({
 			orderId,
-			orderDeliveryMethodId,
+			orderDeliveryMethodId: selectedMethod.id,
 		})
 		.returning();
 
 	console.info(
-		`✅ Order delivery created successfully with ID: ${orderDelivery.id}`,
+		`✅ Order delivery created successfully with ID: ${orderDelivery.id} using method: ${selectedMethod.method}`,
 	);
 
 	await seedActivity({
@@ -949,7 +969,7 @@ async function seedOrderDelivery({
 	});
 }
 
-async function seedOrderPayment({
+async function _seedOrderPayment({
 	orderId,
 	orderPaymentMethodId,
 	totalPriceInCents,
@@ -1033,11 +1053,11 @@ async function seed() {
 		const users = await seedUsers();
 
 		// Create delivery and payment methods first (needed for orders)
-		const orderDeliveryMethod = await seedOrderDeliveryMethod();
+		const _orderDeliveryMethods = await seedOrderDeliveryMethods();
 		const orderPaymentMethods = await seedOrderPaymentMethods();
 
 		// Use Credit Card as the default payment method for seeded orders
-		const defaultPaymentMethod =
+		const _defaultPaymentMethod =
 			orderPaymentMethods.find((method) => method.method === "Credit Card") ||
 			orderPaymentMethods[0];
 
@@ -1072,7 +1092,7 @@ async function seed() {
 
 			// Create cart and add random products
 			const cart = await seedCart();
-			let totalPriceInCents = 0;
+			let _totalPriceInCents = 0;
 
 			// Add 1-3 random products to cart
 			const numberOfProducts = faker.number.int({ min: 1, max: 3 });
@@ -1087,27 +1107,31 @@ async function seed() {
 					quantity: randomQuantity,
 				});
 
-				totalPriceInCents +=
+				_totalPriceInCents +=
 					randomProduct.productPrice.priceInCents * randomQuantity;
 			}
 
-			const order = await seedOrder({
+			const _order = await seedOrder({
 				customerId: customer.id,
 				customerAddressId: customerAddress.id,
 				cartId: cart.id,
 				userId: user.id,
 			});
 
-			await seedOrderDelivery({
-				orderId: order.id,
-				orderDeliveryMethodId: orderDeliveryMethod.id,
-			});
+			// Don't create order delivery and payment for seeded orders
+			// This allows users to go through the proper checkout flow
+			// and select shipping methods and payment methods themselves
 
-			await seedOrderPayment({
-				orderId: order.id,
-				orderPaymentMethodId: defaultPaymentMethod.id,
-				totalPriceInCents,
-			});
+			// await seedOrderDelivery({
+			// 	orderId: order.id,
+			// 	orderDeliveryMethods,
+			// });
+
+			// await seedOrderPayment({
+			// 	orderId: order.id,
+			// 	orderPaymentMethodId: defaultPaymentMethod.id,
+			// 	totalPriceInCents,
+			// });
 		}
 
 		process.exit(0);

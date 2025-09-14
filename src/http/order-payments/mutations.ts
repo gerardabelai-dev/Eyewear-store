@@ -6,6 +6,7 @@ import type {
 	UpdateOrderPaymentRequest,
 	UpdateOrderPaymentResponse,
 } from "@/http/types";
+import { handleApiError } from "@/lib/utils/handle-api-error";
 
 export const useCreateOrderPaymentMutation = (options?: {
 	onSuccess?: (data: CreateOrderPaymentResponse) => void;
@@ -26,8 +27,10 @@ export const useCreateOrderPaymentMutation = (options?: {
 			});
 
 			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT);
+				await handleApiError(
+					response,
+					ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT,
+				);
 			}
 
 			return await response.json();
@@ -54,8 +57,10 @@ export const useUpdateOrderPaymentMutation = (options?: {
 			});
 
 			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT);
+				await handleApiError(
+					response,
+					ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT,
+				);
 			}
 
 			return await response.json();

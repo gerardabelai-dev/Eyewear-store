@@ -7,7 +7,6 @@ import { Suspense, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
-import { ERROR_CODES, ERROR_MESSAGES } from "@/app/api/contants/error-codes";
 import { Button } from "@/components/ui/button";
 import {
 	Form,
@@ -86,15 +85,8 @@ export function CheckoutShippingMethodForm({
 			},
 			onError: (error) => {
 				console.error(error);
-				switch (error.message) {
-					case ERROR_CODES.FAILED_TO_CREATE_ORDER_DELIVERY:
-						toast.error(
-							ERROR_MESSAGES[ERROR_CODES.FAILED_TO_CREATE_ORDER_DELIVERY],
-						);
-						break;
-					default:
-						toast.error(ERROR_MESSAGES[ERROR_CODES.UNEXPECTED_ERROR]);
-				}
+				// Show the actual error message from the backend
+				toast.error(error.message);
 			},
 		});
 

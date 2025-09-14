@@ -2,6 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { ERROR_CODES } from "@/app/api/contants/error-codes";
 import { QUERY_KEYS } from "@/http/query-keys";
 import type { GetOrderDeliveryResponse, GetOrderResponse } from "@/http/types";
+import { handleApiError } from "@/lib/utils/handle-api-error";
 
 export const getOrderByIdQueryOptions = (orderId: string) =>
 	queryOptions({
@@ -12,8 +13,7 @@ export const getOrderByIdQueryOptions = (orderId: string) =>
 			);
 
 			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_GET_ORDER_DETAILS);
+				await handleApiError(response, ERROR_CODES.FAILED_TO_GET_ORDER_DETAILS);
 			}
 
 			const { order } = (await response.json()) as GetOrderResponse;

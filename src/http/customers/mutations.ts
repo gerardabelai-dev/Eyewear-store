@@ -4,6 +4,7 @@ import type {
 	CreateCustomerRequest,
 	CreateCustomerResponse,
 } from "@/http/types";
+import { handleApiError } from "@/lib/utils/handle-api-error";
 
 export const useCreateCustomerMutation = (options?: {
 	onSuccess?: (data: CreateCustomerResponse) => void;
@@ -19,8 +20,7 @@ export const useCreateCustomerMutation = (options?: {
 			});
 
 			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_CREATE_CUSTOMER);
+				await handleApiError(response, ERROR_CODES.FAILED_TO_CREATE_CUSTOMER);
 			}
 
 			return await response.json();

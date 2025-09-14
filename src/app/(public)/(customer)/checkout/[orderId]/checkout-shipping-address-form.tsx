@@ -7,7 +7,6 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
-import { ERROR_CODES, ERROR_MESSAGES } from "@/app/api/contants/error-codes";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -112,15 +111,8 @@ export function CheckoutShippingAddressForm({
 		},
 		onError: (error) => {
 			console.error(error);
-			switch (error.message) {
-				case ERROR_CODES.FAILED_TO_CREATE_CUSTOMER_ADDRESS:
-					toast.error(
-						ERROR_MESSAGES[ERROR_CODES.FAILED_TO_CREATE_CUSTOMER_ADDRESS],
-					);
-					break;
-				default:
-					toast.error(ERROR_MESSAGES[ERROR_CODES.UNEXPECTED_ERROR]);
-			}
+			// Show the actual error message from the backend
+			toast.error(error.message);
 		},
 	});
 
@@ -135,13 +127,8 @@ export function CheckoutShippingAddressForm({
 			},
 			onError: (error) => {
 				console.error(error);
-				switch (error.message) {
-					case ERROR_CODES.FAILED_TO_UPDATE_ORDER:
-						toast.error(ERROR_MESSAGES[ERROR_CODES.FAILED_TO_UPDATE_ORDER]);
-						break;
-					default:
-						toast.error(ERROR_MESSAGES[ERROR_CODES.UNEXPECTED_ERROR]);
-				}
+				// Show the actual error message from the backend
+				toast.error(error.message);
 			},
 		});
 

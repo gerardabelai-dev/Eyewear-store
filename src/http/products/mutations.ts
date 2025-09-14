@@ -8,6 +8,7 @@ import type {
 	UpdateOrderCustomerIdRequest,
 	UpdateOrderCustomerIdResponse,
 } from "@/http/types";
+import { handleApiError } from "@/lib/utils/handle-api-error";
 
 export const useCreateOrderFromCartMutation = (options?: {
 	onSuccess?: (data: CreateOrderFromCartResponse) => void;
@@ -23,8 +24,7 @@ export const useCreateOrderFromCartMutation = (options?: {
 			});
 
 			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_CREATE_ORDER);
+				await handleApiError(response, ERROR_CODES.FAILED_TO_CREATE_ORDER);
 			}
 
 			return await response.json();
@@ -49,8 +49,7 @@ export const useUpdateOrderCustomerIdMutation = (options?: {
 			);
 
 			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_UPDATE_ORDER);
+				await handleApiError(response, ERROR_CODES.FAILED_TO_UPDATE_ORDER);
 			}
 
 			return await response.json();
@@ -75,8 +74,7 @@ export const useUpdateOrderCustomerAddressIdMutation = (options?: {
 			);
 
 			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_UPDATE_ORDER);
+				await handleApiError(response, ERROR_CODES.FAILED_TO_UPDATE_ORDER);
 			}
 
 			return await response.json();

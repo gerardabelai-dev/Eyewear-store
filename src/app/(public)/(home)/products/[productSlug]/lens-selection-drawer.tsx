@@ -2,6 +2,7 @@
 
 import * as SheetPrimitive from "@radix-ui/react-dialog";
 import { ArrowLeft, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
@@ -35,6 +36,7 @@ export function LensSelectionDrawer({
 	glassesProduct,
 	onLensSelect,
 }: LensSelectionDrawerProps) {
+	const router = useRouter();
 	const { data: collections, isLoading, error } = useCollections();
 	const { addGlassesWithLenses } = useCart();
 
@@ -115,13 +117,16 @@ export function LensSelectionDrawer({
 						.filter(Boolean)
 						.map((product) => product.id);
 
-					await addGlassesWithLenses({
+					const result = await addGlassesWithLenses({
 						glassesProductId: glassesProduct.id,
 						lensProductIds,
 						quantity: 1,
 					});
 
 					console.log("✅ Successfully added glasses with lenses to cart!");
+
+					// Redirect to cart page
+					router.push(`/cart/${result.cartId}`);
 				} catch (error) {
 					console.error("❌ Failed to add glasses with lenses to cart:", error);
 					// You might want to show a toast notification here

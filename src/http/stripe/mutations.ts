@@ -6,6 +6,7 @@ import type {
 	CreatePaymentMethodRequest,
 	CreatePaymentMethodResponse,
 } from "@/http/types";
+import { handleApiError } from "@/lib/utils/handle-api-error";
 
 export const useCreatePaymentIntentMutation = (options?: {
 	onSuccess?: (data: CreatePaymentIntentResponse) => void;
@@ -24,8 +25,10 @@ export const useCreatePaymentIntentMutation = (options?: {
 			});
 
 			if (!response.ok) {
-				console.error(response);
-				throw new Error(ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT);
+				await handleApiError(
+					response,
+					ERROR_CODES.FAILED_TO_CREATE_ORDER_PAYMENT,
+				);
 			}
 
 			return await response.json();
@@ -50,8 +53,7 @@ export const useCreatePaymentMethodMutation = (options?: {
 			});
 
 			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.error || "Failed to create payment method");
+				await handleApiError(response, "Failed to create payment method");
 			}
 
 			return await response.json();
