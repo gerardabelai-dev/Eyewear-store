@@ -15,6 +15,7 @@ const addProductToCartParamsSchema = z.object({
 const addProductToCartBodySchema = z.object({
 	productId: z.string(),
 	quantity: z.number().int().positive().default(1),
+	parentProductId: z.string().optional(),
 });
 
 type AddProductToCartParams = z.infer<typeof addProductToCartParamsSchema>;
@@ -45,7 +46,7 @@ export async function POST(
 	}
 
 	const { cartId } = paramsData;
-	const { productId, quantity } = bodyData;
+	const { productId, quantity, parentProductId } = bodyData;
 
 	try {
 		// Check if cart exists
@@ -84,11 +85,14 @@ export async function POST(
 
 		const defaultPrice = productFound.productPrice[0];
 
-		// Check if product already exists in cart
+		// Check if product already exists in cart (including parent product relationship)
 		const existingCartProduct = await db.query.cartProduct.findFirst({
 			where: and(
 				eq(cartProduct.cartId, cartId),
 				eq(cartProduct.productId, productId),
+				parentProductId
+					? eq(cartProduct.parentProductId, parentProductId)
+					: eq(cartProduct.parentProductId, null),
 			),
 		});
 
@@ -115,6 +119,7 @@ export async function POST(
 					productId,
 					productPriceId: defaultPrice.id,
 					quantity,
+					parentProductId,
 				})
 				.returning();
 

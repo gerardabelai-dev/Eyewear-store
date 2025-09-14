@@ -1,0 +1,2 @@
+ALTER TABLE "cartProduct" ADD COLUMN "parentProductId" text;--> statement-breakpoint
+ALTER TABLE "cartProduct" ADD CONSTRAINT "cartProduct_parentProductId_product_id_fk" FOREIGN KEY ("parentProductId") REFERENCES "public"."product"("id") ON DELETE set null ON UPDATE no action;

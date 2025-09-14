@@ -106,6 +106,11 @@ export function MobileProductPage({
 			{/* Mobile: User Actions */}
 			<div className="flex flex-col gap-2">
 				<LensSelectionDrawer
+					glassesProduct={{
+						id: product.id,
+						name: product.name,
+						slug: product.slug,
+					}}
 					trigger={
 						<Button size="lg" className="w-full" variant="vibrant">
 							Escolher lentes e comprar

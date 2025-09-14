@@ -51,10 +51,12 @@ export const useAddProductToCart = () => {
 			cartId,
 			productId,
 			quantity = 1,
+			parentProductId,
 		}: {
 			cartId: string;
 			productId: string;
 			quantity?: number;
+			parentProductId?: string;
 		}): Promise<AddProductToCartResponse> => {
 			const response = await fetch(
 				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts/${cartId}/add-product`,
@@ -63,7 +65,53 @@ export const useAddProductToCart = () => {
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({ productId, quantity }),
+					body: JSON.stringify({ productId, quantity, parentProductId }),
+				},
+			);
+
+			if (!response.ok) {
+				console.error(response);
+				throw new Error(ERROR_CODES.FAILED_TO_ADD_PRODUCT_TO_CART);
+			}
+
+			return await response.json();
+		},
+		onSuccess: (_, variables) => {
+			// Invalidate cart query to refetch updated cart data
+			queryClient.invalidateQueries({
+				queryKey: QUERY_KEYS.cart(variables.cartId),
+			});
+		},
+	});
+};
+
+export const useAddGlassesWithLensesToCart = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({
+			cartId,
+			glassesProductId,
+			lensProductIds,
+			quantity = 1,
+		}: {
+			cartId: string;
+			glassesProductId: string;
+			lensProductIds: string[];
+			quantity?: number;
+		}): Promise<AddProductToCartResponse> => {
+			const response = await fetch(
+				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts/${cartId}/add-glasses-with-lenses`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						glassesProductId,
+						lensProductIds,
+						quantity,
+					}),
 				},
 			);
 

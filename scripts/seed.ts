@@ -61,6 +61,10 @@ async function clearDatabase() {
 	await seedDb.delete(schema.categorySecondary);
 	await seedDb.delete(schema.category);
 
+	// Clear collection tables
+	await seedDb.delete(schema.collectionProduct);
+	await seedDb.delete(schema.collection);
+
 	// Clear order method tables
 	await seedDb.delete(schema.orderDeliveryMethod);
 	await seedDb.delete(schema.orderPaymentMethod);
@@ -434,6 +438,301 @@ async function seedCategorySecondary(categoryId: string) {
 	});
 }
 
+async function seedLensCollections() {
+	console.info("👓 Creating lens collections...");
+
+	// Step 1 - Lens Type Selection
+	const [lensTypeCollection] = await seedDb
+		.insert(schema.collection)
+		.values({
+			name: "Escolha seu tipo de lente",
+			slug: "tipo-de-lente",
+			description: "Selecione a opção que melhor atende às suas necessidades",
+			isActive: true,
+		})
+		.returning();
+
+	console.info(
+		`✅ Lens type collection created successfully with ID: ${lensTypeCollection.id}`,
+	);
+
+	await seedActivity({
+		type: "collection.created",
+		actorId: "system",
+		actorType: "system",
+		metadata: {
+			content: lensTypeCollection,
+		},
+	});
+
+	// Step 2 - Prescription Strength Selection
+	const [prescriptionCollection] = await seedDb
+		.insert(schema.collection)
+		.values({
+			name: "Selecione as lentes de acordo com seu grau",
+			slug: "grau-das-lentes",
+			description:
+				"Assim que finalizar a compra vamos pedir os dados da sua receita. Não se preocupe, também vamos te lembrar via e-mail e sms!",
+			isActive: true,
+		})
+		.returning();
+
+	console.info(
+		`✅ Prescription collection created successfully with ID: ${prescriptionCollection.id}`,
+	);
+
+	await seedActivity({
+		type: "collection.created",
+		actorId: "system",
+		actorType: "system",
+		metadata: {
+			content: prescriptionCollection,
+		},
+	});
+
+	// Step 3 - Lens Finishing Options
+	const [finishingCollection] = await seedDb
+		.insert(schema.collection)
+		.values({
+			name: "Selecione o acabamento das suas lentes",
+			slug: "acabamento-das-lentes",
+			description: "Escolha o tipo de acabamento para suas lentes",
+			isActive: true,
+		})
+		.returning();
+
+	console.info(
+		`✅ Finishing collection created successfully with ID: ${finishingCollection.id}`,
+	);
+
+	await seedActivity({
+		type: "collection.created",
+		actorId: "system",
+		actorType: "system",
+		metadata: {
+			content: finishingCollection,
+		},
+	});
+
+	return {
+		lensTypeCollection,
+		prescriptionCollection,
+		finishingCollection,
+	};
+}
+
+async function seedLensProducts(collections: {
+	lensTypeCollection: any;
+	prescriptionCollection: any;
+	finishingCollection: any;
+}) {
+	console.info("👓 Creating lens products...");
+
+	const lensProducts = [];
+
+	// Step 1 - Lens Type Products
+	const lensTypeProducts = [
+		{
+			name: "Com grau",
+			slug: "com-grau",
+			description:
+				"Lentes monofocais para correção de miopia, hipermetropia ou astigmatismo",
+			price: 0,
+		},
+		{
+			name: "Sem grau | com filtro de luz azul",
+			slug: "sem-grau-com-filtro-de-luz-azul",
+			description:
+				"Lentes sem grau ideais para quem está à procura de estilo e mais conforto visual. Perfeito para quem não desgruda os olhos das telas",
+			price: 0,
+		},
+		{
+			name: "Sem grau | apenas a armação",
+			slug: "sem-grau-apenas-armacao",
+			description:
+				"Armação acompanhada de lentes de demonstração feitas de acrílico e não recomendadas para o uso diário",
+			price: 0,
+		},
+	];
+
+	for (const productData of lensTypeProducts) {
+		const [product] = await seedDb
+			.insert(schema.product)
+			.values({
+				name: productData.name,
+				slug: productData.slug,
+				description: productData.description,
+				stock: 999,
+				status: "active",
+			})
+			.returning();
+
+		const [productPrice] = await seedDb
+			.insert(schema.productPrice)
+			.values({
+				productId: product.id,
+				priceInCents: productData.price,
+				discountPercentage: 0,
+				isDefault: true,
+			})
+			.returning();
+
+		// Link to collection
+		await seedDb.insert(schema.collectionProduct).values({
+			collectionId: collections.lensTypeCollection.id,
+			productId: product.id,
+		});
+
+		lensProducts.push({ product, productPrice });
+
+		await seedActivity({
+			type: "product.created",
+			actorId: "system",
+			actorType: "system",
+			metadata: {
+				content: product,
+			},
+		});
+
+		console.info(
+			`✅ Lens type product created: ${product.name} (${product.slug})`,
+		);
+	}
+
+	// Step 2 - Prescription Strength Products
+	const prescriptionProducts = [
+		{
+			name: "Grau leve | até +/- 2,75",
+			slug: "grau-leve",
+			description:
+				"Lentes com espessura padrão, feitas de resina. Contemplam hipermetropia e miopia até +/- 2,75 e astigmatismo até -2,00",
+			price: 0,
+		},
+		{
+			name: "Grau moderado | até +/- 4,00",
+			slug: "grau-moderado",
+			description:
+				"Lentes mais leves e resistentes, feitas de policarbonato. Contemplam hipermetropia e miopia até +/- 4,00 e astigmatismo até -2,00",
+			price: 30000, // R$ 300.00 in cents
+		},
+		{
+			name: "Grau alto | até +5,00/-6,50",
+			slug: "grau-alto",
+			description:
+				"Lentes mais finas e voltadas para graus mais altos, feitas de resina de alto índice. Contemplam hipermetropia até +5,00, miopia até -6,50, e astigmatismo até -4,00",
+			price: 60000, // R$ 600.00 in cents
+		},
+	];
+
+	for (const productData of prescriptionProducts) {
+		const [product] = await seedDb
+			.insert(schema.product)
+			.values({
+				name: productData.name,
+				slug: productData.slug,
+				description: productData.description,
+				stock: 999,
+				status: "active",
+			})
+			.returning();
+
+		const [productPrice] = await seedDb
+			.insert(schema.productPrice)
+			.values({
+				productId: product.id,
+				priceInCents: productData.price,
+				discountPercentage: 0,
+				isDefault: true,
+			})
+			.returning();
+
+		// Link to collection
+		await seedDb.insert(schema.collectionProduct).values({
+			collectionId: collections.prescriptionCollection.id,
+			productId: product.id,
+		});
+
+		lensProducts.push({ product, productPrice });
+
+		await seedActivity({
+			type: "product.created",
+			actorId: "system",
+			actorType: "system",
+			metadata: {
+				content: product,
+			},
+		});
+
+		console.info(
+			`✅ Prescription product created: ${product.name} (${product.slug})`,
+		);
+	}
+
+	// Step 3 - Lens Finishing Products
+	const finishingProducts = [
+		{
+			name: "Clássico",
+			slug: "classico",
+			description:
+				"Lentes com espessura padrão, feitas de resina. Contemplam hipermetropia e miopia até +/- 2,75 e astigmatismo até -2,00",
+			price: 0,
+		},
+		{
+			name: "Filtro de luz azul",
+			slug: "filtro-de-luz-azul",
+			description:
+				"Além da resistência contra arranhões, antirreflexo e proteção UV, também filtram mais luz azul de aparelhos digitais e do sol do que lentes clássicas ou fotossensíveis. +O filtro de luz azul pode deixar um residual azulado ou esverdeado nas lentes.",
+			price: 20000, // R$ 200.00 in cents
+		},
+	];
+
+	for (const productData of finishingProducts) {
+		const [product] = await seedDb
+			.insert(schema.product)
+			.values({
+				name: productData.name,
+				slug: productData.slug,
+				description: productData.description,
+				stock: 999,
+				status: "active",
+			})
+			.returning();
+
+		const [productPrice] = await seedDb
+			.insert(schema.productPrice)
+			.values({
+				productId: product.id,
+				priceInCents: productData.price,
+				discountPercentage: 0,
+				isDefault: true,
+			})
+			.returning();
+
+		// Link to collection
+		await seedDb.insert(schema.collectionProduct).values({
+			collectionId: collections.finishingCollection.id,
+			productId: product.id,
+		});
+
+		lensProducts.push({ product, productPrice });
+
+		await seedActivity({
+			type: "product.created",
+			actorId: "system",
+			actorType: "system",
+			metadata: {
+				content: product,
+			},
+		});
+
+		console.info(
+			`✅ Finishing product created: ${product.name} (${product.slug})`,
+		);
+	}
+
+	return lensProducts;
+}
+
 async function seedCart() {
 	console.info("🛒 Creating cart...");
 
@@ -758,6 +1057,10 @@ async function seed() {
 				await seedCategorySecondary(category.id);
 			}
 		}
+
+		// Create lens collections and products
+		const lensCollections = await seedLensCollections();
+		await seedLensProducts(lensCollections);
 
 		// Create orders for each user
 		for (const user of users) {

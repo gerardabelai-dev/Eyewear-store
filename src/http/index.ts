@@ -3,6 +3,8 @@
 // Cart
 export * from "./cart/mutations";
 export * from "./cart/queries";
+// Collections
+export * from "./collections/queries";
 // Customer Addresses
 export * from "./customer-addresses/mutations";
 // Customers

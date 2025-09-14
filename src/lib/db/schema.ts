@@ -219,6 +219,9 @@ export const cartProduct = pgTable("cartProduct", {
 	productPriceId: text("productPriceId")
 		.notNull()
 		.references(() => productPrice.id, { onDelete: "set null" }),
+	parentProductId: text("parentProductId").references(() => product.id, {
+		onDelete: "set null",
+	}),
 	quantity: integer("quantity").notNull().default(1),
 	...timestamps,
 });

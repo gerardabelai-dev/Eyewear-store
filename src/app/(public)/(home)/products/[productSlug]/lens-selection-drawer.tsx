@@ -5,101 +5,22 @@ import { ArrowLeft, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
+import { useCart } from "@/hooks/use-cart";
+import {
+	type Collection,
+	type CollectionProduct,
+	useCollections,
+} from "@/http";
 import { formatPrice } from "@/lib/format-price";
 import { cn } from "@/lib/utils";
 
-interface LensOption {
-	id: string;
-	title: string;
-	description: string;
-	badge?: string;
-}
-
-interface PrescriptionOption {
-	id: string;
-	title: string;
-	description: string;
-	price: number;
-	isFree?: boolean;
-}
-
-interface LensFinishOption {
-	id: string;
-	title: string;
-	description: string;
-	price: number;
-	isFree?: boolean;
-}
-
-const lensOptions: LensOption[] = [
-	{
-		id: "com-grau",
-		title: "Com Grau",
-		description:
-			"Lentes monofocais para correção de miopia, hipermetropia ou astigmatismo",
-		badge: undefined,
-	},
-	{
-		id: "sem-grau-filtro",
-		title: "Sem grau | com filtro de luz azul",
-		description:
-			"Lentes sem grau ideais para quem está à procura de estilo e mais conforto visual. Perfeito para quem não desgruda os olhos das telas",
-		badge: undefined,
-	},
-	{
-		id: "sem-grau-armacao",
-		title: "Sem grau | apenas a armação",
-		description:
-			"Armação acompanhada de lentes de demostração feitas de acrílico e não recomendadas para o uso diário",
-		badge: undefined,
-	},
-];
-
-const prescriptionOptions: PrescriptionOption[] = [
-	{
-		id: "grau-leve",
-		title: "Grau leve | até +/- 2,75",
-		description:
-			"Lentes com espessura padrão, feitas de resina. Contemplam hipermetropia e miopia até +/- 2,75 e astigmatismo até -2,00",
-		price: 0,
-		isFree: true,
-	},
-	{
-		id: "grau-moderado",
-		title: "Grau moderado | até +/- 4,00",
-		description:
-			"Lentes mais leves e resistentes, feitas de policarbonato. Contemplam hipermetropia e miopia até +/- 4,00 e astigmatismo até -2,00",
-		price: 30000, // R$ 300.00 in cents
-	},
-	{
-		id: "grau-alto",
-		title: "Grau alto | até +5,00/-6,50",
-		description:
-			"Lentes mais finas e voltadas para graus mais altos, feitas de resina de alto índice. Contemplam hipermetropia até +5,00, miopia até -6,50, e astigmatismo até -4,00",
-		price: 60000, // R$ 600.00 in cents
-	},
-];
-
-const lensFinishOptions: LensFinishOption[] = [
-	{
-		id: "classico",
-		title: "Clássico",
-		description:
-			"Lentes com espessura padrão, feitas de resina. Contemplam hipermetropia e miopia até +/- 2,75 e astigmatismo até -2,00",
-		price: 0,
-		isFree: true,
-	},
-	{
-		id: "filtro-luz-azul",
-		title: "Filtro de luz azul",
-		description:
-			"Além da resistência contra arranhões, antirreflexo e proteção UV, também filtram mais luz azul de aparelhos digitais e do sol do que lentes clássicas ou fotossensíveis. *O filtro de luz azul pode deixar um residual azulado ou esverdeado nas lentes.",
-		price: 20000, // R$ 200.00 in cents
-	},
-];
-
 interface LensSelectionDrawerProps {
 	trigger: React.ReactNode;
+	glassesProduct?: {
+		id: string;
+		name: string;
+		slug: string;
+	};
 	onLensSelect?: (
 		lensId: string,
 		prescriptionId?: string,
@@ -107,135 +28,159 @@ interface LensSelectionDrawerProps {
 	) => void;
 }
 
-type DrawerStep =
-	| "lens-selection"
-	| "prescription-selection"
-	| "finish-selection";
+type DrawerStep = 0 | 1 | 2; // Step indices for collections array
 
 export function LensSelectionDrawer({
 	trigger,
+	glassesProduct,
 	onLensSelect,
 }: LensSelectionDrawerProps) {
+	const { data: collections, isLoading, error } = useCollections();
+	const { addGlassesWithLenses } = useCart();
+
 	const [open, setOpen] = useState(false);
-	const [currentStep, setCurrentStep] = useState<DrawerStep>("lens-selection");
-	const [selectedLens, setSelectedLens] = useState<string | null>(null);
-	const [selectedPrescription, setSelectedPrescription] = useState<
-		string | null
-	>(null);
+	const [currentStep, setCurrentStep] = useState<DrawerStep>(0);
+	const [selectedProducts, setSelectedProducts] = useState<CollectionProduct[]>(
+		[],
+	);
 
-	const handleLensSelect = (lensId: string) => {
-		setSelectedLens(lensId);
+	// Get collections by slug for consistent ordering
+	const lensTypeCollection = collections?.find(
+		(c) => c.slug === "tipo-de-lente",
+	);
+	const prescriptionCollection = collections?.find(
+		(c) => c.slug === "grau-das-lentes",
+	);
+	const finishingCollection = collections?.find(
+		(c) => c.slug === "acabamento-das-lentes",
+	);
 
-		if (
-			lensId === "com-grau" ||
-			lensId === "sem-grau-filtro" ||
-			lensId === "sem-grau-armacao"
-		) {
-			setCurrentStep("prescription-selection");
+	const orderedCollections = [
+		lensTypeCollection,
+		prescriptionCollection,
+		finishingCollection,
+	].filter(Boolean) as Collection[];
+
+	const handleProductSelect = async (product: CollectionProduct) => {
+		const newSelectedProducts = [...selectedProducts];
+		newSelectedProducts[currentStep] = product;
+		setSelectedProducts(newSelectedProducts);
+
+		// Check if we need to go to next step
+		if (currentStep < orderedCollections.length - 1) {
+			// For lens type selection, check if we need prescription step
+			if (currentStep === 0 && product.slug === "com-grau") {
+				setCurrentStep(1); // Go to prescription selection
+			} else if (
+				currentStep === 0 &&
+				(product.slug === "sem-grau-com-filtro-de-luz-azul" ||
+					product.slug === "sem-grau-apenas-armacao")
+			) {
+				setCurrentStep(2); // Skip prescription, go to finishing
+			} else {
+				setCurrentStep((currentStep + 1) as DrawerStep);
+			}
 		} else {
-			// For non-prescription lenses, complete the selection
-			onLensSelect?.(lensId);
-			setOpen(false);
-			resetDrawer();
-		}
-	};
+			// Final step completed - log selection and add to cart
+			const finalSelection = [...newSelectedProducts];
 
-	const handlePrescriptionSelect = (prescriptionId: string) => {
-		setSelectedPrescription(prescriptionId);
-		setCurrentStep("finish-selection");
-	};
+			console.log("=== LENS SELECTION COMPLETED ===");
+			console.log("Glasses Product:", glassesProduct);
+			console.log("Selected Lens Options:");
+			finalSelection.forEach((selectedProduct, index) => {
+				if (selectedProduct) {
+					console.log(
+						`  Step ${index + 1} (${orderedCollections[index]?.name}):`,
+						{
+							id: selectedProduct.id,
+							name: selectedProduct.name,
+							slug: selectedProduct.slug,
+							price: selectedProduct.priceInCents,
+							description: selectedProduct.description,
+						},
+					);
+				}
+			});
+			console.log(
+				"Total Additional Cost:",
+				finalSelection.reduce((total, p) => total + (p?.priceInCents || 0), 0),
+				"cents",
+			);
+			console.log("================================");
 
-	const handleFinishSelect = (finishId: string) => {
-		if (selectedLens && selectedPrescription) {
-			onLensSelect?.(selectedLens, selectedPrescription, finishId);
+			// Add glasses with lenses to cart
+			if (glassesProduct) {
+				try {
+					const lensProductIds = finalSelection
+						.filter(Boolean)
+						.map((product) => product.id);
+
+					await addGlassesWithLenses({
+						glassesProductId: glassesProduct.id,
+						lensProductIds,
+						quantity: 1,
+					});
+
+					console.log("✅ Successfully added glasses with lenses to cart!");
+				} catch (error) {
+					console.error("❌ Failed to add glasses with lenses to cart:", error);
+					// You might want to show a toast notification here
+				}
+			}
+
+			onLensSelect?.(
+				finalSelection[0]?.id || "",
+				finalSelection[1]?.id,
+				finalSelection[2]?.id,
+			);
 			setOpen(false);
 			resetDrawer();
 		}
 	};
 
 	const handleBack = () => {
-		if (currentStep === "finish-selection") {
-			setCurrentStep("prescription-selection");
-			// Keep selectedPrescription when going back to prescription selection
-		} else if (currentStep === "prescription-selection") {
-			setCurrentStep("lens-selection");
-			setSelectedPrescription(null);
-			setSelectedLens(null);
+		if (currentStep > 0) {
+			// For step 2 (prescription), check if we came from step 0 (lens type)
+			if (currentStep === 2 && selectedProducts[0]?.slug !== "com-grau") {
+				setCurrentStep(0); // Go back to lens type if we skipped prescription
+			} else {
+				setCurrentStep((currentStep - 1) as DrawerStep);
+			}
+
+			// Clear the selection for the step we're going back from
+			const newSelectedProducts = [...selectedProducts];
+			newSelectedProducts[currentStep] = undefined as any;
+			setSelectedProducts(newSelectedProducts);
 		}
 	};
 
 	const resetDrawer = () => {
 		setTimeout(() => {
-			setCurrentStep("lens-selection");
-			setSelectedLens(null);
-			setSelectedPrescription(null);
+			setCurrentStep(0);
+			setSelectedProducts([]);
 		}, 300); // Wait for drawer close animation
 	};
 
-	const getStepTitle = () => {
-		switch (currentStep) {
-			case "lens-selection":
-				return "Escolha seu tipo de lente";
-			case "prescription-selection":
-				return "Selecione as lentes de acordo com seu grau.";
-			case "finish-selection":
-				return "Selecione o acabamento das suas lentes";
-			default:
-				return "";
-		}
-	};
-
-	const getStepDescription = () => {
-		switch (currentStep) {
-			case "lens-selection":
-				return "Selecione a opção que melhor atende às suas necessidades";
-			case "prescription-selection":
-				return "Assim que finalizar a compra vamos pedir os dados da sua receita. Não se preocupe, também vamos te lembrar via e-mail e sms!";
-			case "finish-selection":
-				return "";
-			default:
-				return "";
-		}
-	};
-
-	const getCurrentStepNumber = () => {
-		switch (currentStep) {
-			case "lens-selection":
-				return 1;
-			case "prescription-selection":
-				return 2;
-			case "finish-selection":
-				return 3;
-			default:
-				return 1;
-		}
-	};
-
-	const getTotalSteps = () => {
-		// Always show progress for potential steps when on first step
-		// This prevents showing 100% on first step when "Com Grau" might be selected
-		if (currentStep === "lens-selection" && !selectedLens) {
-			// Show progress for potential 3 steps until user makes a choice
-			return 3;
-		}
-
-		// If we're on finish selection step, we know there are 3 steps
-		if (currentStep === "finish-selection") return 3;
-		// If we're on prescription selection step, we know there are at least 2 steps, but will be 3
-		if (currentStep === "prescription-selection") return 3;
-		// If "Com Grau" is selected, there will be 3 steps
-		if (selectedLens === "com-grau") return 3;
-		// Otherwise, just 1 step (for non-prescription lenses)
-		return 1;
+	const getCurrentCollection = () => {
+		return orderedCollections[currentStep];
 	};
 
 	const getProgressPercentage = () => {
-		const current = getCurrentStepNumber();
-		const total = getTotalSteps();
+		if (!orderedCollections.length) return 0;
 
-		// For 3 steps: 1/3 = 33.33%, 2/3 = 66.66%, 3/3 = 100%
-		// For 1 step: 1/1 = 100%
-		return (current / total) * 100;
+		// Determine total steps based on selection
+		let totalSteps = orderedCollections.length;
+
+		// If no lens type selected yet, assume max steps
+		if (!selectedProducts[0]) {
+			totalSteps = 3;
+		} else if (selectedProducts[0]?.slug !== "com-grau") {
+			// If not "com-grau", we skip prescription step
+			totalSteps = 2;
+		}
+
+		const currentStepNumber = currentStep + 1;
+		return (currentStepNumber / totalSteps) * 100;
 	};
 
 	return (
@@ -260,187 +205,129 @@ export function LensSelectionDrawer({
 				>
 					{/* Hidden title for accessibility */}
 					<SheetPrimitive.Title className="sr-only">
-						{getStepTitle()}
+						{getCurrentCollection()?.name || "Lens Selection"}
 					</SheetPrimitive.Title>
 					<div className="p-6">
-						{/* Progress Bar */}
-						<div className="w-full bg-muted h-1 mb-4">
-							<div
-								className="bg-primary h-1 transition-all duration-300"
-								style={{
-									width: `${getProgressPercentage()}%`,
-								}}
-							/>
-						</div>
+						{/* Loading State */}
+						{isLoading && (
+							<div className="flex items-center justify-center py-8">
+								<div className="text-sm text-muted-foreground">
+									Loading lens options...
+								</div>
+							</div>
+						)}
 
-						{/* Header */}
-						<div className="flex items-center justify-between mb-6">
-							<div className="flex items-center gap-3">
-								{currentStep !== "lens-selection" ? (
+						{/* Error State */}
+						{error && (
+							<div className="flex items-center justify-center py-8">
+								<div className="text-sm text-destructive">
+									Failed to load lens options. Please try again.
+								</div>
+							</div>
+						)}
+
+						{/* Content */}
+						{!isLoading && !error && orderedCollections.length > 0 && (
+							<>
+								{/* Progress Bar */}
+								<div className="w-full bg-muted h-1 mb-4">
+									<div
+										className="bg-primary h-1 transition-all duration-300"
+										style={{
+											width: `${getProgressPercentage()}%`,
+										}}
+									/>
+								</div>
+
+								{/* Header */}
+								<div className="flex items-center justify-between mb-6">
+									<div className="flex items-center gap-3">
+										{currentStep > 0 ? (
+											<Button
+												variant="ghost"
+												size="sm"
+												onClick={handleBack}
+												className="p-2"
+											>
+												<ArrowLeft className="h-4 w-4" />
+											</Button>
+										) : (
+											<div className="w-10 h-10" /> // Placeholder to maintain alignment
+										)}
+									</div>
 									<Button
 										variant="ghost"
 										size="sm"
-										onClick={handleBack}
+										onClick={() => setOpen(false)}
 										className="p-2"
 									>
-										<ArrowLeft className="h-4 w-4" />
+										<X className="h-4 w-4" />
 									</Button>
-								) : (
-									<div className="w-10 h-10" /> // Placeholder to maintain alignment
-								)}
-							</div>
-							<Button
-								variant="ghost"
-								size="sm"
-								onClick={() => setOpen(false)}
-								className="p-2"
-							>
-								<X className="h-4 w-4" />
-							</Button>
-						</div>
-
-						{/* Content */}
-						<div className="space-y-6">
-							<div>
-								<h2 className="text-xl font-semibold text-foreground mb-2">
-									{getStepTitle()}
-								</h2>
-								<p className="text-sm text-muted-foreground">
-									{getStepDescription()}
-								</p>
-							</div>
-
-							{currentStep === "lens-selection" && (
-								<div className="space-y-3">
-									{lensOptions.map((option, index) => (
-										<div key={option.id} className="space-y-2">
-											<div
-												className="border border-border rounded-md p-4 hover:border-primary/50 transition-all duration-200 cursor-pointer group hover:shadow-sm"
-												onClick={() => handleLensSelect(option.id)}
-												onKeyDown={(e) => {
-													if (e.key === "Enter" || e.key === " ") {
-														e.preventDefault();
-														handleLensSelect(option.id);
-													}
-												}}
-												role="button"
-												tabIndex={0}
-											>
-												<div className="space-y-3">
-													<div className="inline-block">
-														<span className="px-4 py-2 bg-muted text-foreground text-sm font-medium rounded-full">
-															{option.title}
-														</span>
-													</div>
-													<p className="text-sm text-muted-foreground leading-relaxed">
-														{option.description}
-													</p>
-												</div>
-											</div>
-											{index < lensOptions.length - 1 && (
-												<hr className="border-border/30" />
-											)}
-										</div>
-									))}
 								</div>
-							)}
 
-							{currentStep === "prescription-selection" && (
-								<div className="space-y-3">
-									{prescriptionOptions.map((option, index) => (
-										<div key={option.id} className="space-y-2">
-											<div
-												className="border border-border rounded-md p-4 hover:border-primary/50 transition-all duration-200 cursor-pointer group hover:shadow-sm"
-												onClick={() => handlePrescriptionSelect(option.id)}
-												onKeyDown={(e) => {
-													if (e.key === "Enter" || e.key === " ") {
-														e.preventDefault();
-														handlePrescriptionSelect(option.id);
-													}
-												}}
-												role="button"
-												tabIndex={0}
-											>
-												<div className="space-y-3">
-													<div className="flex items-center justify-between">
-														<div className="inline-block">
-															<span className="px-4 py-2 bg-muted text-foreground text-sm font-medium rounded-full">
-																{option.title}
-															</span>
-														</div>
-														<div className="text-right">
-															{option.isFree ? (
-																<span className="text-sm font-medium text-muted-foreground">
-																	grátis
+								{/* Content */}
+								<div className="space-y-6">
+									<div>
+										<h2 className="text-xl font-semibold text-foreground mb-2">
+											{getCurrentCollection()?.name}
+										</h2>
+										<p className="text-sm text-muted-foreground">
+											{getCurrentCollection()?.description}
+										</p>
+									</div>
+
+									{/* Dynamic Product Options */}
+									<div className="space-y-3">
+										{getCurrentCollection()?.products.map((product, index) => (
+											<div key={product.id} className="space-y-2">
+												<div
+													className="border border-border rounded-md p-4 hover:border-primary/50 transition-all duration-200 cursor-pointer group hover:shadow-sm"
+													onClick={() => handleProductSelect(product)}
+													onKeyDown={(e) => {
+														if (e.key === "Enter" || e.key === " ") {
+															e.preventDefault();
+															handleProductSelect(product);
+														}
+													}}
+													role="button"
+													tabIndex={0}
+												>
+													<div className="space-y-3">
+														<div className="flex items-center justify-between">
+															<div className="inline-block">
+																<span className="px-4 py-2 bg-muted text-foreground text-sm font-medium rounded-full">
+																	{product.name}
 																</span>
-															) : (
-																<span className="text-sm font-medium text-foreground">
-																	+{formatPrice(option.price)}
-																</span>
+															</div>
+															{product.priceInCents > 0 && (
+																<div className="text-right">
+																	<span className="text-sm font-medium text-foreground">
+																		+{formatPrice(product.priceInCents)}
+																	</span>
+																</div>
+															)}
+															{product.priceInCents === 0 && (
+																<div className="text-right">
+																	<span className="text-sm font-medium text-muted-foreground">
+																		grátis
+																	</span>
+																</div>
 															)}
 														</div>
+														<p className="text-sm text-muted-foreground leading-relaxed">
+															{product.description}
+														</p>
 													</div>
-													<p className="text-sm text-muted-foreground leading-relaxed">
-														{option.description}
-													</p>
 												</div>
+												{index <
+													(getCurrentCollection()?.products.length || 0) -
+														1 && <hr className="border-border/30" />}
 											</div>
-											{index < prescriptionOptions.length - 1 && (
-												<hr className="border-border/30" />
-											)}
-										</div>
-									))}
+										))}
+									</div>
 								</div>
-							)}
-
-							{currentStep === "finish-selection" && (
-								<div className="space-y-3">
-									{lensFinishOptions.map((option, index) => (
-										<div key={option.id} className="space-y-2">
-											<div
-												className="border border-border rounded-md p-4 hover:border-primary/50 transition-all duration-200 cursor-pointer group hover:shadow-sm"
-												onClick={() => handleFinishSelect(option.id)}
-												onKeyDown={(e) => {
-													if (e.key === "Enter" || e.key === " ") {
-														e.preventDefault();
-														handleFinishSelect(option.id);
-													}
-												}}
-												role="button"
-												tabIndex={0}
-											>
-												<div className="space-y-3">
-													<div className="flex items-center justify-between">
-														<div className="inline-block">
-															<span className="px-4 py-2 bg-muted text-foreground text-sm font-medium rounded-full">
-																{option.title}
-															</span>
-														</div>
-														<div className="text-right">
-															{option.isFree ? (
-																<span className="text-sm font-medium text-muted-foreground">
-																	grátis
-																</span>
-															) : (
-																<span className="text-sm font-medium text-foreground">
-																	+{formatPrice(option.price)}
-																</span>
-															)}
-														</div>
-													</div>
-													<p className="text-sm text-muted-foreground leading-relaxed">
-														{option.description}
-													</p>
-												</div>
-											</div>
-											{index < lensFinishOptions.length - 1 && (
-												<hr className="border-border/30" />
-											)}
-										</div>
-									))}
-								</div>
-							)}
-						</div>
+							</>
+						)}
 					</div>
 				</SheetPrimitive.Content>
 			</SheetPrimitive.Portal>
