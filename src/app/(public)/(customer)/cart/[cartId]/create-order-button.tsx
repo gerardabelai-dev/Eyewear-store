@@ -29,7 +29,7 @@ export function CreateOrderButton({
 
 	return (
 		<Button
-			variant="vibrant"
+			variant="default"
 			className="w-full"
 			size="lg"
 			disabled={isPending || disabled}

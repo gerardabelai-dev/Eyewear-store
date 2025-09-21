@@ -44,7 +44,7 @@ function LensOption({ item }: { item: CartItemData }) {
 					<TooltipContent>
 						<p className="max-w-xs">{item.product.description} </p>
 						{lensPrice > 0 && (
-							<strong className="block mt-2 text-foreground font-bold">
+							<strong className="block mt-2 font-bold">
 								Custo adicional: {formatPrice(lensPrice)}
 							</strong>
 						)}

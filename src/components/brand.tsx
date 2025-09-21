@@ -17,7 +17,7 @@ export const BRAND_CONFIG = {
 	colors: {
 		primary: "#0066CC", // Blue
 		secondary: "#00A859", // Green
-		accent: "#FFB800", // Yellow/Gold
+		accent: "#0066CC", // Using primary color instead of accent
 		gray: {
 			50: "#F9FAFB",
 			100: "#F3F4F6",

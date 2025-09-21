@@ -28,7 +28,7 @@ export function OrdersPageContent({ orderId }: OrdersPageContentProps) {
 			{/* Tracking code */}
 			<div className="flex flex-col">
 				<h3 className="text-sm font-bold">Codigo de rastreio</h3>
-				<span className="text-sm text-vibrant">
+				<span className="text-sm text-primary">
 					{order.delivery?.id || "Não disponível"}
 				</span>
 			</div>

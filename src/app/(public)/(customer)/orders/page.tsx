@@ -26,7 +26,7 @@ export default function OrdersPage() {
 
 			<div className="flex flex-col">
 				<h3 className="text-sm font-bold">Codigo de rastreio</h3>
-				<span className="text-sm text-vibrant">1234567890</span>
+				<span className="text-sm text-primary">1234567890</span>
 			</div>
 
 			<section className="grid grid-cols-1 gap-4">

@@ -205,7 +205,7 @@ export function PrivateHeaderNavigation({
 													onClick={() => handleModeSwitch("admin")}
 													className={cn(
 														"cursor-pointer",
-														mode === "admin" && "bg-accent",
+														mode === "admin" && "bg-primary",
 													)}
 												>
 													<Cog className="mr-2 h-4 w-4" />
@@ -215,7 +215,7 @@ export function PrivateHeaderNavigation({
 													onClick={() => handleModeSwitch("customer")}
 													className={cn(
 														"cursor-pointer",
-														mode === "customer" && "bg-accent",
+														mode === "customer" && "bg-primary",
 													)}
 												>
 													<ShoppingCart className="mr-2 h-4 w-4" />

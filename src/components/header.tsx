@@ -27,7 +27,7 @@ export function Header() {
 							</Button>
 						</Link>
 						<Link href={ROUTES.SIGN_UP}>
-							<Button size="sm" variant="vibrant">
+							<Button size="sm" variant="default">
 								Começar
 							</Button>
 						</Link>

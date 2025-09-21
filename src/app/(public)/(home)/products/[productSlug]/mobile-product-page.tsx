@@ -112,7 +112,7 @@ export function MobileProductPage({
 						slug: product.slug,
 					}}
 					trigger={
-						<Button size="lg" className="w-full" variant="vibrant">
+						<Button size="lg" className="w-full" variant="default">
 							Escolher lentes e comprar
 						</Button>
 					}

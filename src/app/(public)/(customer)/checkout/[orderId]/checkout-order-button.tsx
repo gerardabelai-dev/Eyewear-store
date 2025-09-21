@@ -205,7 +205,7 @@ export function CheckoutOrderButton({
 
 	if (isLoading) {
 		return (
-			<Button variant="vibrant" className="w-full" size="lg" disabled={true}>
+			<Button variant="default" className="w-full" size="lg" disabled={true}>
 				<Loader2 className="w-4 h-4 animate-spin" />
 				{isProcessingPayment ? "Processando pagamento..." : ""}
 			</Button>
@@ -233,7 +233,7 @@ export function CheckoutOrderButton({
 
 	return (
 		<Button
-			variant="vibrant"
+			variant="default"
 			className="w-full"
 			size="lg"
 			disabled={isOrderPendingRequirements}

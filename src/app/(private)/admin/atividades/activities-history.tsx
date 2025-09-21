@@ -473,7 +473,7 @@ function getActivityColor(type: string): string {
 
 	switch (action) {
 		case "created":
-			return "bg-vibrant";
+			return "bg-primary";
 		case "updated":
 			return "bg-primary";
 		case "deleted":

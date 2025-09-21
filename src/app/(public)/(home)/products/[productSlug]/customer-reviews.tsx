@@ -61,7 +61,7 @@ export function CustomerReviews({ reviews }: CustomerReviewsProps) {
 										aria-hidden="true"
 										className={cn(
 											review.rating > rating
-												? "text-vibrant"
+												? "text-primary"
 												: "text-muted-foreground",
 											"size-5 shrink-0",
 										)}

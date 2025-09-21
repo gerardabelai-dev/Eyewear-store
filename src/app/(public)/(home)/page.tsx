@@ -237,7 +237,7 @@ export default async function HomePage() {
 	return (
 		<>
 			{/* Hero Section */}
-			<section className="relative h-[400px] md:h-[600px] bg-accent overflow-hidden">
+			<section className="relative h-[400px] md:h-[600px] bg-primary overflow-hidden">
 				{/* Desktop Image */}
 				<Image
 					src="https://s.ygstatic.com/image/promotion/back-to-school-sale/back-to-school-sale--home-l.1920.db40a014-bac.jpg"
@@ -320,37 +320,37 @@ export default async function HomePage() {
 				</div>
 			</section>
 			<section>
-				<ul className="flex flex-row overflow-x-auto w-full gap-2 lg:justify-center font-medium text-xs bg-muted p-4 rounded-lg">
+				<ul className="flex flex-row overflow-x-auto w-full gap-2 lg:justify-center font-medium text-xs text-secondary-foreground bg-secondary p-4 rounded-lg">
 					<li className="flex items-center gap-2">
-						<Glasses className="size-4 text-vibrant" />
+						<Glasses className="size-4" />
 						<span className="whitespace-nowrap">
 							Lentes de alto índice 1,61 grátis
 						</span>
 					</li>
 					<Separator
-						className="bg-accent min-w-0.5 min-h-6"
+						className="bg-secondary-foreground w-0.5 min-h-6"
 						orientation="vertical"
 					/>
 					<li className="flex items-center gap-2">
-						<Truck className="size-4 text-vibrant" />
+						<Truck className="size-4" />
 						<span className="whitespace-nowrap">Frete USPS grátis</span>
 					</li>
 					<Separator
-						className="bg-accent min-w-0.5 min-h-6"
+						className="bg-secondary-foreground w-0.5 min-h-6"
 						orientation="vertical"
 					/>
 					<li className="flex items-center gap-2">
-						<ShieldCheck className="size-4 text-vibrant" />
+						<ShieldCheck className="size-4" />
 						<span className="whitespace-nowrap">
 							Garantia de ajuste e estilo de 14 dias
 						</span>
 					</li>
 					<Separator
-						className="bg-accent min-w-0.5 min-h-6"
+						className="bg-secondary-foreground w-0.5 min-h-6"
 						orientation="vertical"
 					/>
 					<li className="flex items-center gap-2">
-						<BadgeCheck className="size-4 text-vibrant" />
+						<BadgeCheck className="size-4" />
 						<span className="whitespace-nowrap">
 							Garantia de qualidade de 365 dias
 						</span>
@@ -394,13 +394,13 @@ export default async function HomePage() {
 
 					<div className="flex flex-row overflow-x-auto w-full gap-2 lg:justify-center">
 						<Button variant="default">Todos</Button>
-						<Button variant="secondary">Gatinho</Button>
-						<Button variant="secondary">Aviador</Button>
-						<Button variant="secondary">Redondo</Button>
-						<Button variant="secondary">Quadrado</Button>
-						<Button variant="secondary">Oversized</Button>
-						<Button variant="secondary">Hipster</Button>
-						<Button variant="secondary">Wide</Button>
+						<Button variant="inactive">Gatinho</Button>
+						<Button variant="inactive">Aviador</Button>
+						<Button variant="inactive">Redondo</Button>
+						<Button variant="inactive">Quadrado</Button>
+						<Button variant="inactive">Oversized</Button>
+						<Button variant="inactive">Hipster</Button>
+						<Button variant="inactive">Wide</Button>
 					</div>
 				</div>
 				<div className="grid items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-2 gap-4 w-full md:w-fit mx-auto">
@@ -594,12 +594,12 @@ export default async function HomePage() {
 			</section>
 
 			{/* FAQ Section */}
-			<section className="bg-accent p-2 py-20 mt-4 grid items-center justify-items-center gap-8 mx-auto">
+			<section className="bg-secondary text-secondary-foreground p-2 py-20 mt-4 grid items-center justify-items-center gap-8 mx-auto">
 				<div className="grid items-start justify-items-center gap-4 w-full max-w-2xl">
 					<h2 className="text-lg md:text-3xl text-left font-bold">
 						Perguntas Frequentes
 					</h2>
-					<p className="text-xs md:text-sm text-left text-muted-foreground">
+					<p className="text-xs md:text-sm text-left text-secondary-foreground/60">
 						Tire suas dúvidas sobre nossos produtos e serviços
 					</p>
 				</div>
@@ -611,10 +611,10 @@ export default async function HomePage() {
 								<AccordionPrimitive.Trigger className="focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-center justify-between rounded-md py-2 text-left text-[15px] leading-6 font-semibold transition-all outline-none focus-visible:ring-[3px] [&[data-state=open]>svg]:rotate-180">
 									<span className="flex items-center gap-3">
 										<span
-											className="flex size-10 shrink-0 items-center justify-center rounded-full border"
+											className="flex size-10 shrink-0 items-center justify-center rounded-full border border-secondary-foreground"
 											aria-hidden="true"
 										>
-											<ShoppingCart size={16} className="opacity-60" />
+											<ShoppingCart size={16} />
 										</span>
 										<span className="flex flex-col space-y-1">
 											<span>
@@ -632,7 +632,7 @@ export default async function HomePage() {
 									/>
 								</AccordionPrimitive.Trigger>
 							</AccordionPrimitive.Header>
-							<AccordionContent className="text-muted-foreground ms-3 ps-10 pb-2">
+							<AccordionContent className="text-secondary-foreground/60 ms-3 ps-10 pb-2">
 								Para escolher o tamanho ideal, verifique as medidas dos seus
 								óculos atuais ou use nossa ferramenta de medição virtual. As
 								principais medidas são: largura da lente, ponte nasal e
@@ -646,10 +646,10 @@ export default async function HomePage() {
 								<AccordionPrimitive.Trigger className="focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-center justify-between rounded-md py-2 text-left text-[15px] leading-6 font-semibold transition-all outline-none focus-visible:ring-[3px] [&[data-state=open]>svg]:rotate-180">
 									<span className="flex items-center gap-3">
 										<span
-											className="flex size-10 shrink-0 items-center justify-center rounded-full border"
+											className="flex size-10 shrink-0 items-center justify-center rounded-full border border-secondary-foreground"
 											aria-hidden="true"
 										>
-											<Shield size={16} className="opacity-60" />
+											<Shield size={16} />
 										</span>
 										<span className="flex flex-col space-y-1">
 											<span>Qual é a qualidade das lentes oferecidas?</span>
@@ -665,7 +665,7 @@ export default async function HomePage() {
 									/>
 								</AccordionPrimitive.Trigger>
 							</AccordionPrimitive.Header>
-							<AccordionContent className="text-muted-foreground ms-3 ps-10 pb-2">
+							<AccordionContent className="text-secondary-foreground/60 ms-3 ps-10 pb-2">
 								Todas as nossas lentes possuem proteção UV 100% e são feitas com
 								materiais de alta qualidade. Oferecemos lentes de alto índice
 								1,61 gratuitamente, além de opções premium como antirreflexo,
@@ -679,10 +679,10 @@ export default async function HomePage() {
 								<AccordionPrimitive.Trigger className="focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-center justify-between rounded-md py-2 text-left text-[15px] leading-6 font-semibold transition-all outline-none focus-visible:ring-[3px] [&[data-state=open]>svg]:rotate-180">
 									<span className="flex items-center gap-3">
 										<span
-											className="flex size-10 shrink-0 items-center justify-center rounded-full border"
+											className="flex size-10 shrink-0 items-center justify-center rounded-full border border-secondary-foreground"
 											aria-hidden="true"
 										>
-											<Truck size={16} className="opacity-60" />
+											<Truck size={16} />
 										</span>
 										<span className="flex flex-col space-y-1">
 											<span>Qual é o prazo de entrega?</span>
@@ -698,7 +698,7 @@ export default async function HomePage() {
 									/>
 								</AccordionPrimitive.Trigger>
 							</AccordionPrimitive.Header>
-							<AccordionContent className="text-muted-foreground ms-3 ps-10 pb-2">
+							<AccordionContent className="text-secondary-foreground/60 ms-3 ps-10 pb-2">
 								O prazo de entrega varia conforme sua localização: capitais de
 								3-5 dias úteis, interior de 5-8 dias úteis. Oferecemos frete
 								grátis para compras acima de R$ 200. Você receberá o código de
@@ -711,10 +711,10 @@ export default async function HomePage() {
 								<AccordionPrimitive.Trigger className="focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-center justify-between rounded-md py-2 text-left text-[15px] leading-6 font-semibold transition-all outline-none focus-visible:ring-[3px] [&[data-state=open]>svg]:rotate-180">
 									<span className="flex items-center gap-3">
 										<span
-											className="flex size-10 shrink-0 items-center justify-center rounded-full border"
+											className="flex size-10 shrink-0 items-center justify-center rounded-full border border-secondary-foreground"
 											aria-hidden="true"
 										>
-											<RotateCcw size={16} className="opacity-60" />
+											<RotateCcw size={16} />
 										</span>
 										<span className="flex flex-col space-y-1">
 											<span>Posso trocar ou devolver meus óculos?</span>
@@ -730,7 +730,7 @@ export default async function HomePage() {
 									/>
 								</AccordionPrimitive.Trigger>
 							</AccordionPrimitive.Header>
-							<AccordionContent className="text-muted-foreground ms-3 ps-10 pb-2">
+							<AccordionContent className="text-secondary-foreground/60 ms-3 ps-10 pb-2">
 								Sim! Oferecemos 30 dias para trocas e devoluções sem custo
 								adicional. Os óculos devem estar em perfeito estado, com
 								embalagem original. Para óculos graduados, aceitamos trocas por
@@ -744,10 +744,10 @@ export default async function HomePage() {
 								<AccordionPrimitive.Trigger className="focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-center justify-between rounded-md py-2 text-left text-[15px] leading-6 font-semibold transition-all outline-none focus-visible:ring-[3px] [&[data-state=open]>svg]:rotate-180">
 									<span className="flex items-center gap-3">
 										<span
-											className="flex size-10 shrink-0 items-center justify-center rounded-full border"
+											className="flex size-10 shrink-0 items-center justify-center rounded-full border border-secondary-foreground"
 											aria-hidden="true"
 										>
-											<HeadphonesIcon size={16} className="opacity-60" />
+											<HeadphonesIcon size={16} />
 										</span>
 										<span className="flex flex-col space-y-1">
 											<span>Como posso entrar em contato com o suporte?</span>
@@ -763,7 +763,7 @@ export default async function HomePage() {
 									/>
 								</AccordionPrimitive.Trigger>
 							</AccordionPrimitive.Header>
-							<AccordionContent className="text-muted-foreground ms-3 ps-10 pb-2">
+							<AccordionContent className="text-secondary-foreground/60 ms-3 ps-10 pb-2">
 								Nossa equipe está disponível de segunda a sexta, das 8h às 18h.
 								Você pode nos contatar através do chat online no site, WhatsApp,
 								email suporte@ubell.com.br ou telefone 0800-123-4567. Para

@@ -22,6 +22,13 @@ type OrderCartItem = NonNullable<
 	GetOrderResponse["order"]["cart"]
 >["cartProducts"][0];
 
+type TransformedOrderCartItem = OrderCartItem & {
+	productPrice: {
+		priceInCents: number;
+		discountPercentage: number | null;
+	};
+};
+
 function LensOption({ item }: { item: OrderCartItem }) {
 	// Get the product price, handling the array case
 	const productPrice = Array.isArray(item.product?.productPrice)
@@ -50,7 +57,7 @@ function LensOption({ item }: { item: OrderCartItem }) {
 					<TooltipContent>
 						<p className="max-w-xs">{item.product?.description}</p>
 						{lensPrice > 0 && (
-							<strong className="block mt-2 text-foreground font-bold">
+							<strong className="block mt-2 font-bold">
 								Custo adicional: {formatPrice(lensPrice)}
 							</strong>
 						)}
@@ -64,7 +71,7 @@ function LensOption({ item }: { item: OrderCartItem }) {
 function OrderItem({
 	groupedItem,
 }: {
-	groupedItem: GroupedCartItem<OrderCartItem>;
+	groupedItem: GroupedCartItem<TransformedOrderCartItem>;
 }) {
 	const item = groupedItem.glasses;
 	const product = item.product;
@@ -171,15 +178,17 @@ export function OrderItems({ order }: OrderItemsProps) {
 
 		return {
 			...cartProduct,
-			productPrice: productPrice || {
-				priceInCents: 0,
-				discountPercentage: null,
+			productPrice: {
+				priceInCents: productPrice?.priceInCents || 0,
+				discountPercentage: productPrice?.discountPercentage || null,
 			},
 		};
 	});
 
 	// Group items using the shared utility
-	const groupedItems = groupCartItems(itemsForGrouping);
+	const groupedItems = groupCartItems(
+		itemsForGrouping,
+	) as GroupedCartItem<TransformedOrderCartItem>[];
 
 	return (
 		<ul className="flex flex-col gap-4">

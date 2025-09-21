@@ -25,13 +25,13 @@ export default async function CheckoutSuccessPage({
 
 	return (
 		<>
-			<h2 className="text-md text-vibrant -mb-6">Obrigado!</h2>
+			<h2 className="text-md text-primary -mb-6">Obrigado!</h2>
 
 			<PageHeader
 				title="Pedido em análise"
 				description={`Seu pedido #${orderId} esta sendo analisado e será enviado em breve`}
 				action={
-					<Button asChild variant="vibrant" size="lg">
+					<Button asChild variant="default" size="lg">
 						<Link href={`/orders/${orderId}`}>Acompanhar pedido</Link>
 					</Button>
 				}
