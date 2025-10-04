@@ -25,8 +25,6 @@ import { signIn } from "@/lib/auth-client";
 
 const signInSchema = z.object({
 	email: z
-		.string()
-		.min(1, "Email é obrigatório")
 		.email("Por favor, insira um endereço de email válido"),
 	password: z
 		.string()
@@ -37,7 +35,7 @@ const signInSchema = z.object({
 
 type SignInValues = z.infer<typeof signInSchema>;
 
-function SignIn() {
+export function SignInForm() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const form = useForm<SignInValues>({
@@ -121,6 +119,7 @@ function SignIn() {
 										<FormLabel>Email</FormLabel>
 										<FormControl>
 											<Input
+  											autoFocus
 												placeholder="seu@email.com"
 												type="email"
 												autoComplete="email"
@@ -139,16 +138,12 @@ function SignIn() {
 									<FormItem>
 										<div className="flex items-center justify-between">
 											<FormLabel>Senha</FormLabel>
-											<button
-												type="button"
+											<Link
+  											href={ROUTES.RESET_PASSWORD}
 												className="text-sm text-muted-foreground hover:text-primary cursor-pointer underline bg-transparent border-none p-0"
-												onClick={() => {
-													// TODO: Implement forgot password functionality
-													console.log("Forgot password clicked");
-												}}
 											>
 												Esqueceu a senha?
-											</button>
+											</Link>
 										</div>
 										<FormControl>
 											<Input
@@ -255,7 +250,3 @@ function SignIn() {
 			</div>
 		</div>
 	);
-}
-
-SignIn.displayName = "SignIn";
-export default SignIn;

@@ -13,6 +13,18 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: true,
 		requireEmailVerification: false,
+		sendResetPassword: async ({ user, url, token }, _request) => {
+			console.log({
+				to: user.email,
+				subject: "Reset your password",
+				text: `Click the link to reset your password: ${url}`,
+				token,
+			});
+		},
+		onPasswordReset: async ({ user }, _request) => {
+			// your logic here
+			console.log(`Password for user ${user.email} has been reset.`);
+		},
 	},
 	session: {
 		fields: {

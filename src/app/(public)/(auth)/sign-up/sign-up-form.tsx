@@ -35,7 +35,7 @@ const signUpSchema = z
 
 type SignUpValues = z.infer<typeof signUpSchema>;
 
-function SignUp() {
+export function SignUpForm() {
 	const router = useRouter();
 
 	const form = useForm<SignUpValues>({
@@ -114,6 +114,7 @@ function SignUp() {
 										<FormLabel>Nome completo</FormLabel>
 										<FormControl>
 											<Input
+												autoFocus
 												placeholder="João Silva"
 												className="w-full"
 												{...field}
@@ -254,6 +255,3 @@ function SignUp() {
 		</div>
 	);
 }
-
-SignUp.displayName = "SignUp";
-export default SignUp;

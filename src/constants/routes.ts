@@ -8,6 +8,7 @@ export const ROUTES = {
 	HOME: "/",
 	SIGN_IN: "/sign-in",
 	SIGN_UP: "/sign-up",
+	RESET_PASSWORD: "/reset-password",
 
 	// Private admin routes
 	ADMIN_CATEGORIES: "/admin/categorias",
