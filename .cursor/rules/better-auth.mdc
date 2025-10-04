@@ -1,6 +1,0 @@
----
-description: If Request is related to auth or better-auth use this
-globs: 
-alwaysApply: false
----
-For referencing better-auth docs usage use this https://www.better-auth.com/llms.txt
