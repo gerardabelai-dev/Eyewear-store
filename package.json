@@ -61,6 +61,7 @@
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"react-hook-form": "^7.59.0",
+		"resend": "^6.1.2",
 		"server-only": "^0.0.1",
 		"sonner": "^2.0.5",
 		"stripe": "^18.4.0",
