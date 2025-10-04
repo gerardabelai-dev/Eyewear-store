@@ -18,7 +18,7 @@ export const useCreateOrderFromCartMutation = (options?: {
 		mutationFn: async (
 			data: CreateOrderFromCartRequest,
 		): Promise<CreateOrderFromCartResponse> => {
-			const response = await fetch(`/api/orders/create-order-from-cart-id`, {
+			const response = await fetch(`/api/orders`, {
 				method: "POST",
 				body: JSON.stringify(data),
 			});
@@ -40,13 +40,10 @@ export const useUpdateOrderCustomerIdMutation = (options?: {
 		mutationFn: async (
 			data: UpdateOrderCustomerIdRequest,
 		): Promise<UpdateOrderCustomerIdResponse> => {
-			const response = await fetch(
-				`/api/orders/${data.orderId}/update-order-customer-id`,
-				{
-					method: "POST",
-					body: JSON.stringify(data),
-				},
-			);
+			const response = await fetch(`/api/orders/${data.orderId}/customer`, {
+				method: "POST",
+				body: JSON.stringify(data),
+			});
 
 			if (!response.ok) {
 				await handleApiError(response, ERROR_CODES.FAILED_TO_UPDATE_ORDER);
@@ -66,7 +63,7 @@ export const useUpdateOrderCustomerAddressIdMutation = (options?: {
 			data: UpdateOrderCustomerAddressIdRequest,
 		): Promise<UpdateOrderCustomerAddressIdResponse> => {
 			const response = await fetch(
-				`/api/orders/${data.orderId}/update-order-customer-address-id`,
+				`/api/orders/${data.orderId}/customer-address`,
 				{
 					method: "POST",
 					body: JSON.stringify(data),

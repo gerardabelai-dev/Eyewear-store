@@ -14,7 +14,7 @@ export const useCreateCustomerMutation = (options?: {
 		mutationFn: async (
 			data: CreateCustomerRequest,
 		): Promise<CreateCustomerResponse> => {
-			const response = await fetch("/api/customers/create-customer", {
+			const response = await fetch("/api/customers", {
 				method: "POST",
 				body: JSON.stringify(data),
 			});

@@ -9,7 +9,7 @@ export const getOrderByIdQueryOptions = (orderId: string) =>
 		queryKey: QUERY_KEYS.order(orderId),
 		queryFn: async () => {
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_WEB_URL}/api/orders/${orderId}/get-order-by-id`,
+				`${process.env.NEXT_PUBLIC_WEB_URL}/api/orders/${orderId}`,
 			);
 
 			if (!response.ok) {

@@ -15,7 +15,7 @@ export const useCreateCart = () => {
 	return useMutation({
 		mutationFn: async (): Promise<CreateCartResponse> => {
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts/create-cart`,
+				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts`,
 				{
 					method: "POST",
 					headers: {
@@ -58,7 +58,7 @@ export const useAddProductToCart = () => {
 			parentProductId?: string;
 		}): Promise<AddProductToCartResponse> => {
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts/${cartId}/add-product`,
+				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts/${cartId}/products`,
 				{
 					method: "POST",
 					headers: {
@@ -102,7 +102,7 @@ export const useAddGlassesWithLensesToCart = () => {
 			quantity?: number;
 		}): Promise<AddProductToCartResponse> => {
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts/${cartId}/add-glasses-with-lenses`,
+				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts/${cartId}/glasses`,
 				{
 					method: "POST",
 					headers: {
@@ -146,7 +146,7 @@ export const useRemoveProductFromCart = () => {
 			productId: string;
 		}): Promise<RemoveProductFromCartResponse> => {
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts/${cartId}/remove-product`,
+				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts/${cartId}/products`,
 				{
 					method: "DELETE",
 					headers: {
@@ -190,7 +190,7 @@ export const useUpdateCartProductQuantity = () => {
 			groupId?: string;
 		}): Promise<UpdateCartProductQuantityResponse> => {
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts/${cartId}/update-quantity`,
+				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts/${cartId}/quantity`,
 				{
 					method: "PATCH",
 					headers: {

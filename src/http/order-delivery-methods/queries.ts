@@ -8,7 +8,7 @@ export const getOrderDeliveryMethodsQueryOptions = () =>
 		queryKey: QUERY_KEYS.orderDeliveryMethods(),
 		queryFn: async () => {
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_WEB_URL}/api/order-delivery-methods/list-all`,
+				`${process.env.NEXT_PUBLIC_WEB_URL}/api/order-delivery-methods`,
 			);
 
 			if (!response.ok) {

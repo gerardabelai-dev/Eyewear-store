@@ -18,7 +18,7 @@ export const useCreateOrderPaymentMutation = (options?: {
 		): Promise<CreateOrderPaymentResponse> => {
 			console.log("🔄 Sending order payment request:", data);
 
-			const response = await fetch("/api/order-payments/create-order-payment", {
+			const response = await fetch("/api/order-payments", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -48,7 +48,7 @@ export const useUpdateOrderPaymentMutation = (options?: {
 		): Promise<UpdateOrderPaymentResponse> => {
 			console.log("🔄 Sending order payment update request:", data);
 
-			const response = await fetch("/api/order-payments/update-order-payment", {
+			const response = await fetch("/api/order-payments", {
 				method: "PATCH",
 				headers: {
 					"Content-Type": "application/json",

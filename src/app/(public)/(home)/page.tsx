@@ -320,7 +320,7 @@ export default async function HomePage() {
 				</div>
 			</section>
 			<section>
-				<ul className="flex flex-row overflow-x-auto w-full gap-2 lg:justify-center font-medium text-xs text-secondary-foreground bg-secondary p-4 rounded-lg">
+				<ul className="flex flex-row overflow-x-auto w-full gap-2 lg:justify-center font-medium text-xs text-primary-foreground bg-primary p-4 rounded-lg">
 					<li className="flex items-center gap-2">
 						<Glasses className="size-4" />
 						<span className="whitespace-nowrap">
@@ -594,7 +594,7 @@ export default async function HomePage() {
 			</section>
 
 			{/* FAQ Section */}
-			<section className="bg-secondary text-secondary-foreground p-2 py-20 mt-4 grid items-center justify-items-center gap-8 mx-auto">
+			<section className="bg-primary text-primary-foreground p-2 py-20 mt-4 grid items-center justify-items-center gap-8 mx-auto">
 				<div className="grid items-start justify-items-center gap-4 w-full max-w-2xl">
 					<h2 className="text-lg md:text-3xl text-left font-bold">
 						Perguntas Frequentes

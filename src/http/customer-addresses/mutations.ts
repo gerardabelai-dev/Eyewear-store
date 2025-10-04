@@ -14,13 +14,10 @@ export const useCreateCustomerAddressMutation = (options?: {
 		mutationFn: async (
 			data: CreateCustomerAddressRequest,
 		): Promise<CreateCustomerAddressResponse> => {
-			const response = await fetch(
-				"/api/customers-addresses/create-customer-address",
-				{
-					method: "POST",
-					body: JSON.stringify(data),
-				},
-			);
+			const response = await fetch("/api/customers-addresses", {
+				method: "POST",
+				body: JSON.stringify(data),
+			});
 
 			if (!response.ok) {
 				await handleApiError(

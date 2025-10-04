@@ -16,13 +16,10 @@ export const useCreateOrderDeliveryMutation = (options?: {
 		mutationFn: async (
 			data: CreateOrderDeliveryRequest,
 		): Promise<CreateOrderDeliveryResponse> => {
-			const response = await fetch(
-				"/api/order-deliveries/create-order-delivery",
-				{
-					method: "POST",
-					body: JSON.stringify(data),
-				},
-			);
+			const response = await fetch("/api/order-deliveries", {
+				method: "POST",
+				body: JSON.stringify(data),
+			});
 
 			if (!response.ok) {
 				await handleApiError(
@@ -44,16 +41,13 @@ export const useUpdateOrderDeliveryMutation = (options?: {
 		mutationFn: async (
 			data: UpdateOrderDeliveryRequest,
 		): Promise<UpdateOrderDeliveryResponse> => {
-			const response = await fetch(
-				"/api/order-deliveries/update-order-delivery",
-				{
-					method: "PATCH",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify(data),
+			const response = await fetch("/api/order-deliveries", {
+				method: "PATCH",
+				headers: {
+					"Content-Type": "application/json",
 				},
-			);
+				body: JSON.stringify(data),
+			});
 
 			if (!response.ok) {
 				await handleApiError(

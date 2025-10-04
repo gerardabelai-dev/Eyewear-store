@@ -8,7 +8,7 @@ export const getOrderPaymentMethodsQueryOptions = () =>
 		queryKey: QUERY_KEYS.orderPaymentMethods(),
 		queryFn: async () => {
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_WEB_URL}/api/order-payment-methods/list-all`,
+				`${process.env.NEXT_PUBLIC_WEB_URL}/api/order-payment-methods`,
 			);
 
 			if (!response.ok) {

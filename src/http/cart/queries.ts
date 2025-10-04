@@ -9,7 +9,7 @@ export const getCartQueryOptions = (cartId: string) =>
 		queryKey: QUERY_KEYS.cart(cartId),
 		queryFn: async (): Promise<GetCartResponse> => {
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts/${cartId}/get-cart-by-id`,
+				`${process.env.NEXT_PUBLIC_WEB_URL}/api/carts/${cartId}`,
 			);
 
 			if (!response.ok) {

@@ -9,7 +9,7 @@ export const getProductBySlugQueryOptions = (productSlug: string) =>
 		queryKey: QUERY_KEYS.product(productSlug),
 		queryFn: async () => {
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_WEB_URL}/api/products/${productSlug}/get-product-by-slug`,
+				`${process.env.NEXT_PUBLIC_WEB_URL}/api/products/${productSlug}`,
 			);
 
 			if (!response.ok) {

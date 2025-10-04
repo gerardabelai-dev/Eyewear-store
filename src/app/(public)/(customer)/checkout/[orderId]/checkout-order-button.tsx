@@ -126,19 +126,16 @@ export function CheckoutOrderButton({
 		});
 
 		try {
-			const response = await fetch(
-				`/api/orders/${orderId}/update-payment-status`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						paymentIntentId,
-						status: "paid",
-					}),
+			const response = await fetch(`/api/orders/${orderId}/payment-status`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
 				},
-			);
+				body: JSON.stringify({
+					paymentIntentId,
+					status: "paid",
+				}),
+			});
 
 			console.log(
 				"📤 Update payment status response:",

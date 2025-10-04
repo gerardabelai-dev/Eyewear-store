@@ -2,6 +2,7 @@ import "server-only";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, bearer } from "better-auth/plugins";
+import { localization } from "better-auth-localization";
 import { db } from "./db";
 import { env } from "./env";
 
@@ -32,10 +33,17 @@ export const auth = betterAuth({
 	},
 	baseURL: env.WEB_URL,
 	trustedOrigins: [env.WEB_URL],
-	plugins: [admin(), bearer()],
+	plugins: [
+		admin(),
+		bearer(),
+		localization({
+			defaultLocale: "pt-BR", // Use built-in Portuguese translations
+			fallbackLocale: "default", // Fallback to English
+		}),
+	],
 	onAPIError: {
 		throw: true,
-		onError(error, ctx) {
+		onError(error: any, ctx: any) {
 			console.error("Auth error:", error, ctx);
 		},
 		errorURL: "/sign-in?error=failed",
