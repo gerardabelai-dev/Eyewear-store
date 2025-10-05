@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { parseAsString, useQueryState } from "nuqs";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -36,8 +37,8 @@ const signInSchema = z.object({
 type SignInValues = z.infer<typeof signInSchema>;
 
 export function SignInForm() {
+  const [error] = useQueryState("error", parseAsString);
 	const router = useRouter();
-	const searchParams = useSearchParams();
 	const form = useForm<SignInValues>({
 		resolver: zodResolver(signInSchema),
 		defaultValues: {
@@ -48,11 +49,12 @@ export function SignInForm() {
 	});
 
 	useEffect(() => {
-		const error = searchParams.get("error");
-		if (error) {
-			toast.error("Falha na autenticação. Tente novamente.");
+		if (error === "INVALID_TOKEN" ) {
+			toast.error("O token do seu link está inválido, tente novamente.");
+		} else if (error) {
+			toast.error("Não foi possível fazer login. Tente novamente.");
 		}
-	}, [searchParams]);
+	}, []);
 
 	const onSubmit = async (values: SignInValues) => {
 		await signIn.email(
@@ -88,9 +90,24 @@ export function SignInForm() {
 		);
 	};
 
+	const handleSendMagicLink = async () => {
+  	const { data, error } = await signIn.magicLink({
+     	email: "admin@example.com", // required
+     	name: "Victor Nogueira",
+     	callbackURL: "/minha-conta",
+     	newUserCallbackURL: "/minha-conta",
+     	errorCallbackURL: "/sign-in",
+  	});
+
+  	console.log({data, error})
+	};
+
 	return (
 		<div className="w-full max-w-md mx-auto space-y-6">
 			<div className="space-y-2 text-center">
+			<Button onClick={handleSendMagicLink}>
+			Test magic link
+			</Button>
 				<h1 className="text-2xl font-semibold tracking-tight">
 					Bem-vindo de volta
 				</h1>

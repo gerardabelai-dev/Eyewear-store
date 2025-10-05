@@ -1,10 +1,12 @@
 import "server-only";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { admin, bearer } from "better-auth/plugins";
+import { admin, bearer, magicLink } from "better-auth/plugins";
 import { localization } from "better-auth-localization";
+import CompleteRegistrationEmail from "../../emails/complete-registration";
 import { db } from "./db";
 import { env } from "./env";
+import { resend } from "./resend/client";
 
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
@@ -51,6 +53,27 @@ export const auth = betterAuth({
 		localization({
 			defaultLocale: "pt-BR", // Use built-in Portuguese translations
 			fallbackLocale: "default", // Fallback to English
+		}),
+		magicLink({
+			sendMagicLink: async ({ email, url, token: _token }, _request) => {
+				const { data, error } = await resend.emails.send({
+					from: "Dr. Vista <onboarding@resend.dev>",
+					to: ["delivered@resend.dev"],
+					subject: "Bem-vindo à Dr. Vista! Complete seu cadastro.",
+					react: CompleteRegistrationEmail({
+						customerName: email,
+						magicLink: url,
+					}),
+				});
+
+				if (error) {
+					console.error("Error sending magic link:", error);
+				}
+
+				if (data) {
+					console.log("Magic link sent successfully:", data);
+				}
+			},
 		}),
 	],
 	onAPIError: {
