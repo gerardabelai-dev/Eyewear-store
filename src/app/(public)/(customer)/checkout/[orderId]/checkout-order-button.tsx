@@ -1,6 +1,5 @@
 "use client";
 
-import { loadStripe } from "@stripe/stripe-js";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -12,12 +11,10 @@ import { useCartStore } from "@/stores/cart-store";
 
 interface CheckoutOrderButtonProps {
 	orderId: string;
-	stripePublishableKey: string;
 }
 
 export function CheckoutOrderButton({
 	orderId,
-	stripePublishableKey,
 }: CheckoutOrderButtonProps) {
 	const router = useRouter();
 	const queryClient = useQueryClient();
@@ -29,14 +26,18 @@ export function CheckoutOrderButton({
 	);
 
 	const handleFinishOrder = async () => {
-		console.log(
-			"🚀 Finishing order, needsPaymentProcessing:",
-			needsPaymentProcessing,
-		);
+		console.log("🚀 Finishing order, needsPaymentProcessing:", needsPaymentProcessing);
+		console.log("📊 Order payment state:", {
+			hasPaymentMethodId: !!order?.payment?.orderPaymentMethodId,
+			hasStripePaymentMethodId: !!order?.payment?.stripePaymentMethodId,
+			hasStripeClientSecret: !!order?.payment?.stripeClientSecret,
+			paymentStatus: order?.payment?.orderPaymentStatus,
+		});
 
-		if (needsPaymentProcessing) {
+		if (needsPaymentProcessing && order) {
 			console.log("💳 Processing payment...");
 			await processPayment();
+			// processPayment will handle redirect after successful payment
 		} else {
 			console.log(
 				"✅ Order already paid or doesn't need payment, proceeding to success",
@@ -50,14 +51,14 @@ export function CheckoutOrderButton({
 	const processPayment = async () => {
 		console.log("🚀 Starting payment processing...");
 		console.log("💳 Payment data:", {
-			hasClientSecret: !!order?.payment?.stripeClientSecret,
+			hasPaymentIntentId: !!order?.payment?.stripePaymentIntentId,
 			hasPaymentMethodId: !!order?.payment?.stripePaymentMethodId,
-			clientSecret: order?.payment?.stripeClientSecret,
+			paymentIntentId: order?.payment?.stripePaymentIntentId,
 			paymentMethodId: order?.payment?.stripePaymentMethodId,
 		});
 
 		if (
-			!order?.payment?.stripeClientSecret ||
+			!order?.payment?.stripePaymentIntentId ||
 			!order?.payment?.stripePaymentMethodId
 		) {
 			console.error("❌ Missing payment information");
@@ -68,46 +69,42 @@ export function CheckoutOrderButton({
 		setIsProcessingPayment(true);
 
 		try {
-			console.log("🔑 Loading Stripe with key:", stripePublishableKey);
-
-			if (!stripePublishableKey) {
-				throw new Error("Chave pública do Stripe não configurada");
-			}
-
-			const stripe = await loadStripe(stripePublishableKey);
-			if (!stripe) {
-				throw new Error("Erro ao carregar Stripe");
-			}
-
-			console.log("✅ Stripe loaded successfully, confirming payment with:", {
-				clientSecret: order.payment.stripeClientSecret,
-				paymentMethodId: order.payment.stripePaymentMethodId,
+			// Confirm payment on the server (this will trigger webhooks)
+			console.log("💰 Confirming payment on server...");
+			const response = await fetch("/api/stripe/payment-intents/confirm", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					paymentIntentId: order.payment.stripePaymentIntentId,
+					paymentMethodId: order.payment.stripePaymentMethodId,
+				}),
 			});
 
-			// Confirm payment with Stripe
-			console.log("💰 Calling stripe.confirmCardPayment...");
-			const { error, paymentIntent } = await stripe.confirmCardPayment(
-				order.payment.stripeClientSecret,
-				{
-					payment_method: order.payment.stripePaymentMethodId,
-				},
-			);
+			console.log("📋 Payment confirmation response:", response.status);
 
-			console.log("📋 Payment result:", { error, paymentIntent });
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(
+					errorData.message || "Falha ao confirmar pagamento",
+				);
+			}
 
-			if (error) {
-				console.error("Payment failed:", error);
-				toast.error(error.message || "Erro no pagamento");
-			} else if (paymentIntent?.status === "succeeded") {
-				console.log("Payment succeeded:", paymentIntent);
+			const { paymentIntent } = await response.json();
+			console.log("✅ Payment confirmed:", paymentIntent);
+
+			if (paymentIntent.status === "succeeded") {
 				toast.success("Pagamento realizado com sucesso!");
 
-				// Update order payment status to paid
-				await updateOrderPaymentStatus(paymentIntent.id);
+				// Wait a brief moment for webhook to process
+				await new Promise((resolve) => setTimeout(resolve, 1000));
 
 				// Clear cart and navigate to success
 				clearCartId();
 				router.push(`/checkout/${orderId}/success`);
+			} else {
+				throw new Error(`Status de pagamento inesperado: ${paymentIntent.status}`);
 			}
 		} catch (error) {
 			console.error("Payment error:", error);
@@ -116,42 +113,6 @@ export function CheckoutOrderButton({
 			toast.error(errorMessage);
 		} finally {
 			setIsProcessingPayment(false);
-		}
-	};
-
-	const updateOrderPaymentStatus = async (paymentIntentId: string) => {
-		console.log("🔄 Updating order payment status to 'paid'...", {
-			paymentIntentId,
-			orderId,
-		});
-
-		try {
-			const response = await fetch(`/api/orders/${orderId}/payment-status`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					paymentIntentId,
-					status: "paid",
-				}),
-			});
-
-			console.log(
-				"📤 Update payment status response:",
-				response.status,
-				response.statusText,
-			);
-
-			if (!response.ok) {
-				throw new Error("Failed to update payment status");
-			}
-
-			// Refresh order data
-			queryClient.invalidateQueries(getOrderByIdQueryOptions(orderId));
-		} catch (error) {
-			console.error("Failed to update payment status:", error);
-			// Don't throw here as payment succeeded, just log the error
 		}
 	};
 

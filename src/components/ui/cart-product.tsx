@@ -155,6 +155,7 @@ interface CartProductDescriptionProps {
 	className?: string;
 }
 
+// TODO: make this not show complete description if too long, allow user to toggle "Ver mais..."
 export function CartProductDescription({
 	description,
 	className,

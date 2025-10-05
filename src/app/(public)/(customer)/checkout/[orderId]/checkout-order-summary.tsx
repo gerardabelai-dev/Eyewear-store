@@ -10,7 +10,6 @@ import { getOrderByIdQueryOptions } from "./get-checkout-query-options";
 
 interface CheckoutOrderSummaryProps {
 	orderId: string;
-	stripePublishableKey: string;
 }
 
 type OrderData = GetOrderResponse["order"];
@@ -34,7 +33,6 @@ function calculateItemTotal(item: CartProductData): number {
 
 export function CheckoutOrderSummary({
 	orderId,
-	stripePublishableKey,
 }: CheckoutOrderSummaryProps) {
 	const { data: order } = useSuspenseQuery(getOrderByIdQueryOptions(orderId));
 
@@ -103,10 +101,7 @@ export function CheckoutOrderSummary({
 
 			<CheckoutCouponForm />
 
-			<CheckoutOrderButton
-				orderId={orderId}
-				stripePublishableKey={stripePublishableKey}
-			/>
+			<CheckoutOrderButton orderId={orderId} />
 		</div>
 	);
 }

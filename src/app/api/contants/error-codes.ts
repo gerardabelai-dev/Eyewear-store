@@ -56,6 +56,7 @@ export const ERROR_CODES = {
 	FAILED_TO_UPDATE_ORDER_PAYMENT: "FAILED_TO_UPDATE_ORDER_PAYMENT",
 	ORDER_ALREADY_HAS_STRIPE_PAYMENT_INTENT:
 		"ORDER_ALREADY_HAS_STRIPE_PAYMENT_INTENT",
+	FAILED_TO_CONFIRM_PAYMENT_INTENT: "FAILED_TO_CONFIRM_PAYMENT_INTENT",
 
 	// Order Delivery
 	ORDER_DELIVERY_NOT_FOUND: "ORDER_DELIVERY_NOT_FOUND",
@@ -123,6 +124,8 @@ export const ERROR_MESSAGES = {
 		"Houve um erro ao atualizar o pagamento do pedido",
 	[ERROR_CODES.ORDER_ALREADY_HAS_PAYMENT_METHOD]:
 		"Pedido já possui um método de pagamento",
+	[ERROR_CODES.FAILED_TO_CONFIRM_PAYMENT_INTENT]:
+		"Houve um erro ao confirmar o pagamento",
 
 	// User
 	[ERROR_CODES.USER_ALREADY_EXISTS]: "Usuário com este e-mail já existe",

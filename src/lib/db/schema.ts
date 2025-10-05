@@ -269,6 +269,7 @@ export const orderDeliveryStatus = pgEnum("orderDeliveryStatus", [
 	"returned",
 ]);
 
+// TODO: add estimatedDelivery time
 export const orderDelivery = pgTable("orderDelivery", {
 	id: text("id")
 		.primaryKey()
@@ -299,6 +300,7 @@ export const orderPaymentStatus = pgEnum("orderPaymentStatus", [
 	"failed",
 ]);
 
+// TODO: add subtotal (products sum), shipping cost, tax, total
 export const orderPayment = pgTable("orderPayment", {
 	id: text("id")
 		.primaryKey()

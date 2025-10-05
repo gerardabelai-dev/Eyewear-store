@@ -90,24 +90,9 @@ export function SignInForm() {
 		);
 	};
 
-	const handleSendMagicLink = async () => {
-  	const { data, error } = await signIn.magicLink({
-     	email: "admin@example.com", // required
-     	name: "Victor Nogueira",
-     	callbackURL: "/minha-conta",
-     	newUserCallbackURL: "/minha-conta",
-     	errorCallbackURL: "/sign-in",
-  	});
-
-  	console.log({data, error})
-	};
-
 	return (
 		<div className="w-full max-w-md mx-auto space-y-6">
 			<div className="space-y-2 text-center">
-			<Button onClick={handleSendMagicLink}>
-			Test magic link
-			</Button>
 				<h1 className="text-2xl font-semibold tracking-tight">
 					Bem-vindo de volta
 				</h1>

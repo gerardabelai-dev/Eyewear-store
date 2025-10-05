@@ -42,7 +42,7 @@ const CompleteRegistrationEmail = ({
 						{/* Header */}
 						<Section className="bg-white px-[40px] pt-[40px] pb-[20px]">
 							<Img
-								src={`${baseUrl}/static/drvista-logo.png`}
+								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/branding/drvista-logo.png"
 								alt="Dr. Vista"
 								width="200"
 								className="w-full max-w-[200px] mx-auto block"
@@ -125,7 +125,7 @@ const CompleteRegistrationEmail = ({
 
 CompleteRegistrationEmail.PreviewProps = {
 	customerName: "João Silva",
-	magicLink: "http://localhost:3000/sign-in?token=abc123",
+	magicLink: "https://drvista.com.br/sign-in?token=abc123",
 };
 
 export default CompleteRegistrationEmail;

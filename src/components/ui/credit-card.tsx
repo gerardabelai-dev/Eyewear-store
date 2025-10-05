@@ -524,7 +524,9 @@ function CreditCard({
 					<label className="block text-sm font-medium mb-2">
 						Nome do Portador
 					</label>
+					{/* TODO: Automatic scroll to center this element when it loads  */}
 					<Input
+						autoFocus
 						ref={cardholderInputRef}
 						type="text"
 						placeholder="João Silva"
