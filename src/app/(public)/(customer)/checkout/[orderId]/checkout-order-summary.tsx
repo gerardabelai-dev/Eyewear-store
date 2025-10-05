@@ -31,9 +31,7 @@ function calculateItemTotal(item: CartProductData): number {
 	return discountedPrice * item.quantity;
 }
 
-export function CheckoutOrderSummary({
-	orderId,
-}: CheckoutOrderSummaryProps) {
+export function CheckoutOrderSummary({ orderId }: CheckoutOrderSummaryProps) {
 	const { data: order } = useSuspenseQuery(getOrderByIdQueryOptions(orderId));
 
 	// Get cart products from the order

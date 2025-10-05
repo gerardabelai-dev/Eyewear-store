@@ -24,13 +24,10 @@ export async function POST(request: NextRequest) {
 	const { paymentIntentId, paymentMethodId } = data;
 
 	try {
-		const paymentIntent = await stripe.paymentIntents.confirm(
-			paymentIntentId,
-			{
-				payment_method: paymentMethodId,
-				return_url: `${request.nextUrl.origin}/api/stripe/payment-intents/return`,
-			},
-		);
+		const paymentIntent = await stripe.paymentIntents.confirm(paymentIntentId, {
+			payment_method: paymentMethodId,
+			return_url: `${request.nextUrl.origin}/api/stripe/payment-intents/return`,
+		});
 
 		// If payment succeeded, handle it immediately
 		if (paymentIntent.status === "succeeded") {

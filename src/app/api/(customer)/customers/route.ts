@@ -1,12 +1,15 @@
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import z from "zod";
+import { z } from "zod";
 import { ERROR_CODES } from "@/app/api/contants/error-codes";
 import { HTTP_CODES } from "@/app/api/contants/http-codes";
 import { mapErrorCodes } from "@/app/api/utils/map-error-codes";
 import { mapInvalidZodResponse } from "@/app/api/utils/map-invalid-zod-response";
 import { db } from "@/lib/db";
 import { customer, user } from "@/lib/db/schema";
+import { env } from "@/lib/env";
+import { resend } from "@/lib/resend/client";
+import CompleteRegistrationEmail from "../../../../../emails/complete-registration";
 
 const createCustomerSchema = z.object({
 	firstName: z.string(),
@@ -18,13 +21,17 @@ const createCustomerSchema = z.object({
 export async function POST(request: Request) {
 	const body = await request.json();
 
-	const { success, error, data } = createCustomerSchema.safeParse(body);
+	const {
+		success,
+		error,
+		data: validatedData,
+	} = createCustomerSchema.safeParse(body);
 
 	if (!success) {
 		return mapInvalidZodResponse(error);
 	}
 
-	const { firstName, lastName, email, phoneNumber } = data;
+	const { firstName, lastName, email, phoneNumber } = validatedData;
 
 	const userAlreadyExists = await db.query.user.findFirst({
 		where: eq(user.email, email),
@@ -67,6 +74,27 @@ export async function POST(request: Request) {
 				status: HTTP_CODES.INTERNAL_SERVER_ERROR,
 			},
 		);
+	}
+
+	// Send complete registration email with magic link
+	const magicLinkUrl = `${env.WEB_URL}/api/auth/sign-in/magic-link?email=${encodeURIComponent(email)}`;
+
+	const { data, error: emailError } = await resend.emails.send({
+		from: "Dr. Vista <onboarding@resend.dev>",
+		to: ["delivered@resend.dev"],
+		subject: "Bem-vindo à Dr. Vista! Complete seu cadastro.",
+		react: CompleteRegistrationEmail({
+			customerName: firstName,
+			magicLink: magicLinkUrl,
+		}),
+	});
+
+	if (emailError) {
+		console.error("Error sending complete registration email:", emailError);
+	}
+
+	if (data) {
+		console.log("Complete registration email sent successfully:", data);
 	}
 
 	return NextResponse.json({

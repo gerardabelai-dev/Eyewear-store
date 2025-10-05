@@ -13,11 +13,9 @@ interface CheckoutOrderButtonProps {
 	orderId: string;
 }
 
-export function CheckoutOrderButton({
-	orderId,
-}: CheckoutOrderButtonProps) {
+export function CheckoutOrderButton({ orderId }: CheckoutOrderButtonProps) {
 	const router = useRouter();
-	const queryClient = useQueryClient();
+	const _queryClient = useQueryClient();
 	const { clearCartId } = useCartStore();
 	const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
@@ -26,7 +24,10 @@ export function CheckoutOrderButton({
 	);
 
 	const handleFinishOrder = async () => {
-		console.log("🚀 Finishing order, needsPaymentProcessing:", needsPaymentProcessing);
+		console.log(
+			"🚀 Finishing order, needsPaymentProcessing:",
+			needsPaymentProcessing,
+		);
 		console.log("📊 Order payment state:", {
 			hasPaymentMethodId: !!order?.payment?.orderPaymentMethodId,
 			hasStripePaymentMethodId: !!order?.payment?.stripePaymentMethodId,
@@ -86,9 +87,7 @@ export function CheckoutOrderButton({
 
 			if (!response.ok) {
 				const errorData = await response.json();
-				throw new Error(
-					errorData.message || "Falha ao confirmar pagamento",
-				);
+				throw new Error(errorData.message || "Falha ao confirmar pagamento");
 			}
 
 			const { paymentIntent } = await response.json();
@@ -104,7 +103,9 @@ export function CheckoutOrderButton({
 				clearCartId();
 				router.push(`/checkout/${orderId}/success`);
 			} else {
-				throw new Error(`Status de pagamento inesperado: ${paymentIntent.status}`);
+				throw new Error(
+					`Status de pagamento inesperado: ${paymentIntent.status}`,
+				);
 			}
 		} catch (error) {
 			console.error("Payment error:", error);
