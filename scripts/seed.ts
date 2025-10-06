@@ -952,6 +952,8 @@ async function _seedOrderDelivery({
 		.values({
 			orderId,
 			orderDeliveryMethodId: selectedMethod.id,
+			estimatedDeliveryDays: faker.number.int({ min: 3, max: 15 }),
+			trackingCode: faker.string.alphanumeric({ length: 13, casing: "upper" }),
 		})
 		.returning();
 
@@ -973,18 +975,27 @@ async function _seedOrderPayment({
 	orderId,
 	orderPaymentMethodId,
 	totalPriceInCents,
+	shippingCostInCents,
 }: {
 	orderId: string;
 	orderPaymentMethodId: string;
 	totalPriceInCents: number;
+	shippingCostInCents: number;
 }) {
 	console.info(`💳 Creating order payment for order ID: ${orderId}...`);
+
+	// Calculate subtotal (total - shipping)
+	const subtotalInCents = totalPriceInCents - shippingCostInCents;
+	const taxInCents = 0; // Tax calculation will be implemented later
 
 	const [orderPayment] = await seedDb
 		.insert(schema.orderPayment)
 		.values({
 			orderId,
 			orderPaymentMethodId,
+			subtotalInCents,
+			shippingCostInCents,
+			taxInCents,
 			totalPriceInCents,
 		})
 		.returning();

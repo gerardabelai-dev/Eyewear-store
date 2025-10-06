@@ -57,12 +57,41 @@ export const useCart = () => {
 				});
 
 				return { cartId: activeCartId };
-			} catch (error) {
+			} catch (error: any) {
+				// If cart not found, clear the stale cart ID and retry once
+				if (error?.message === "Carrinho não encontrado" && activeCartId) {
+					console.log(
+						"Cart: Stored cart not found, clearing and creating new cart",
+					);
+					clearCartId();
+
+					// Create new cart
+					const response = await createCartMutation.mutateAsync();
+					setCartId(response.cart.id);
+					activeCartId = response.cart.id;
+					console.log("Cart: New cart created with ID:", activeCartId);
+
+					// Retry adding product
+					await addProductToCartMutation.mutateAsync({
+						cartId: activeCartId,
+						productId: item.productId,
+						quantity: item.quantity,
+					});
+
+					return { cartId: activeCartId };
+				}
+
 				console.error("Cart: Failed to add product to cart", error);
 				throw error;
 			}
 		},
-		[cartId, setCartId, createCartMutation, addProductToCartMutation],
+		[
+			cartId,
+			setCartId,
+			clearCartId,
+			createCartMutation,
+			addProductToCartMutation,
+		],
 	);
 
 	const addGlassesWithLenses = useCallback(
@@ -99,12 +128,42 @@ export const useCart = () => {
 				});
 
 				return { cartId: activeCartId };
-			} catch (error) {
+			} catch (error: any) {
+				// If cart not found, clear the stale cart ID and retry once
+				if (error?.message === "Carrinho não encontrado" && activeCartId) {
+					console.log(
+						"Cart: Stored cart not found, clearing and creating new cart",
+					);
+					clearCartId();
+
+					// Create new cart
+					const response = await createCartMutation.mutateAsync();
+					setCartId(response.cart.id);
+					activeCartId = response.cart.id;
+					console.log("Cart: New cart created with ID:", activeCartId);
+
+					// Retry adding glasses
+					await addGlassesWithLensesToCartMutation.mutateAsync({
+						cartId: activeCartId,
+						glassesProductId: item.glassesProductId,
+						lensProductIds: item.lensProductIds,
+						quantity: item.quantity,
+					});
+
+					return { cartId: activeCartId };
+				}
+
 				console.error("Cart: Failed to add glasses with lenses to cart", error);
 				throw error;
 			}
 		},
-		[cartId, setCartId, createCartMutation, addGlassesWithLensesToCartMutation],
+		[
+			cartId,
+			setCartId,
+			clearCartId,
+			createCartMutation,
+			addGlassesWithLensesToCartMutation,
+		],
 	);
 
 	return {

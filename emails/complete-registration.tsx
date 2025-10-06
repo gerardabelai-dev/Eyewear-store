@@ -16,19 +16,22 @@ import {
 // biome-ignore lint/correctness/noUnusedImports: react-email
 import * as React from "react";
 
-const baseUrl = process.env.VERCEL_URL
+const _baseUrl = process.env.VERCEL_URL
 	? `https://${process.env.VERCEL_URL}`
 	: "";
 
 interface CompleteRegistrationEmailProps {
 	customerName: string;
-	magicLink: string;
+	resetPasswordUrl?: string;
 }
 
 const CompleteRegistrationEmail = ({
 	customerName,
-	magicLink,
+	resetPasswordUrl,
 }: CompleteRegistrationEmailProps) => {
+	const resetUrl =
+		resetPasswordUrl ||
+		`${process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000"}/reset-password`;
 	return (
 		<Html lang="pt-BR" dir="ltr">
 			<Head />
@@ -71,7 +74,7 @@ const CompleteRegistrationEmail = ({
 
 							<Section className="text-center my-[32px]">
 								<Button
-									href={magicLink}
+									href={resetUrl}
 									className="bg-[#34A759] text-white px-[32px] py-[16px] text-[16px] font-semibold"
 									style={{
 										textDecoration: "none",
@@ -125,7 +128,7 @@ const CompleteRegistrationEmail = ({
 
 CompleteRegistrationEmail.PreviewProps = {
 	customerName: "João Silva",
-	magicLink: "https://drvista.com.br/sign-in?token=abc123",
+	resetPasswordUrl: "http://localhost:3000/reset-password",
 };
 
 export default CompleteRegistrationEmail;

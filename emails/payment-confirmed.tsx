@@ -19,7 +19,7 @@ import {
 import * as React from "react";
 import { formatPrice } from "@/lib/format-price";
 
-const baseUrl = process.env.VERCEL_URL
+const _baseUrl = process.env.VERCEL_URL
 	? `https://${process.env.VERCEL_URL}`
 	: "";
 
@@ -193,7 +193,8 @@ const PaymentConfirmedEmail = ({
 																		+ {subItem.name}
 																	</Text>
 																	<Text className="text-[#666] text-[12px] m-0">
-																		{formatPrice(subItem.price)} x {subItem.quantity}
+																		{formatPrice(subItem.price)} x{" "}
+																		{subItem.quantity}
 																	</Text>
 																</Column>
 															</Row>
@@ -290,11 +291,12 @@ const PaymentConfirmedEmail = ({
 							{/* Action Button */}
 							<Section className="text-center my-[32px]">
 								<Button
-									href="https://drvista.com.br/meus-pedidos"
+									href={`${process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000"}/orders/${orderNumber}`}
 									className="bg-[#34A759] text-white px-[32px] py-[16px] text-[16px] font-semibold"
 									style={{
 										textDecoration: "none",
 										display: "inline-block",
+										borderRadius: "8px",
 									}}
 								>
 									Acompanhar Pedido

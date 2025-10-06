@@ -19,7 +19,7 @@ import {
 import * as React from "react";
 import { formatPrice } from "@/lib/format-price";
 
-const baseUrl = process.env.VERCEL_URL
+const _baseUrl = process.env.VERCEL_URL
 	? `https://${process.env.VERCEL_URL}`
 	: "";
 
@@ -169,7 +169,8 @@ const OrderConfirmedEmail = ({
 																		+ {subItem.name}
 																	</Text>
 																	<Text className="text-[#666] text-[12px] m-0">
-																		{formatPrice(subItem.price)} x {subItem.quantity}
+																		{formatPrice(subItem.price)} x{" "}
+																		{subItem.quantity}
 																	</Text>
 																</Column>
 															</Row>
@@ -251,6 +252,7 @@ const OrderConfirmedEmail = ({
 										style={{
 											textDecoration: "none",
 											display: "inline-block",
+											borderRadius: "8px",
 										}}
 									>
 										Acompanhar Pedido

@@ -269,7 +269,6 @@ export const orderDeliveryStatus = pgEnum("orderDeliveryStatus", [
 	"returned",
 ]);
 
-// TODO: add estimatedDelivery time
 export const orderDelivery = pgTable("orderDelivery", {
 	id: text("id")
 		.primaryKey()
@@ -283,6 +282,8 @@ export const orderDelivery = pgTable("orderDelivery", {
 	orderDeliveryStatus: orderDeliveryStatus("orderDeliveryStatus")
 		.notNull()
 		.default("pending"),
+	estimatedDeliveryDays: integer("estimatedDeliveryDays"),
+	trackingCode: text("trackingCode"),
 	...timestamps,
 });
 
@@ -300,7 +301,6 @@ export const orderPaymentStatus = pgEnum("orderPaymentStatus", [
 	"failed",
 ]);
 
-// TODO: add subtotal (products sum), shipping cost, tax, total
 export const orderPayment = pgTable("orderPayment", {
 	id: text("id")
 		.primaryKey()
@@ -314,6 +314,9 @@ export const orderPayment = pgTable("orderPayment", {
 	orderPaymentStatus: orderPaymentStatus("orderPaymentStatus")
 		.notNull()
 		.default("pending"),
+	subtotalInCents: integer("subtotalInCents").notNull().default(0),
+	shippingCostInCents: integer("shippingCostInCents").notNull().default(0),
+	taxInCents: integer("taxInCents").notNull().default(0),
 	totalPriceInCents: integer("totalPriceInCents").notNull().default(0),
 	// Stripe-specific fields
 	stripePaymentIntentId: text("stripePaymentIntentId"),

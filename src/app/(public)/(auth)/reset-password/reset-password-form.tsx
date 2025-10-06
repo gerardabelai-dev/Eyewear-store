@@ -21,11 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ROUTES } from "@/constants/routes";
-import {
-	requestPasswordReset,
-	resetPassword,
-	useSession,
-} from "@/lib/auth-client";
+import { resetPassword, useSession } from "@/lib/auth-client";
 
 const resetPasswordSchema = z
 	.object({
@@ -70,14 +66,6 @@ export function ResetPasswordForm() {
 		});
 
 		router.push(ROUTES.SIGN_IN);
-	};
-
-	const onSubmitRequestPassword = async (values: ResetPasswordValues) => {
-		console.log(values);
-		await requestPasswordReset({
-			email: values.email,
-			redirectTo: ROUTES.HOME,
-		});
 	};
 
 	useEffect(() => {
@@ -198,16 +186,6 @@ export function ResetPasswordForm() {
 								)}
 							/>
 
-							<Button
-								type="button"
-								className="w-full"
-								variant="secondary"
-								onClick={() => {
-									onSubmitRequestPassword(form.getValues());
-								}}
-							>
-								Solicitar Resetar Senha
-							</Button>
 							<Button
 								type="submit"
 								className="w-full"

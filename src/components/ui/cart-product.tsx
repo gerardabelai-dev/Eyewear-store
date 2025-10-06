@@ -4,7 +4,7 @@ import { Check, Minus, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type React from "react";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format-price";
 import { cn } from "@/lib/utils";
@@ -155,14 +155,31 @@ interface CartProductDescriptionProps {
 	className?: string;
 }
 
-// TODO: make this not show complete description if too long, allow user to toggle "Ver mais..."
+const MAX_DESCRIPTION_LENGTH = 100;
+
 export function CartProductDescription({
 	description,
 	className,
 }: CartProductDescriptionProps) {
+	const [isExpanded, setIsExpanded] = useState(false);
+	const shouldTruncate = description.length > MAX_DESCRIPTION_LENGTH;
+	const displayText =
+		shouldTruncate && !isExpanded
+			? `${description.slice(0, MAX_DESCRIPTION_LENGTH)}...`
+			: description;
+
 	return (
 		<span className={cn("text-sm text-muted-foreground", className)}>
-			{description}
+			{displayText}
+			{shouldTruncate && (
+				<button
+					type="button"
+					onClick={() => setIsExpanded(!isExpanded)}
+					className="ml-1 text-primary hover:underline"
+				>
+					{isExpanded ? "Ver menos" : "Ver mais"}
+				</button>
+			)}
 		</span>
 	);
 }

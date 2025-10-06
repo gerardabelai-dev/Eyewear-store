@@ -33,6 +33,7 @@ type OrderWithDetails = Order & {
 	customerEmail?: string;
 	deliveryStatus?: OrderDelivery["orderDeliveryStatus"];
 	paymentStatus?: OrderPayment["orderPaymentStatus"];
+	totalPriceInCents?: number;
 	productCount?: number;
 };
 
@@ -50,6 +51,7 @@ const getMockOrders = (): OrderWithDetails[] => [
 		customerEmail: "joao.silva@example.com",
 		deliveryStatus: "processing",
 		paymentStatus: "paid",
+		totalPriceInCents: 87140,
 		productCount: 3,
 	},
 	{
@@ -64,6 +66,7 @@ const getMockOrders = (): OrderWithDetails[] => [
 		customerEmail: "maria.santos@example.com",
 		deliveryStatus: "shipped",
 		paymentStatus: "paid",
+		totalPriceInCents: 66650,
 		productCount: 1,
 	},
 	{
@@ -78,6 +81,7 @@ const getMockOrders = (): OrderWithDetails[] => [
 		customerEmail: "pedro.oliveira@example.com",
 		deliveryStatus: "delivered",
 		paymentStatus: "paid",
+		totalPriceInCents: 45000,
 		productCount: 2,
 	},
 	{
@@ -92,6 +96,7 @@ const getMockOrders = (): OrderWithDetails[] => [
 		customerEmail: "ana.costa@example.com",
 		deliveryStatus: "pending",
 		paymentStatus: "pending",
+		totalPriceInCents: 0,
 		productCount: 1,
 	},
 ];
@@ -213,8 +218,7 @@ export function OrdersTable({ orders: ordersProp }: OrdersTableProps) {
 										{getPaymentStatusBadge(order.paymentStatus)}
 									</TableCell>
 									<TableCell className="font-medium">
-										{formatCurrency(0)}{" "}
-										{/* TODO: Calculate from orderPayment */}
+										{formatCurrency(order.totalPriceInCents || 0)}
 									</TableCell>
 									<TableCell className="text-sm text-muted-foreground">
 										{order.productCount} produto

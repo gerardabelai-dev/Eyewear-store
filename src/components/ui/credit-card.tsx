@@ -337,6 +337,16 @@ function CreditCard({
 		setFocusedField(null);
 	};
 
+	// Auto-scroll to center the cardholder input when it loads
+	useEffect(() => {
+		if (cardholderInputRef.current) {
+			cardholderInputRef.current.scrollIntoView({
+				behavior: "smooth",
+				block: "center",
+			});
+		}
+	}, []);
+
 	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
 		if (!containerRef.current) return;
 		const rect = containerRef.current.getBoundingClientRect();
@@ -524,7 +534,6 @@ function CreditCard({
 					<label className="block text-sm font-medium mb-2">
 						Nome do Portador
 					</label>
-					{/* TODO: Automatic scroll to center this element when it loads  */}
 					<Input
 						autoFocus
 						ref={cardholderInputRef}

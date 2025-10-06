@@ -76,8 +76,8 @@ export async function POST(request: Request) {
 		);
 	}
 
-	// Send complete registration email with magic link
-	const magicLinkUrl = `${env.WEB_URL}/api/auth/sign-in/magic-link?email=${encodeURIComponent(email)}`;
+	// Send complete registration email with reset password link
+	const resetPasswordUrl = `${env.WEB_URL}/reset-password`;
 
 	const { data, error: emailError } = await resend.emails.send({
 		from: "Dr. Vista <onboarding@resend.dev>",
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
 		subject: "Bem-vindo à Dr. Vista! Complete seu cadastro.",
 		react: CompleteRegistrationEmail({
 			customerName: firstName,
-			magicLink: magicLinkUrl,
+			resetPasswordUrl,
 		}),
 	});
 

@@ -55,14 +55,14 @@ export const auth = betterAuth({
 			fallbackLocale: "default", // Fallback to English
 		}),
 		magicLink({
-			sendMagicLink: async ({ email, url, token: _token }, _request) => {
+			sendMagicLink: async ({ email, url: _url, token: _token }, _request) => {
 				const { data, error } = await resend.emails.send({
 					from: "Dr. Vista <onboarding@resend.dev>",
 					to: ["delivered@resend.dev"],
 					subject: "Bem-vindo à Dr. Vista! Complete seu cadastro.",
 					react: CompleteRegistrationEmail({
 						customerName: email,
-						magicLink: url,
+						resetPasswordUrl: `${env.WEB_URL}/reset-password`,
 					}),
 				});
 
