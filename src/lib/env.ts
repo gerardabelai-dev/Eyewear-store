@@ -7,7 +7,7 @@ const schema = z.object({
 		.default("development"),
 	WEB_URL: z.url("Invalid WEB_URL"),
 	NEXT_PUBLIC_WEB_URL: z.url("Invalid NEXT_PUBLIC_WEB_URL"),
-	VERCEL_URL: z.url("Invalid VERCEL_URL"),
+	VERCEL_URL: z.string().min(1, "Invalid VERCEL_URL"),
 
 	// Database Configuration
 	DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
