@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter, } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -25,8 +25,7 @@ import { ROUTES } from "@/constants/routes";
 import { signIn } from "@/lib/auth-client";
 
 const signInSchema = z.object({
-	email: z
-		.email("Por favor, insira um endereço de email válido"),
+	email: z.email("Por favor, insira um endereço de email válido"),
 	password: z
 		.string()
 		.min(1, "Senha é obrigatória")
@@ -37,7 +36,7 @@ const signInSchema = z.object({
 type SignInValues = z.infer<typeof signInSchema>;
 
 export function SignInForm() {
-  const [error] = useQueryState("error", parseAsString);
+	const [error] = useQueryState("error", parseAsString);
 	const router = useRouter();
 	const form = useForm<SignInValues>({
 		resolver: zodResolver(signInSchema),
@@ -49,7 +48,7 @@ export function SignInForm() {
 	});
 
 	useEffect(() => {
-		if (error === "INVALID_TOKEN" ) {
+		if (error === "INVALID_TOKEN") {
 			toast.error("O token do seu link está inválido, tente novamente.");
 		} else if (error) {
 			toast.error("Não foi possível fazer login. Tente novamente.");
@@ -121,7 +120,7 @@ export function SignInForm() {
 										<FormLabel>Email</FormLabel>
 										<FormControl>
 											<Input
-  											autoFocus
+												autoFocus
 												placeholder="seu@email.com"
 												type="email"
 												autoComplete="email"
@@ -141,7 +140,7 @@ export function SignInForm() {
 										<div className="flex items-center justify-between">
 											<FormLabel>Senha</FormLabel>
 											<Link
-  											href={ROUTES.RESET_PASSWORD}
+												href={ROUTES.RESET_PASSWORD}
 												className="text-sm text-muted-foreground hover:text-primary cursor-pointer underline bg-transparent border-none p-0"
 											>
 												Esqueceu a senha?
@@ -252,3 +251,4 @@ export function SignInForm() {
 			</div>
 		</div>
 	);
+}

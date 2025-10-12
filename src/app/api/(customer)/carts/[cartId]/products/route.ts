@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { ERROR_CODES } from "@/app/api/contants/error-codes";
@@ -92,7 +92,7 @@ export async function POST(
 				eq(cartProduct.productId, productId),
 				parentProductId
 					? eq(cartProduct.parentProductId, parentProductId)
-					: eq(cartProduct.parentProductId, null),
+					: isNull(cartProduct.parentProductId),
 			),
 		});
 

@@ -45,6 +45,8 @@ const getMockProducts = (): ProductWithCategory[] => [
 	{
 		id: "1",
 		name: "Notebook Dell Inspiron",
+		slug: "notebook-dell-inspiron",
+		subtitle: "Processador Intel Core i5",
 		stock: 12,
 		status: "active" as const,
 		createdAt: new Date("2024-01-20"),
@@ -62,6 +64,8 @@ const getMockProducts = (): ProductWithCategory[] => [
 	{
 		id: "2",
 		name: "Camiseta Básica Preta",
+		slug: "camiseta-basica-preta",
+		subtitle: "100% Algodão",
 		stock: 50,
 		status: "active" as const,
 		createdAt: new Date("2024-01-18"),
@@ -79,6 +83,8 @@ const getMockProducts = (): ProductWithCategory[] => [
 	{
 		id: "3",
 		name: "Sofá 3 Lugares",
+		slug: "sofa-3-lugares",
+		subtitle: "Conforto para sua sala",
 		stock: 3,
 		status: "active" as const,
 		createdAt: new Date("2024-01-15"),

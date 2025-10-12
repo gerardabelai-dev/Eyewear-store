@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import type Stripe from "stripe";
 import { z } from "zod";
 import { stripe } from "@/app/api/stripe/stripe-client";
 
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
 				break;
 		}
 
-		let paymentMethod;
+		let paymentMethod: Stripe.PaymentMethod;
 
 		if (testToken) {
 			// Create payment method using test token

@@ -50,17 +50,21 @@ Dr. Vista e-commerce platform for eyewear (óculos) - Next.js 15 fullstack appli
 - `product` - Base product (glasses/sunglasses)
 - `productPrice` - Pricing per product
 - `productImage` - Product images
-- `cartProduct` - Has `parentProductId` field - lens options link to parent glasses via this field
+- `cartProduct` - Shopping cart line items
+  - `parentProductId` - Links lens options to parent glasses
+  - `groupId` - Groups related cart items together (glasses + lens options bundled as one unit)
 - `order` - Order header
 - `orderPayment` - Payment details, linked to Stripe PaymentIntent
 - `orderDelivery` - Shipping information
 - `customer` - Customer data
 - `customerAddress` - Shipping addresses
 
-**Important: Product Hierarchy**
-- Glasses are parent products
+**Important: Product Hierarchy & Grouping**
+- Glasses are parent products (no `parentProductId`)
 - Lens options (e.g., "Com grau", "Grau moderado") are child products linked via `cartProduct.parentProductId`
+- Related items share a `groupId` in cart for bundled quantity updates
 - When displaying in emails/UI, filter for `!parentProductId` to get main products, then fetch children
+- Use `/api/carts/[cartId]/glasses` endpoint to add glasses with multiple lens options in one operation
 
 ### Authentication & Authorization
 
@@ -109,14 +113,19 @@ Uses **Resend** + **react-email**:
 ### State Management
 
 - **Zustand** for cart state (`@/stores/cart-store`)
+  - Persists `cartId` to localStorage
 - **TanStack Query** for server state
+  - All API queries/mutations centralized in `/src/http/`
+  - Exported via `/src/http/index.ts` barrel file
+  - Pattern: Create `queries.ts` and `mutations.ts` per domain
 - **nuqs** for URL search params
 
 ### Form Handling
 
 - **react-hook-form** + **Zod** for validation
 - Error codes defined in `/src/app/api/contants/error-codes.ts`
-- Centralized error mapping in `/src/app/api/utils/`
+- Error messages in Portuguese (`ERROR_MESSAGES`)
+- Centralized error handling via `handleApiError()` in `/src/lib/utils/handle-api-error.ts`
 
 ## Development Notes
 
@@ -132,5 +141,9 @@ Uses **Resend** + **react-email**:
 
 ### Code Quality
 - Uses Biome (not ESLint/Prettier)
+  - Tab indentation (not spaces)
+  - Double quotes for strings
+  - `noExplicitAny` disabled - but avoid `any` when possible per global instructions
+  - Auto-organize imports enabled
 - TypeScript strict mode enabled
-- Server-only code: Import `"server-only"` at top of file
+- Server-only code: Import `"server-only"` at top of file (used in auth, API routes)

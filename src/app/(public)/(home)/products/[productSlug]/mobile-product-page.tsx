@@ -109,7 +109,7 @@ export function MobileProductPage({
 					glassesProduct={{
 						id: product.id,
 						name: product.name,
-						slug: product.slug,
+						slug: product.slug || "",
 					}}
 					trigger={
 						<Button size="lg" className="w-full" variant="default">

@@ -40,12 +40,7 @@ export default async function CheckoutPage({
 				<CheckoutAccordionForms orderId={orderId} />
 
 				<Suspense fallback={<CheckoutOrderSummarySkeleton />}>
-					<CheckoutOrderSummary
-						orderId={orderId}
-						stripePublishableKey={
-							process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ""
-						}
-					/>
+					<CheckoutOrderSummary orderId={orderId} />
 				</Suspense>
 			</section>
 		</CheckoutProvider>

@@ -90,6 +90,8 @@ export const ERROR_MESSAGES = {
 	[ERROR_CODES.PRODUCT_NOT_FOUND]: "Produto não encontrado",
 	[ERROR_CODES.PRODUCT_PRICE_NOT_FOUND]: "Preço do produto não encontrado",
 	[ERROR_CODES.INSUFFICIENT_STOCK]: "Estoque insuficiente para este produto",
+	[ERROR_CODES.FAILED_TO_GET_PRODUCT_DETAILS]:
+		"Houve um erro ao buscar os detalhes do produto",
 
 	// Order
 	[ERROR_CODES.FAILED_TO_CREATE_ORDER]: "Houve um erro ao criar o pedido",

@@ -70,7 +70,7 @@ export async function handlePaymentSuccess(
 				orderStatus: "paid",
 			})
 			.where(eq(order.id, orderPaymentFound.orderId));
-		const { data, error } = await resend.emails.send({
+		const { error } = await resend.emails.send({
 			from: "Dr. Vista <onboarding@resend.dev>",
 			to: ["delivered@resend.dev"],
 			subject: "Seu pagamento foi realizado com sucesso!",
