@@ -80,8 +80,8 @@ export async function POST(request: Request) {
 	const resetPasswordUrl = `${env.WEB_URL}/reset-password`;
 
 	const { data, error: emailError } = await resend.emails.send({
-		from: "Dr. Vista <onboarding@resend.dev>",
-		to: ["delivered@resend.dev"],
+		from: "Dr. Vista <contato@drvista.com.br>",
+		to: [email],
 		subject: "Bem-vindo à Dr. Vista! Complete seu cadastro.",
 		react: CompleteRegistrationEmail({
 			customerName: firstName,

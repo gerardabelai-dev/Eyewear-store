@@ -57,8 +57,8 @@ export const auth = betterAuth({
 		magicLink({
 			sendMagicLink: async ({ email, url: _url, token: _token }, _request) => {
 				const { data, error } = await resend.emails.send({
-					from: "Dr. Vista <onboarding@resend.dev>",
-					to: ["delivered@resend.dev"],
+					from: "Dr. Vista <contato@drvista.com.br>",
+					to: [email],
 					subject: "Bem-vindo à Dr. Vista! Complete seu cadastro.",
 					react: CompleteRegistrationEmail({
 						customerName: email,

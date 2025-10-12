@@ -18,7 +18,11 @@ export async function handlePaymentSuccess(
 			with: {
 				order: {
 					with: {
-						customer: true,
+						customer: {
+							with: {
+								user: true,
+							},
+						},
 						customerAddress: true,
 						payment: {
 							with: {
@@ -71,8 +75,8 @@ export async function handlePaymentSuccess(
 			})
 			.where(eq(order.id, orderPaymentFound.orderId));
 		const { error } = await resend.emails.send({
-			from: "Dr. Vista <onboarding@resend.dev>",
-			to: ["delivered@resend.dev"],
+			from: "Dr. Vista <contato@drvista.com.br>",
+			to: [orderPaymentFound.order.customer?.user?.email || ""],
 			subject: "Seu pagamento foi realizado com sucesso!",
 			react: PaymentConfirmedEmail({
 				customerName: orderPaymentFound.order.customer?.firstName || "N/A",

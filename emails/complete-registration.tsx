@@ -16,9 +16,7 @@ import {
 // biome-ignore lint/correctness/noUnusedImports: react-email
 import * as React from "react";
 
-const _baseUrl = process.env.VERCEL_URL
-	? `https://${process.env.VERCEL_URL}`
-	: "";
+const baseUrl = process.env.WEB_URL || "https://drvista.com.br";
 
 interface CompleteRegistrationEmailProps {
 	customerName: string;
@@ -29,9 +27,7 @@ const CompleteRegistrationEmail = ({
 	customerName,
 	resetPasswordUrl,
 }: CompleteRegistrationEmailProps) => {
-	const resetUrl =
-		resetPasswordUrl ||
-		`${process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000"}/reset-password`;
+	const resetUrl = resetPasswordUrl || `${baseUrl}/reset-password`;
 	return (
 		<Html lang="pt-BR" dir="ltr">
 			<Head />
@@ -45,7 +41,7 @@ const CompleteRegistrationEmail = ({
 						{/* Header */}
 						<Section className="bg-white px-[40px] pt-[40px] pb-[20px]">
 							<Img
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/branding/drvista-logo.png"
+								src={`${baseUrl}/static/drvista-logo.png`}
 								alt="Dr. Vista"
 								width="200"
 								className="w-full max-w-[200px] mx-auto block"
@@ -128,7 +124,7 @@ const CompleteRegistrationEmail = ({
 
 CompleteRegistrationEmail.PreviewProps = {
 	customerName: "João Silva",
-	resetPasswordUrl: "http://localhost:3000/reset-password",
+	resetPasswordUrl: "https://drvista.com.br/reset-password",
 };
 
 export default CompleteRegistrationEmail;

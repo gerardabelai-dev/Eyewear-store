@@ -19,9 +19,7 @@ import {
 import * as React from "react";
 import { formatPrice } from "@/lib/format-price";
 
-const _baseUrl = process.env.VERCEL_URL
-	? `https://${process.env.VERCEL_URL}`
-	: "";
+const baseUrl = process.env.WEB_URL || "https://drvista.com.br";
 
 interface OrderProductSubItem {
 	name: string;
@@ -80,7 +78,7 @@ const PaymentConfirmedEmail = ({
 						{/* Header */}
 						<Section className="bg-white px-[40px] pt-[40px] pb-[20px]">
 							<Img
-								src="https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/branding/drvista-logo.png"
+								src={`${baseUrl}/static/drvista-logo.png`}
 								alt="Dr. Vista"
 								width="200"
 								className="w-full max-w-[200px] mx-auto block"
@@ -291,7 +289,7 @@ const PaymentConfirmedEmail = ({
 							{/* Action Button */}
 							<Section className="text-center my-[32px]">
 								<Button
-									href={`${process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000"}/orders/${orderNumber}`}
+									href={`${baseUrl}/orders/${orderNumber}`}
 									className="bg-[#34A759] text-white px-[32px] py-[16px] text-[16px] font-semibold"
 									style={{
 										textDecoration: "none",
