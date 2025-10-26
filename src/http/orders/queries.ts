@@ -1,7 +1,11 @@
 import { queryOptions } from "@tanstack/react-query";
 import { ERROR_CODES } from "@/app/api/contants/error-codes";
 import { QUERY_KEYS } from "@/http/query-keys";
-import type { GetOrderDeliveryResponse, GetOrderResponse } from "@/http/types";
+import type {
+	GetCustomerOrdersResponse,
+	GetOrderDeliveryResponse,
+	GetOrderResponse,
+} from "@/http/types";
 import { handleApiError } from "@/lib/utils/handle-api-error";
 
 export const getOrderByIdQueryOptions = (orderId: string) =>
@@ -59,4 +63,23 @@ export const getOrderDeliveryQueryOptions = (orderId: string) =>
 		retry: false, // Don't retry since missing delivery is expected initially
 		staleTime: 1000 * 60 * 5, // 5 minutes
 		refetchOnWindowFocus: false, // Avoid unnecessary refetches
+	});
+
+export const getCustomerOrdersQueryOptions = () =>
+	queryOptions({
+		queryKey: QUERY_KEYS.customerOrders(),
+		queryFn: async () => {
+			const response = await fetch(
+				`${process.env.NEXT_PUBLIC_WEB_URL}/api/orders/my-orders`,
+			);
+
+			if (!response.ok) {
+				await handleApiError(response, ERROR_CODES.FAILED_TO_GET_ORDER_DETAILS);
+			}
+
+			const { orders } = (await response.json()) as GetCustomerOrdersResponse;
+
+			return orders;
+		},
+		staleTime: 1000 * 60 * 5, // 5 minutes
 	});

@@ -104,6 +104,34 @@ export interface GetOrderResponse {
 	};
 }
 
+export interface GetCustomerOrdersResponse {
+	orders: Array<
+		Order & {
+			cart: Cart & {
+				cartProducts: Array<
+					CartProduct & {
+						product: Product & {
+							images: ProductImage[];
+							productPrice: ProductPrice[];
+						};
+						productPrice: ProductPrice | null;
+					}
+				>;
+			};
+			delivery:
+				| (OrderDelivery & {
+						orderDeliveryMethod: OrderDeliveryMethod;
+				  })
+				| null;
+			payment:
+				| (OrderPayment & {
+						orderPaymentMethod: OrderPaymentMethod;
+				  })
+				| null;
+		}
+	>;
+}
+
 // Customer Types
 export interface CreateCustomerRequest
 	extends Pick<NewCustomer, "firstName" | "lastName" | "phoneNumber"> {

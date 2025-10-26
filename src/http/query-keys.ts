@@ -5,6 +5,7 @@ export const QUERY_KEYS = {
 
 	// Order
 	order: (orderId: string) => ["order", { id: orderId }] as const,
+	customerOrders: () => ["customer-orders"] as const,
 	orderDelivery: (orderId: string) =>
 		["order-delivery", { id: orderId }] as const,
 

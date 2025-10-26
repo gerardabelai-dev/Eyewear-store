@@ -1,6 +1,7 @@
 export const ERROR_CODES = {
 	// Generic
 	UNEXPECTED_ERROR: "UNEXPECTED_ERROR",
+	UNAUTHORIZED: "UNAUTHORIZED",
 
 	// Stripe
 	UNEXPECTED_STRIPE_ERROR: "UNEXPECTED_STRIPE_ERROR",
@@ -66,6 +67,8 @@ export const ERROR_MESSAGES = {
 	// Generic
 	[ERROR_CODES.UNEXPECTED_ERROR]:
 		"Não foi possível completar a ação, houve um erro inesperado",
+	[ERROR_CODES.UNAUTHORIZED]:
+		"Você precisa estar autenticado para acessar este recurso",
 
 	// Stripe
 	[ERROR_CODES.UNEXPECTED_STRIPE_ERROR]:
