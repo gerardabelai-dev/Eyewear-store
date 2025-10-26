@@ -70,6 +70,7 @@
     "sonner": "^2.0.5",
     "stripe": "^18.4.0",
     "tailwind-merge": "^3.3.1",
+    "use-mask-input": "^3.5.2",
     "zod": "^4.0.14",
     "zustand": "^5.0.7"
   },

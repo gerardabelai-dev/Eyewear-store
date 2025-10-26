@@ -81,7 +81,7 @@ Last Updated: 2025-01-11
 - [ ] Order history page for customers (2-3h)
 - [ ] Saved addresses (2h)
 - [ ] Order tracking page (customer-facing) (3-4h)
-- [ ] Add input-mask to checkout fields (Whatsapp, CEP, )
+- [x] Add input-mask to checkout fields (Whatsapp, CEP, )
 
 ### Admin
 - [ ] Sales dashboard with charts (4-6h)

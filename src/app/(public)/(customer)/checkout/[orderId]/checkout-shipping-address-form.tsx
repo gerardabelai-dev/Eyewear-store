@@ -19,6 +19,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { InputMask } from "@/components/ui/input-mask";
 import {
 	getOrderByIdQueryOptions,
 	useCreateCustomerAddressMutation,
@@ -367,8 +368,13 @@ export function CheckoutShippingAddressForm({
 						<FormItem>
 							<FormLabel>CEP</FormLabel>
 							<FormControl>
-								<Input
+								<InputMask
 									{...field}
+									mask="99999-999"
+									maskOptions={{
+										placeholder: "",
+										showMaskOnHover: false,
+									}}
 									placeholder="12345-678"
 									disabled={hasNozipCode}
 								/>

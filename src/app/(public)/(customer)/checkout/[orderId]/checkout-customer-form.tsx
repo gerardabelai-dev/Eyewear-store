@@ -18,6 +18,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { InputMask } from "@/components/ui/input-mask";
 import {
 	getOrderByIdQueryOptions,
 	useCreateCustomerMutation,
@@ -164,7 +165,15 @@ export function CheckoutCustomerForm({ orderId }: CheckoutCustomerFormProps) {
 						<FormItem>
 							<FormLabel>WhatsApp</FormLabel>
 							<FormControl>
-								<Input {...field} placeholder="(11) 99999-9999" />
+								<InputMask
+									{...field}
+									mask="(99) 99999-9999"
+									maskOptions={{
+										placeholder: "",
+										showMaskOnHover: false,
+									}}
+									placeholder="(11) 99999-9999"
+								/>
 							</FormControl>
 							<FormDescription>
 								Caso algum problema ocorra, entraremos em contato por aqui
