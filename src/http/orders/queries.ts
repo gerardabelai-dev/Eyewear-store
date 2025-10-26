@@ -81,5 +81,8 @@ export const getCustomerOrdersQueryOptions = () =>
 
 			return orders;
 		},
-		staleTime: 1000 * 60 * 5, // 5 minutes
+		staleTime: 1000 * 60 * 5, // 5 minutes - data is considered fresh for 5 minutes
+		gcTime: 1000 * 60 * 10, // 10 minutes - cache persists for 10 minutes
+		refetchOnMount: false, // Don't refetch if data is still fresh
+		refetchOnWindowFocus: false, // Don't refetch on window focus
 	});

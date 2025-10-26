@@ -1,20 +1,61 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { BadgeCheck, Clock } from "lucide-react";
+import {
+	BadgeCheck,
+	Clock,
+	Package,
+	PackageCheck,
+	Truck,
+	XCircle,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getCustomerOrdersQueryOptions } from "@/http/orders/queries";
+import type { OrderDelivery } from "@/lib/db/schema";
 import { formatDate } from "@/lib/format-date";
 import { formatPrice } from "@/lib/format-price";
 
-export function OrderList() {
-	const { data: orders, isLoading } = useQuery(getCustomerOrdersQueryOptions());
-
-	if (isLoading) {
-		return null;
+function getDeliveryStatusDisplay(
+	status: OrderDelivery["orderDeliveryStatus"],
+) {
+	switch (status) {
+		case "delivered":
+			return {
+				icon: <BadgeCheck className="text-white fill-green-500 size-6" />,
+				label: "Entregue",
+			};
+		case "shipped":
+			return {
+				icon: <Truck className="text-blue-500 size-6" />,
+				label: "Em trânsito",
+			};
+		case "processing":
+			return {
+				icon: <Package className="text-orange-500 size-6" />,
+				label: "Em processamento",
+			};
+		case "cancelled":
+			return {
+				icon: <XCircle className="text-red-500 size-6" />,
+				label: "Cancelado",
+			};
+		case "returned":
+			return {
+				icon: <PackageCheck className="text-gray-500 size-6" />,
+				label: "Devolvido",
+			};
+		default:
+			return {
+				icon: <Clock className="text-muted-foreground size-6" />,
+				label: "Aguardando envio",
+			};
 	}
+}
+
+export function OrderList() {
+	const { data: orders } = useQuery(getCustomerOrdersQueryOptions());
 
 	if (!orders || orders.length === 0) {
 		return (
@@ -135,25 +176,17 @@ export function OrderList() {
 									<div className="flex gap-8 justify-between">
 										{/* Product delivery status */}
 										<div className="flex gap-2 items-center">
-											{isDelivered ? (
-												<>
-													<BadgeCheck className="text-white fill-green-500 size-6" />
-													<span className="text-muted-foreground">
-														Entregue em {formatDate(order.updatedAt)}
-													</span>
-												</>
-											) : (
-												<>
-													<Clock className="text-muted-foreground size-6" />
-													<span className="text-muted-foreground">
-														{deliveryStatus === "shipped"
-															? "Em trânsito"
-															: deliveryStatus === "processing"
-																? "Em processamento"
-																: "Aguardando envio"}
-													</span>
-												</>
-											)}
+											{getDeliveryStatusDisplay(deliveryStatus).icon}
+											<span className="text-muted-foreground">
+												{isDelivered ? (
+													<>
+														{getDeliveryStatusDisplay(deliveryStatus).label} em{" "}
+														{formatDate(order.updatedAt)}
+													</>
+												) : (
+													getDeliveryStatusDisplay(deliveryStatus).label
+												)}
+											</span>
 										</div>
 
 										{/* Product actions */}
