@@ -10,6 +10,7 @@ import {
 	TimelineTitle,
 } from "@/components/ui/timeline";
 import type { GetOrderResponse } from "@/http/types";
+import { formatDateShort } from "@/lib/format-date";
 
 interface OrderTimelineProps {
 	order: GetOrderResponse["order"];
@@ -52,20 +53,12 @@ export function OrderTimeline({ order }: OrderTimelineProps) {
 		// Keep current step but mark as cancelled
 	}
 
-	const formatDate = (date: string | Date) => {
-		const dateObj = typeof date === "string" ? new Date(date) : date;
-		return dateObj.toLocaleDateString("pt-BR", {
-			day: "2-digit",
-			month: "short",
-		});
-	};
-
 	// Helper function to get appropriate date for each step
 	const getStepDate = (stepNumber: number) => {
 		switch (stepNumber) {
 			case 1:
 				// Step 1: Order creation date
-				return order.createdAt ? formatDate(order.createdAt) : "Pendente";
+				return order.createdAt ? formatDateShort(order.createdAt) : "Pendente";
 			case 2:
 				// Step 2: Only show date if processing has actually started
 				if (
@@ -75,19 +68,21 @@ export function OrderTimeline({ order }: OrderTimelineProps) {
 				) {
 					// Use delivery update date when processing started, or payment date if available
 					if (order.delivery?.updatedAt) {
-						return formatDate(order.delivery.updatedAt);
+						return formatDateShort(order.delivery.updatedAt);
 					}
 					if (paymentStatus === "paid" && order.payment?.updatedAt) {
-						return formatDate(order.payment.updatedAt);
+						return formatDateShort(order.payment.updatedAt);
 					}
-					return order.createdAt ? formatDate(order.createdAt) : "Pendente";
+					return order.createdAt
+						? formatDateShort(order.createdAt)
+						: "Pendente";
 				}
 				return "Pendente";
 			case 3:
 				// Step 3: Only show date when shipped
 				if (deliveryStatus === "shipped" || deliveryStatus === "delivered") {
 					return order.delivery?.updatedAt
-						? formatDate(order.delivery.updatedAt)
+						? formatDateShort(order.delivery.updatedAt)
 						: "Enviado";
 				}
 				return "Pendente";
@@ -95,7 +90,7 @@ export function OrderTimeline({ order }: OrderTimelineProps) {
 				// Step 4: Only show date when delivered
 				if (deliveryStatus === "delivered") {
 					return order.delivery?.updatedAt
-						? formatDate(order.delivery.updatedAt)
+						? formatDateShort(order.delivery.updatedAt)
 						: "Entregue";
 				}
 				return "Previsão: Em breve";

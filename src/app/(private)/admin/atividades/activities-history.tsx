@@ -1,5 +1,3 @@
-import { formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import {
 	BookOpenIcon,
 	CreditCardIcon,
@@ -26,6 +24,7 @@ import {
 	parseActivityType,
 } from "@/constants/activities";
 import { ROUTES } from "@/constants/routes";
+import { formatRelativeDate } from "@/lib/format-date";
 
 // Mock data - demonstrating real data structure from seed
 const mockActivities = [
@@ -566,10 +565,7 @@ export function ActivitiesHistory() {
 
 									<div className="flex items-center gap-2">
 										<Badge variant="secondary" className="text-xs">
-											{formatDistanceToNow(activity.createdAt, {
-												addSuffix: true,
-												locale: ptBR,
-											})}
+											{formatRelativeDate(activity.createdAt)}
 										</Badge>
 									</div>
 								</TimelineContent>

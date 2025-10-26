@@ -26,6 +26,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import type { Category } from "@/lib/db/schema";
+import { formatDate } from "@/lib/format-date";
 import { CategoryForm } from "./category-form";
 
 // Category type with counts
@@ -173,9 +174,7 @@ export function CategoriesTable({
 											{category.subcategoriesCount}
 										</Badge>
 									</TableCell>
-									<TableCell>
-										{new Date(category.createdAt).toLocaleDateString("pt-BR")}
-									</TableCell>
+									<TableCell>{formatDate(category.createdAt)}</TableCell>
 									<TableCell className="text-right">
 										<DropdownMenu>
 											<DropdownMenuTrigger asChild>

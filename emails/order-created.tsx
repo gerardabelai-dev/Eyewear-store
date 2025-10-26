@@ -301,7 +301,7 @@ const OrderConfirmedEmail = ({
 OrderConfirmedEmail.PreviewProps = {
 	customerName: "Maria Santos",
 	orderNumber: "DV-2025-001234",
-	orderDate: "05 de Janeiro de 2025",
+	orderDate: "05/01/2025 às 14:30",
 	products: [
 		{
 			name: "Incredible Steel Mouse",

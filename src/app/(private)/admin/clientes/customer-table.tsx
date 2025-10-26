@@ -24,6 +24,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import type { Customer } from "@/lib/db/schema";
+import { formatDate } from "@/lib/format-date";
 import { CustomerForm } from "./customer-form";
 
 // Mock customers data - in a real app this would come from props or server action
@@ -119,7 +120,7 @@ export function CustomersTable({
 									</TableCell>
 									<TableCell>{customer.email || "—"}</TableCell>
 									<TableCell className="text-sm text-muted-foreground">
-										{customer.createdAt.toLocaleDateString("pt-BR")}
+										{formatDate(customer.createdAt)}
 									</TableCell>
 									<TableCell className="text-right">
 										<DropdownMenu>

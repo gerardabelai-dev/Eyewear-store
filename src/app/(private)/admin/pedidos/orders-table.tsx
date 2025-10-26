@@ -25,6 +25,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import type { Order, OrderDelivery, OrderPayment } from "@/lib/db/schema";
+import { formatDate } from "@/lib/format-date";
 import { OrderForm } from "./order-form";
 
 // Extended Order type with customer and status information for table display
@@ -175,10 +176,6 @@ export function OrdersTable({ orders: ordersProp }: OrdersTableProps) {
 			style: "currency",
 			currency: "BRL",
 		}).format(cents / 100);
-	};
-
-	const formatDate = (date: Date) => {
-		return new Intl.DateTimeFormat("pt-BR").format(date);
 	};
 
 	return (

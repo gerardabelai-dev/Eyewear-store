@@ -17,10 +17,11 @@ Last Updated: 2025-01-11
 - [ ] **Add out-of-stock UI** (1h) - Disable "Add to Cart" button when stock = 0
 
 ### Payment confirmed email
-- [ ] needs to format `Data do Pedido` 2025-10-13T00:15:41.308Z
-- [ ] needs to use low quality product images instead of original ones
-- [ ] needs to proxy product images through new route to avoid email being targeted as spam https://github.com/vercel/next.js/discussions/71421#discussioncomment-14396412
-- [ ] needs to handle better subproducts when same product ID was added in cart with different subproducts, its mixing the subproducts and duplicating them 
+- [x] needs to format `Data do Pedido` 2025-10-13T00:15:41.308Z
+- [x] needs to format all dates considering bralizian timezone
+- [x] needs to use low quality product images instead of original ones
+- [x] needs to proxy product images through new route to avoid email being targeted as spam https://github.com/vercel/next.js/discussions/71421#discussioncomment-14396412
+- [x] needs to handle better subproducts when same product ID was added in cart with different subproducts, its mixing the subproducts and duplicating them 
 
 
 ### User Experience
@@ -80,6 +81,7 @@ Last Updated: 2025-01-11
 - [ ] Order history page for customers (2-3h)
 - [ ] Saved addresses (2h)
 - [ ] Order tracking page (customer-facing) (3-4h)
+- [ ] Add input-mask to checkout fields (Whatsapp, CEP, )
 
 ### Admin
 - [ ] Sales dashboard with charts (4-6h)
