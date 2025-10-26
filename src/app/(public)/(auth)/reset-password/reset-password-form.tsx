@@ -21,11 +21,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ROUTES } from "@/constants/routes";
-import { resetPassword, useSession } from "@/lib/auth-client";
+import { resetPassword, signIn, useSession } from "@/lib/auth-client";
 
 const resetPasswordSchema = z
 	.object({
-		name: z.string().min(2),
 		email: z.email(),
 		password: z.string().min(8),
 		confirmPassword: z.string().min(1),
@@ -39,14 +38,14 @@ type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;
 
 export function ResetPasswordForm() {
 	const [token] = useQueryState("token", parseAsString);
+	const [emailParam] = useQueryState("email", parseAsString);
 	const session = useSession();
 	const router = useRouter();
 
 	const form = useForm<ResetPasswordValues>({
 		resolver: zodResolver(resetPasswordSchema),
 		defaultValues: {
-			name: session.data?.user.name || "",
-			email: session.data?.user.email || "",
+			email: emailParam || session.data?.user.email || "",
 			password: "",
 			confirmPassword: "",
 		},
@@ -60,31 +59,54 @@ export function ResetPasswordForm() {
 			return;
 		}
 
-		await resetPassword({
-			newPassword: values.password,
-			token: token,
-		});
+		try {
+			// Reset password
+			await resetPassword({
+				newPassword: values.password,
+				token: token,
+			});
 
-		router.push(ROUTES.SIGN_IN);
+			// Auto sign-in after password setup
+			const signInResult = await signIn.email({
+				email: values.email,
+				password: values.password,
+			});
+
+			if (signInResult.error) {
+				console.error("Auto sign-in error:", signInResult.error);
+				toast.error(
+					"Senha configurada com sucesso! Por favor, faça login manualmente.",
+				);
+				router.push(ROUTES.SIGN_IN);
+				return;
+			}
+
+			// Redirect to customer profile
+			toast.success("Senha configurada com sucesso! Bem-vindo!");
+			router.push(ROUTES.CUSTOMER_PROFILE);
+		} catch (error) {
+			console.error("Password reset error:", error);
+			toast.error(
+				"Erro ao configurar senha. Por favor, tente novamente ou entre em contato com o suporte.",
+			);
+		}
 	};
 
 	useEffect(() => {
-		if (session.data?.user) {
-			if (session.data.user.email) {
-				form.setValue("email", session.data.user.email);
-			}
-			if (session.data.user.name) {
-				form.setValue("name", session.data.user.name);
-			}
+		const emailToUse = emailParam || session.data?.user?.email;
+		if (emailToUse) {
+			form.setValue("email", emailToUse);
 		}
-	}, [session]);
+	}, [emailParam, session, form]);
 
 	return (
 		<div className="w-full max-w-md mx-auto space-y-6">
 			<div className="space-y-2 text-center">
-				<h1 className="text-2xl font-semibold tracking-tight">Resetar Senha</h1>
+				<h1 className="text-2xl font-semibold tracking-tight">
+					Configure sua Senha
+				</h1>
 				<p className="text-sm text-muted-foreground">
-					Digite sua nova senha e confirme-a.
+					Crie uma senha segura para acessar sua conta.
 				</p>
 			</div>
 
@@ -102,29 +124,6 @@ export function ResetPasswordForm() {
 						>
 							<FormField
 								control={form.control}
-								name="name"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Nome completo</FormLabel>
-										<FormControl>
-											{session.isPending && !session.data ? (
-												<Skeleton className="w-full h-10" />
-											) : (
-												<Input
-													disabled
-													placeholder="João Silva"
-													className="w-full"
-													{...field}
-												/>
-											)}
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							<FormField
-								control={form.control}
 								name="email"
 								render={({ field }) => (
 									<FormItem>
@@ -134,7 +133,7 @@ export function ResetPasswordForm() {
 												<Skeleton className="w-full h-10" />
 											) : (
 												<Input
-													disabled
+													autoFocus
 													placeholder="seu@email.com"
 													type="email"
 													autoComplete="email"
@@ -155,7 +154,6 @@ export function ResetPasswordForm() {
 										<FormLabel>Senha</FormLabel>
 										<FormControl>
 											<Input
-												autoFocus
 												placeholder="Crie uma senha"
 												type="password"
 												autoComplete="new-password"
@@ -194,10 +192,10 @@ export function ResetPasswordForm() {
 								{form.formState.isSubmitting ? (
 									<>
 										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-										Resetando senha...
+										Configurando senha...
 									</>
 								) : (
-									"Resetar senha"
+									"Configurar senha e acessar conta"
 								)}
 							</Button>
 						</form>

@@ -19,6 +19,7 @@ export const ROUTES = {
 
 	// Private user routes
 	CUSTOMER_PROFILE: "/minha-conta",
+	CUSTOMER_ORDERS: "/meus-pedidos",
 
 	// Customer routes
 	CART: (cartId: string) => `/cart/${cartId}`,

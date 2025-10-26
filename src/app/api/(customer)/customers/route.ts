@@ -5,11 +5,9 @@ import { ERROR_CODES } from "@/app/api/contants/error-codes";
 import { HTTP_CODES } from "@/app/api/contants/http-codes";
 import { mapErrorCodes } from "@/app/api/utils/map-error-codes";
 import { mapInvalidZodResponse } from "@/app/api/utils/map-invalid-zod-response";
+import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { customer, user } from "@/lib/db/schema";
-import { env } from "@/lib/env";
-import { resend } from "@/lib/resend/client";
-import CompleteRegistrationEmail from "../../../../../emails/complete-registration";
 
 const createCustomerSchema = z.object({
 	firstName: z.string(),
@@ -76,25 +74,17 @@ export async function POST(request: Request) {
 		);
 	}
 
-	// Send complete registration email with reset password link
-	const resetPasswordUrl = `${env.WEB_URL}/reset-password`;
-
-	const { data, error: emailError } = await resend.emails.send({
-		from: "Dr. Vista <contato@drvista.com.br>",
-		to: [email],
-		subject: "Bem-vindo à Dr. Vista! Complete seu cadastro.",
-		react: CompleteRegistrationEmail({
-			customerName: firstName,
-			resetPasswordUrl,
-		}),
-	});
-
-	if (emailError) {
-		console.error("Error sending complete registration email:", emailError);
-	}
-
-	if (data) {
-		console.log("Complete registration email sent successfully:", data);
+	// Trigger password reset flow to send welcome email with setup link
+	try {
+		await auth.api.forgetPassword({
+			body: {
+				email: email,
+				redirectTo: "/minha-conta",
+			},
+		});
+		console.log("Welcome email with password setup link sent successfully");
+	} catch (error) {
+		console.error("Error sending welcome email:", error);
 	}
 
 	return NextResponse.json({

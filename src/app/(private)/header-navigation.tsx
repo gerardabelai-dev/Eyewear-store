@@ -36,6 +36,7 @@ interface PrivateHeaderNavigationProps {
 
 const privateNavigationItems = [
 	{ name: "Minha Conta", href: ROUTES.CUSTOMER_PROFILE },
+	{ name: "Meus pedidos", href: ROUTES.CUSTOMER_ORDERS },
 ];
 
 const adminNavigationItems = [
@@ -194,38 +195,40 @@ export function PrivateHeaderNavigation({
 								</DropdownMenuLabel>
 								<DropdownMenuSeparator />
 								{isAdmin && (
-									<DropdownMenuSub>
-										<DropdownMenuSubTrigger>
-											<Repeat className="mr-2 h-4 w-4" />
-											<span>Gerenciar</span>
-										</DropdownMenuSubTrigger>
-										<DropdownMenuPortal>
-											<DropdownMenuSubContent>
-												<DropdownMenuItem
-													onClick={() => handleModeSwitch("admin")}
-													className={cn(
-														"cursor-pointer",
-														mode === "admin" && "bg-primary",
-													)}
-												>
-													<Cog className="mr-2 h-4 w-4" />
-													<span>Ver como Admin</span>
-												</DropdownMenuItem>
-												<DropdownMenuItem
-													onClick={() => handleModeSwitch("customer")}
-													className={cn(
-														"cursor-pointer",
-														mode === "customer" && "bg-primary",
-													)}
-												>
-													<ShoppingCart className="mr-2 h-4 w-4" />
-													<span>Ver como Cliente</span>
-												</DropdownMenuItem>
-											</DropdownMenuSubContent>
-										</DropdownMenuPortal>
-									</DropdownMenuSub>
+									<>
+										<DropdownMenuSub>
+											<DropdownMenuSubTrigger>
+												<Repeat className="mr-2 h-4 w-4" />
+												<span>Gerenciar</span>
+											</DropdownMenuSubTrigger>
+											<DropdownMenuPortal>
+												<DropdownMenuSubContent>
+													<DropdownMenuItem
+														onClick={() => handleModeSwitch("admin")}
+														className={cn(
+															"cursor-pointer",
+															mode === "admin" && "bg-primary",
+														)}
+													>
+														<Cog className="mr-2 h-4 w-4" />
+														<span>Ver como Admin</span>
+													</DropdownMenuItem>
+													<DropdownMenuItem
+														onClick={() => handleModeSwitch("customer")}
+														className={cn(
+															"cursor-pointer",
+															mode === "customer" && "bg-primary",
+														)}
+													>
+														<ShoppingCart className="mr-2 h-4 w-4" />
+														<span>Ver como Cliente</span>
+													</DropdownMenuItem>
+												</DropdownMenuSubContent>
+											</DropdownMenuPortal>
+										</DropdownMenuSub>
+										<DropdownMenuSeparator />
+									</>
 								)}
-								<DropdownMenuSeparator />
 								<DropdownMenuItem asChild>
 									<Link
 										href={ROUTES.CUSTOMER_PROFILE}

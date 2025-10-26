@@ -15,16 +15,28 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: true,
 		requireEmailVerification: false,
-		sendResetPassword: async ({ user, url, token }, _request) => {
-			console.log({
-				to: user.email,
-				subject: "Reset your password",
-				text: `Click the link to reset your password: ${url}`,
-				token,
+		sendResetPassword: async ({ user, token }, _request) => {
+			const resetUrl = `${env.WEB_URL}/reset-password?token=${token}&email=${encodeURIComponent(user.email)}`;
+
+			const { data, error } = await resend.emails.send({
+				from: "Dr. Vista <contato@drvista.com.br>",
+				to: [user.email],
+				subject: "Bem-vindo à Dr. Vista! Complete seu cadastro",
+				react: CompleteRegistrationEmail({
+					customerName: user.name,
+					resetPasswordUrl: resetUrl,
+				}),
 			});
+
+			if (error) {
+				console.error("Error sending reset password email:", error);
+			}
+
+			if (data) {
+				console.log("Reset password email sent successfully:", data);
+			}
 		},
 		onPasswordReset: async ({ user }, _request) => {
-			// your logic here
 			console.log(`Password for user ${user.email} has been reset.`);
 		},
 	},
