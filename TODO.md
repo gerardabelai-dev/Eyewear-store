@@ -10,11 +10,18 @@ Last Updated: 2025-01-11
 
 ### Security & Data
 - [x] **Setup drvista.com.br domain at resend and vercel** - (10 min)
-- [ ] **Fix email recipients** (5 min) - Change line 74 in `handle-payment-success.ts` from `delivered@resend.dev` to actual customer email
+- [x] **Fix email recipients** (5 min) - Change line 74 in `handle-payment-success.ts` from `delivered@resend.dev` to actual customer email
 - [ ] **Add checkout authorization** (1-2h) - Prevent unauthorized access to checkout URLs with cookies/tokens
 - [ ] **Add stock validation on cart** (2-3h) - Check available stock before adding products to cart
 - [ ] **Deduct stock after payment** (1h) - Update product stock after successful payment
 - [ ] **Add out-of-stock UI** (1h) - Disable "Add to Cart" button when stock = 0
+
+### Payment confirmed email
+- [ ] needs to format `Data do Pedido` 2025-10-13T00:15:41.308Z
+- [ ] needs to use low quality product images instead of original ones
+- [ ] needs to proxy product images through new route to avoid email being targeted as spam https://github.com/vercel/next.js/discussions/71421#discussioncomment-14396412
+- [ ] needs to handle better subproducts when same product ID was added in cart with different subproducts, its mixing the subproducts and duplicating them 
+
 
 ### User Experience
 - [ ] **Guest-to-auth middleware** (1-2h) - Auto-login users after account creation in checkout

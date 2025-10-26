@@ -20,6 +20,7 @@ import * as React from "react";
 import { formatPrice } from "@/lib/format-price";
 
 const baseUrl = process.env.WEB_URL || "https://drvista.com.br";
+const logoUrl = `${baseUrl}/api/images/proxy?url=${encodeURIComponent("https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/branding/drvista-logo.png")}&w=200&q=80`;
 
 interface OrderProductSubItem {
 	name: string;
@@ -78,7 +79,7 @@ const PaymentConfirmedEmail = ({
 						{/* Header */}
 						<Section className="bg-white px-[40px] pt-[40px] pb-[20px]">
 							<Img
-								src={`${baseUrl}/static/drvista-logo.png`}
+								src={logoUrl}
 								alt="Dr. Vista"
 								width="200"
 								className="w-full max-w-[200px] mx-auto block"
@@ -358,12 +359,13 @@ const PaymentConfirmedEmail = ({
 PaymentConfirmedEmail.PreviewProps = {
 	customerName: "Maria Silva",
 	orderNumber: "DV-2025-001234",
-	orderDate: "05 de Janeiro de 2025",
+	orderDate: "05/01/2025 às 14:30",
 	paymentMethod: "Cartão de Crédito",
 	products: [
 		{
 			name: "Incredible Steel Mouse",
-			image: "https://new.email/static/app/placeholder.png",
+			image:
+				"https://drvista.com.br/api/images/proxy?url=https%3A%2F%2Fnew.email%2Fstatic%2Fapp%2Fplaceholder.png&w=200&q=60",
 			price: 66650, // Total: 1650 (base) + 15000 + 30000 + 20000
 			quantity: 1,
 			prescription: "OD: -2.00 | OE: -1.75",
@@ -387,7 +389,8 @@ PaymentConfirmedEmail.PreviewProps = {
 		},
 		{
 			name: "Óculos de Sol Premium",
-			image: "https://new.email/static/app/placeholder.png",
+			image:
+				"https://drvista.com.br/api/images/proxy?url=https%3A%2F%2Fnew.email%2Fstatic%2Fapp%2Fplaceholder.png&w=200&q=60",
 			price: 18990,
 			quantity: 1,
 		},
