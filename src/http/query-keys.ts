@@ -3,6 +3,9 @@ export const QUERY_KEYS = {
 	// Cart
 	cart: (cartId: string) => ["cart", { id: cartId }] as const,
 
+	// Customer
+	currentCustomer: () => ["current-customer"] as const,
+
 	// Order
 	order: (orderId: string) => ["order", { id: orderId }] as const,
 	customerOrders: () => ["customer-orders"] as const,

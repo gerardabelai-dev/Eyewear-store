@@ -80,7 +80,7 @@ export function CheckoutShippingAddressForm({
 	orderId,
 }: CheckoutShippingAddressFormProps) {
 	const queryClient = useQueryClient();
-	const { goToNextStep } = useCheckoutContext();
+	const { goToNextStep, authenticatedCustomer } = useCheckoutContext();
 
 	const form = useForm<CustomerAddressFormValues>({
 		resolver: zodResolver(formSchema),
@@ -161,9 +161,23 @@ export function CheckoutShippingAddressForm({
 		}
 	}, [hasNozipCode, form]);
 
-	// Update form when order data is available
+	// Pre-fill form with authenticated customer's first address
 	useEffect(() => {
-		if (order?.customerAddress) {
+		if (
+			authenticatedCustomer &&
+			authenticatedCustomer.addresses &&
+			authenticatedCustomer.addresses.length > 0
+		) {
+			const address = authenticatedCustomer.addresses[0];
+			form.setValue("address.street", address.street || "");
+			form.setValue("address.number", address.number || "");
+			form.setValue("address.complement", address.complement || "");
+			form.setValue("address.neighborhood", address.neighborhood || "");
+			form.setValue("address.city", address.city || "");
+			form.setValue("address.state", address.state || "");
+			form.setValue("address.zipCode", address.zipCode || "");
+		} else if (order?.customerAddress) {
+			// Fallback to order data if no authenticated customer
 			form.setValue("address.street", order.customerAddress.street || "");
 			form.setValue("address.number", order.customerAddress.number || "");
 			form.setValue(
@@ -192,7 +206,7 @@ export function CheckoutShippingAddressForm({
 				order.customerAddress.hasNozipCode || false,
 			);
 		}
-	}, [order, form]);
+	}, [authenticatedCustomer, order, form]);
 
 	function onSubmit(values: CustomerAddressFormValues) {
 		createCustomerAddressMutation.mutate({

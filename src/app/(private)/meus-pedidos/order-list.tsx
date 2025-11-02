@@ -12,6 +12,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getCustomerOrdersQueryOptions } from "@/http/orders/queries";
 import type { OrderDelivery } from "@/lib/db/schema";
 import { formatDate } from "@/lib/format-date";
@@ -55,7 +56,11 @@ function getDeliveryStatusDisplay(
 }
 
 export function OrderList() {
-	const { data: orders } = useQuery(getCustomerOrdersQueryOptions());
+	const { data: orders, isPending } = useQuery(getCustomerOrdersQueryOptions());
+
+	if (isPending) {
+		return <OrderListSkeleton />;
+	}
 
 	if (!orders || orders.length === 0) {
 		return (
@@ -129,9 +134,9 @@ export function OrderList() {
 									className="flex flex-col gap-4 mt-6 pt-6 border-t border-muted"
 								>
 									{/* Product image, name, details & price */}
-									<div className="flex gap-8">
+									<div className="flex gap-8 w-full">
 										{/* Product image */}
-										<div className="relative size-48 md:size-32 w-full aspect-square">
+										<div className="relative size-48 md:size-32 flex-shrink-0 aspect-square">
 											{mainImage ? (
 												<Image
 													src={mainImage.imageUrl}
@@ -150,13 +155,13 @@ export function OrderList() {
 											)}
 										</div>
 
-										<div className="flex flex-col gap-4 w-full">
-											<div className="flex gap-4 justify-between">
+										<div className="flex flex-col gap-4 flex-1 min-w-0">
+											<div className="flex gap-4 justify-between w-full">
 												{/* Product name */}
 												<strong className="font-medium">{product.name}</strong>
 
 												{/* Product price */}
-												<strong className="font-medium">
+												<strong className="font-medium flex-shrink-0">
 													{price
 														? formatPrice(price.priceInCents)
 														: "Preço indisponível"}
@@ -173,7 +178,7 @@ export function OrderList() {
 									</div>
 
 									{/* Order delivery date & actions */}
-									<div className="flex gap-8 justify-between">
+									<div className="flex gap-8 justify-between w-full">
 										{/* Product delivery status */}
 										<div className="flex gap-2 items-center">
 											{getDeliveryStatusDisplay(deliveryStatus).icon}
@@ -204,6 +209,55 @@ export function OrderList() {
 					</div>
 				);
 			})}
+		</div>
+	);
+}
+
+function OrderListSkeleton() {
+	return (
+		<div className="flex flex-col gap-6">
+			{[1, 2].map((i) => (
+				<div key={i} className="border border-muted rounded p-6 space-y-6">
+					{/* Order Header Skeleton */}
+					<div className="flex gap-8">
+						<div className="flex flex-col gap-2">
+							<Skeleton className="h-4 w-32" />
+							<Skeleton className="h-3 w-16" />
+						</div>
+						<div className="flex flex-col gap-2">
+							<Skeleton className="h-4 w-24" />
+							<Skeleton className="h-3 w-24" />
+						</div>
+						<div className="flex flex-col gap-2">
+							<Skeleton className="h-4 w-20" />
+							<Skeleton className="h-3 w-20" />
+						</div>
+						<div className="flex gap-4 ml-auto my-auto">
+							<Skeleton className="h-9 w-24" />
+						</div>
+					</div>
+
+					{/* Order Product Skeleton */}
+					<div className="flex flex-col gap-4 pt-6 border-t border-muted">
+						<div className="flex gap-8 w-full">
+							<Skeleton className="size-48 md:size-32 flex-shrink-0 aspect-square rounded" />
+							<div className="flex flex-col gap-4 flex-1 min-w-0">
+								<div className="flex gap-4 justify-between w-full">
+									<Skeleton className="h-5 w-40" />
+									<Skeleton className="h-5 w-24" />
+								</div>
+								<Skeleton className="h-16 w-full" />
+							</div>
+						</div>
+						<div className="flex gap-8 justify-between w-full">
+							<Skeleton className="h-6 w-48" />
+							<div className="flex gap-2">
+								<Skeleton className="h-8 w-24" />
+							</div>
+						</div>
+					</div>
+				</div>
+			))}
 		</div>
 	);
 }

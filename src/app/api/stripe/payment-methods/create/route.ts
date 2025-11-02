@@ -99,13 +99,13 @@ export async function POST(request: NextRequest) {
 
 		if (error instanceof z.ZodError) {
 			return NextResponse.json(
-				{ error: "Invalid card data", details: error.issues },
+				{ error: "Dados do cartão inválidos", details: error.issues },
 				{ status: 400 },
 			);
 		}
 
 		return NextResponse.json(
-			{ error: "Failed to create payment method" },
+			{ error: "Houve um erro ao criar o método de pagamento" },
 			{ status: 500 },
 		);
 	}

@@ -53,7 +53,10 @@ export const useCreatePaymentMethodMutation = (options?: {
 			});
 
 			if (!response.ok) {
-				await handleApiError(response, "Failed to create payment method");
+				await handleApiError(
+					response,
+					ERROR_CODES.FAILED_TO_CREATE_PAYMENT_METHOD,
+				);
 			}
 
 			return await response.json();

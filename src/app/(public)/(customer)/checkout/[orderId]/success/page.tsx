@@ -31,9 +31,14 @@ export default async function CheckoutSuccessPage({
 				title="Pedido em análise"
 				description={`Seu pedido #${orderId} esta sendo analisado e será enviado em breve`}
 				action={
-					<Button asChild variant="default" size="lg">
-						<Link href={`/orders/${orderId}`}>Acompanhar pedido</Link>
-					</Button>
+					<div className="flex gap-2">
+						<Button asChild variant="link" size="lg">
+							<Link href="/meus-pedidos">Ver todos os pedidos</Link>
+						</Button>
+						<Button asChild variant="default" size="lg">
+							<Link href={`/orders/${orderId}`}>Acompanhar pedido</Link>
+						</Button>
+					</div>
 				}
 			/>
 

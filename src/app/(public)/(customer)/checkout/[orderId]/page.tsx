@@ -1,6 +1,10 @@
+import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PageHeader } from "@/components/page-header";
+import { getCurrentUser } from "@/lib/auth-server";
+import { db } from "@/lib/db";
+import { customer } from "@/lib/db/schema";
 import { getQueryClient } from "@/lib/tanstack-query/get-query-client";
 import { CheckoutAccordionForms } from "./checkout-accordion-forms";
 import { CheckoutProvider } from "./checkout-context";
@@ -29,8 +33,33 @@ export default async function CheckoutPage({
 	);
 	const hasCustomer = !!orderData?.customerId;
 
+	// Get authenticated user and their customer data
+	const user = await getCurrentUser();
+	let authenticatedCustomer = null;
+
+	if (user) {
+		const customerData = await db.query.customer.findFirst({
+			where: eq(customer.userId, user.id),
+			with: {
+				addresses: true,
+				user: true,
+			},
+		});
+
+		if (customerData) {
+			authenticatedCustomer = {
+				...customerData,
+				userEmail: user.email,
+			};
+		}
+	}
+
 	return (
-		<CheckoutProvider hasCustomer={hasCustomer} orderId={orderId}>
+		<CheckoutProvider
+			hasCustomer={hasCustomer}
+			orderId={orderId}
+			authenticatedCustomer={authenticatedCustomer}
+		>
 			<PageHeader
 				title="Checkout"
 				description="Verifique seu pedido e finalize sua compra"

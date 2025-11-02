@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PageHeader } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
 import { getOrderByIdQueryOptions } from "@/http/orders/queries";
 import { getQueryClient } from "@/lib/tanstack-query/get-query-client";
 import { OrdersPageContent } from "./orders-page-content";
@@ -26,6 +28,11 @@ export default async function OrdersPage({
 			<PageHeader
 				title={`Pedido #${orderId}`}
 				description="Confira os detalhes do seu pedido"
+				action={
+					<Button asChild variant="link" size="lg">
+						<Link href="/meus-pedidos">Ver todos os pedidos</Link>
+					</Button>
+				}
 			/>
 
 			<Suspense fallback={<OrdersPageSkeleton />}>

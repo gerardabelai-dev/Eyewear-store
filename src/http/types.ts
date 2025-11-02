@@ -133,12 +133,28 @@ export interface GetCustomerOrdersResponse {
 }
 
 // Customer Types
+export interface GetCurrentCustomerResponse {
+	customer: Customer & {
+		email: string;
+		role: string;
+	};
+}
+
 export interface CreateCustomerRequest
 	extends Pick<NewCustomer, "firstName" | "lastName" | "phoneNumber"> {
 	email: string; // This comes from the user, not customer table
 }
 
 export interface CreateCustomerResponse {
+	customer: Customer;
+}
+
+export interface UpdateCustomerRequest
+	extends Pick<NewCustomer, "firstName" | "lastName" | "phoneNumber"> {
+	customerId: string;
+}
+
+export interface UpdateCustomerResponse {
 	customer: Customer;
 }
 

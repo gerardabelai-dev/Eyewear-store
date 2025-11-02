@@ -17,6 +17,33 @@ export type CheckoutStep =
 	| "payment-method"
 	| "complete";
 
+export interface AuthenticatedCustomer {
+	id: string;
+	userId: string;
+	firstName: string;
+	lastName: string;
+	phoneNumber: string | null;
+	userEmail: string;
+	addresses?: Array<{
+		id: string;
+		customerId: string;
+		street: string;
+		number: string | null;
+		hasNoNumber: boolean;
+		complement: string | null;
+		hasNoComplement: boolean;
+		neighborhood: string;
+		city: string;
+		state: string;
+		zipCode: string | null;
+		hasNozipCode: boolean;
+		country: string;
+		isDefault: boolean;
+		createdAt: Date;
+		updatedAt: Date;
+	}>;
+}
+
 interface CheckoutContextType {
 	activeStep: CheckoutStep | null;
 	setActiveStep: (step: CheckoutStep | null) => void;
@@ -26,6 +53,7 @@ interface CheckoutContextType {
 	isStepDisabled: (step: CheckoutStep) => boolean;
 	isStepCompleted: (step: CheckoutStep) => boolean;
 	isStepAccessible: (step: CheckoutStep) => boolean;
+	authenticatedCustomer: AuthenticatedCustomer | null;
 }
 
 const CheckoutContext = createContext<CheckoutContextType | null>(null);
@@ -42,6 +70,7 @@ interface CheckoutProviderProps {
 	children: ReactNode;
 	hasCustomer: boolean;
 	orderId: string;
+	authenticatedCustomer: AuthenticatedCustomer | null;
 }
 
 const stepOrder: CheckoutStep[] = [
@@ -56,6 +85,7 @@ export function CheckoutProvider({
 	children,
 	hasCustomer,
 	orderId,
+	authenticatedCustomer,
 }: CheckoutProviderProps) {
 	// Start with null, will be set based on completion status
 	const [activeStep, setActiveStep] = useState<CheckoutStep | null>(null);
@@ -69,7 +99,7 @@ export function CheckoutProvider({
 
 		switch (step) {
 			case "customer":
-				selector = 'input[name="customer.fullName"]';
+				selector = 'input[name="customer.email"]';
 				break;
 			case "shipping-address":
 				selector = 'input[name="address.street"]';
@@ -148,9 +178,9 @@ export function CheckoutProvider({
 		return !isStepAccessible(step);
 	};
 
-	// Initialize the active step based on completion status when order data loads
+	// Initialize the active step based on completion status when order data loads or changes
 	useEffect(() => {
-		if (!order || hasInitialized) return;
+		if (!order) return;
 
 		// Find the first incomplete step
 		let firstIncompleteStep: CheckoutStep | null = null;
@@ -163,20 +193,38 @@ export function CheckoutProvider({
 			}
 		}
 
-		// If all steps are completed, focus the order button
-		if (!firstIncompleteStep) {
-			setActiveStep(null); // Close all accordions
-			// Give time for the UI to render before focusing
-			setTimeout(() => focusOrderButton(), 300);
-		} else {
-			// Open the first incomplete step
-			setActiveStep(firstIncompleteStep);
-			// Focus the first input in that step
-			setTimeout(() => focusFirstInput(firstIncompleteStep), 300);
+		// Only update activeStep if it's different from what should be active
+		// This prevents unnecessary re-focusing when user manually changes steps
+		const shouldUpdateStep =
+			!hasInitialized ||
+			(firstIncompleteStep && !isStepCompleted(firstIncompleteStep));
+
+		if (shouldUpdateStep) {
+			// If all steps are completed, focus the order button
+			if (!firstIncompleteStep) {
+				setActiveStep(null); // Close all accordions
+				// Give time for the UI to render before focusing
+				setTimeout(() => focusOrderButton(), 300);
+			} else {
+				// Open the first incomplete step only if not already on a valid step
+				if (activeStep === null || isStepCompleted(activeStep)) {
+					setActiveStep(firstIncompleteStep);
+					// Focus the first input in that step
+					setTimeout(() => focusFirstInput(firstIncompleteStep), 300);
+				}
+			}
 		}
 
-		setHasInitialized(true);
-	}, [order, hasInitialized]);
+		if (!hasInitialized) {
+			setHasInitialized(true);
+		}
+	}, [
+		order?.customerId,
+		order?.customerAddressId,
+		order?.delivery?.orderDeliveryMethodId,
+		order?.payment?.orderPaymentMethodId,
+		hasInitialized,
+	]);
 
 	// Focus first input when customer form opens initially (for new customers)
 	useEffect(() => {
@@ -223,6 +271,7 @@ export function CheckoutProvider({
 				isStepDisabled,
 				isStepCompleted,
 				isStepAccessible,
+				authenticatedCustomer,
 			}}
 		>
 			{children}

@@ -34,15 +34,8 @@ export async function POST(request: Request) {
 		});
 	}
 
-	if (orderFound.customerId) {
-		return NextResponse.json(
-			mapErrorCodes(ERROR_CODES.ORDER_ALREADY_HAS_CUSTOMER),
-			{
-				status: HTTP_CODES.BAD_REQUEST,
-			},
-		);
-	}
-
+	// Update customer ID regardless of whether order already has a customer
+	// This allows updating customer information for the order
 	const [orderUpdated] = await db
 		.update(order)
 		.set({

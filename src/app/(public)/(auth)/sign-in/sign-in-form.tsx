@@ -37,6 +37,8 @@ type SignInValues = z.infer<typeof signInSchema>;
 
 export function SignInForm() {
 	const [error] = useQueryState("error", parseAsString);
+	const [redirectTo] = useQueryState("redirect_to", parseAsString);
+	const [emailParam] = useQueryState("email", parseAsString);
 	const router = useRouter();
 	const form = useForm<SignInValues>({
 		resolver: zodResolver(signInSchema),
@@ -55,6 +57,13 @@ export function SignInForm() {
 		}
 	}, []);
 
+	// Pre-fill email from URL parameter
+	useEffect(() => {
+		if (emailParam) {
+			form.setValue("email", emailParam);
+		}
+	}, [emailParam, form]);
+
 	const onSubmit = async (values: SignInValues) => {
 		await signIn.email(
 			{
@@ -63,7 +72,7 @@ export function SignInForm() {
 			},
 			{
 				onSuccess: () => {
-					router.push(ROUTES.CUSTOMER_PROFILE);
+					router.push(redirectTo || ROUTES.CUSTOMER_PROFILE);
 				},
 				onError: (ctx) => {
 					const message = ctx.error.message || "Falha ao fazer login";
@@ -77,7 +86,7 @@ export function SignInForm() {
 		await signIn.social(
 			{
 				provider: "google",
-				callbackURL: ROUTES.CUSTOMER_PROFILE,
+				callbackURL: redirectTo || ROUTES.CUSTOMER_PROFILE,
 			},
 			{
 				onError: (ctx) => {
@@ -140,7 +149,7 @@ export function SignInForm() {
 										<div className="flex items-center justify-between">
 											<FormLabel>Senha</FormLabel>
 											<Link
-												href={ROUTES.RESET_PASSWORD}
+												href={ROUTES.FORGOT_PASSWORD}
 												className="text-sm text-muted-foreground hover:text-primary cursor-pointer underline bg-transparent border-none p-0"
 											>
 												Esqueceu a senha?

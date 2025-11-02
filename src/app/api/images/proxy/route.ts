@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
 		if (!imageUrl) {
 			return NextResponse.json(
-				{ error: "Missing 'url' parameter" },
+				{ error: "Parâmetro 'url' ausente" },
 				{ status: 400 },
 			);
 		}
@@ -25,13 +25,13 @@ export async function GET(request: NextRequest) {
 		try {
 			url = new URL(imageUrl);
 		} catch {
-			return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
+			return NextResponse.json({ error: "URL inválida" }, { status: 400 });
 		}
 
 		// Only allow HTTPS URLs
 		if (url.protocol !== "https:") {
 			return NextResponse.json(
-				{ error: "Only HTTPS URLs are allowed" },
+				{ error: "Apenas URLs HTTPS são permitidas" },
 				{ status: 400 },
 			);
 		}
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
 
 		if (!response.ok) {
 			return NextResponse.json(
-				{ error: "Failed to fetch image" },
+				{ error: "Houve um erro ao buscar a imagem" },
 				{ status: response.status },
 			);
 		}
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
 		// Validate content type
 		if (!contentType?.startsWith("image/")) {
 			return NextResponse.json(
-				{ error: "URL does not point to an image" },
+				{ error: "URL não aponta para uma imagem" },
 				{ status: 400 },
 			);
 		}
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
 	} catch (error) {
 		console.error("Error proxying image:", error);
 		return NextResponse.json(
-			{ error: "Internal server error" },
+			{ error: "Erro interno do servidor" },
 			{ status: 500 },
 		);
 	}

@@ -25,7 +25,7 @@ async function fetchCollections(): Promise<Collection[]> {
 	const response = await fetch("/api/collections");
 
 	if (!response.ok) {
-		throw new Error("Failed to fetch collections");
+		throw new Error("Houve um erro ao buscar as coleções");
 	}
 
 	return response.json();

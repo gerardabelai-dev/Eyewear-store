@@ -4,15 +4,20 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 
 interface ProfileDisplayProps {
-	user: {
-		name: string;
-		email: string;
-		image?: string | null;
-		role?: string | null;
-	};
+	email: string;
+	role: string;
+	firstName: string;
+	lastName: string;
+	phoneNumber: string;
 }
 
-export function ProfileDisplay({ user }: ProfileDisplayProps) {
+export function ProfileDisplay({
+	email,
+	role,
+	firstName,
+	lastName,
+	phoneNumber,
+}: ProfileDisplayProps) {
 	return (
 		<Card>
 			<CardContent className="pt-6">
@@ -20,7 +25,7 @@ export function ProfileDisplay({ user }: ProfileDisplayProps) {
 					<div className="space-y-2 max-w-md">
 						<header className="flex justify-between items-center gap-4">
 							<h3 className="text-lg font-semibold">Informações do Perfil</h3>
-							{user.role && <Badge variant="outline">{user.role}</Badge>}
+							{role && <Badge variant="outline">{role}</Badge>}
 						</header>
 						<p className="text-muted-foreground">
 							Visualize suas informações básicas de perfil.
@@ -29,11 +34,17 @@ export function ProfileDisplay({ user }: ProfileDisplayProps) {
 						<div className="space-y-2">
 							<div>
 								<Label className="text-sm font-medium">Nome Completo</Label>
-								<p className="text-sm text-muted-foreground">{user.name}</p>
+								<p className="text-sm text-muted-foreground">
+									{firstName} {lastName}
+								</p>
 							</div>
 							<div>
 								<Label className="text-sm font-medium">Email</Label>
-								<p className="text-sm text-muted-foreground">{user.email}</p>
+								<p className="text-sm text-muted-foreground">{email}</p>
+							</div>
+							<div>
+								<Label className="text-sm font-medium">WhatsApp</Label>
+								<p className="text-sm text-muted-foreground">{phoneNumber}</p>
 							</div>
 						</div>
 					</div>

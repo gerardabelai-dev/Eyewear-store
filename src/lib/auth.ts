@@ -4,6 +4,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, bearer, magicLink } from "better-auth/plugins";
 import { localization } from "better-auth-localization";
 import CompleteRegistrationEmail from "../../emails/complete-registration";
+import ResetPasswordEmail from "../../emails/reset-password";
 import { db } from "./db";
 import { env } from "./env";
 import { resend } from "./resend/client";
@@ -21,8 +22,8 @@ export const auth = betterAuth({
 			const { data, error } = await resend.emails.send({
 				from: "Dr. Vista <contato@drvista.com.br>",
 				to: [user.email],
-				subject: "Bem-vindo à Dr. Vista! Complete seu cadastro",
-				react: CompleteRegistrationEmail({
+				subject: "Redefinir senha - Dr. Vista",
+				react: ResetPasswordEmail({
 					customerName: user.name,
 					resetPasswordUrl: resetUrl,
 				}),

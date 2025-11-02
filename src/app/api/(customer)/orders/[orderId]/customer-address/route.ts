@@ -35,15 +35,8 @@ export async function POST(request: Request) {
 		});
 	}
 
-	if (orderFound.customerAddressId) {
-		return NextResponse.json(
-			mapErrorCodes(ERROR_CODES.ORDER_ALREADY_HAS_CUSTOMER_ADDRESS),
-			{
-				status: HTTP_CODES.BAD_REQUEST,
-			},
-		);
-	}
-
+	// Update customer address ID regardless of whether order already has one
+	// This allows updating address information for the order
 	const [orderUpdated] = await db
 		.update(order)
 		.set({

@@ -9,6 +9,7 @@ export * from "./collections/queries";
 export * from "./customer-addresses/mutations";
 // Customers
 export * from "./customers/mutations";
+export * from "./customers/queries";
 // Order Deliveries
 export * from "./order-deliveries/mutations";
 // Order Delivery Methods
