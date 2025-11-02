@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -58,33 +58,17 @@ export function ForgotPasswordForm() {
 	if (emailSent) {
 		return (
 			<div className="w-full max-w-md mx-auto space-y-6">
-				<div className="space-y-2 text-center">
-					<h1 className="text-2xl font-semibold tracking-tight">
-						Email enviado!
-					</h1>
-					<p className="text-sm text-muted-foreground">
-						Verifique sua caixa de entrada e clique no link para redefinir sua
-						senha.
-					</p>
-				</div>
-
 				<Card>
 					<CardContent className="pt-6">
-						<div className="space-y-4">
-							<div className="rounded-lg bg-muted p-4 text-sm">
-								<p className="font-medium mb-2">Próximos passos:</p>
-								<ol className="list-decimal list-inside space-y-1 text-muted-foreground">
-									<li>Verifique sua caixa de entrada de email</li>
-									<li>Clique no link de redefinição de senha</li>
-									<li>Crie uma nova senha</li>
-								</ol>
+						<div className="flex flex-col items-center text-center space-y-4">
+							<CheckCircle2 className="h-16 w-16 text-green-500" />
+							<div className="space-y-2">
+								<h2 className="text-xl font-semibold">Email enviado</h2>
+								<p className="text-sm text-muted-foreground">
+									Verifique sua caixa de entrada e clique no link para redefinir
+									sua senha.
+								</p>
 							</div>
-
-							<p className="text-xs text-muted-foreground text-center">
-								Não recebeu o email? Verifique sua pasta de spam ou tente enviar
-								novamente.
-							</p>
-
 							<Button
 								variant="outline"
 								className="w-full"
