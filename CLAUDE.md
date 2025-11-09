@@ -147,3 +147,4 @@ Uses **Resend** + **react-email**:
   - Auto-organize imports enabled
 - TypeScript strict mode enabled
 - Server-only code: Import `"server-only"` at top of file (used in auth, API routes)
+- Every time we change the database schema, check the seed script and update it to reflect the latest changes while ensuring it contains existing data for each applicable schema table.

@@ -62,6 +62,17 @@ export const ERROR_CODES = {
 
 	// Order Delivery
 	ORDER_DELIVERY_NOT_FOUND: "ORDER_DELIVERY_NOT_FOUND",
+
+	// Coupon
+	COUPON_NOT_FOUND: "COUPON_NOT_FOUND",
+	COUPON_EXPIRED: "COUPON_EXPIRED",
+	COUPON_INACTIVE: "COUPON_INACTIVE",
+	COUPON_USAGE_LIMIT_REACHED: "COUPON_USAGE_LIMIT_REACHED",
+	MINIMUM_ORDER_VALUE_NOT_MET: "MINIMUM_ORDER_VALUE_NOT_MET",
+	ORDER_ALREADY_HAS_COUPON: "ORDER_ALREADY_HAS_COUPON",
+	INVALID_COUPON_CODE: "INVALID_COUPON_CODE",
+	FAILED_TO_APPLY_COUPON: "FAILED_TO_APPLY_COUPON",
+	FAILED_TO_REMOVE_COUPON: "FAILED_TO_REMOVE_COUPON",
 } as const;
 
 export const ERROR_MESSAGES = {
@@ -79,7 +90,8 @@ export const ERROR_MESSAGES = {
 	[ERROR_CODES.INVALID_STRIPE_SIGNATURE]: "A assinatura do webhook é inválida",
 
 	// Cart
-	[ERROR_CODES.CART_NOT_FOUND]: "Carrinho não encontrado",
+	[ERROR_CODES.CART_NOT_FOUND]:
+		"Carrinho não encontrado. Por favor, limpe o carrinho e tente novamente.",
 	[ERROR_CODES.FAILED_TO_GET_CART]:
 		"Houve um erro ao buscar os detalhes carrinho",
 	[ERROR_CODES.FAILED_TO_CREATE_CART]: "Houve um erro ao criar o carrinho",
@@ -148,4 +160,17 @@ export const ERROR_MESSAGES = {
 		"Houve um erro ao criar o endereço do cliente",
 	[ERROR_CODES.ORDER_ALREADY_HAS_CUSTOMER_ADDRESS]:
 		"Pedido já possui um endereço de cliente",
+
+	// Coupon
+	[ERROR_CODES.COUPON_NOT_FOUND]: "Cupom não encontrado",
+	[ERROR_CODES.COUPON_EXPIRED]: "Este cupom está expirado",
+	[ERROR_CODES.COUPON_INACTIVE]: "Este cupom não está ativo",
+	[ERROR_CODES.COUPON_USAGE_LIMIT_REACHED]:
+		"Este cupom atingiu o limite de uso",
+	[ERROR_CODES.MINIMUM_ORDER_VALUE_NOT_MET]:
+		"Valor mínimo do pedido não atingido para usar este cupom",
+	[ERROR_CODES.ORDER_ALREADY_HAS_COUPON]: "Pedido já possui um cupom aplicado",
+	[ERROR_CODES.INVALID_COUPON_CODE]: "Código de cupom inválido",
+	[ERROR_CODES.FAILED_TO_APPLY_COUPON]: "Houve um erro ao aplicar o cupom",
+	[ERROR_CODES.FAILED_TO_REMOVE_COUPON]: "Houve um erro ao remover o cupom",
 } as const;

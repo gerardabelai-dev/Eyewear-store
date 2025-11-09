@@ -45,6 +45,8 @@ interface PaymentConfirmedEmailProps {
 	products: OrderProduct[];
 	subtotal: number;
 	shipping: number;
+	discount?: number;
+	couponCode?: string;
 	total: number;
 	shippingAddress: {
 		street: string;
@@ -63,6 +65,8 @@ const PaymentConfirmedEmail = ({
 	products,
 	subtotal,
 	shipping,
+	discount,
+	couponCode,
 	total,
 	shippingAddress,
 	estimatedDelivery,
@@ -236,6 +240,21 @@ const PaymentConfirmedEmail = ({
 									</Column>
 								</Row>
 
+								{discount && discount > 0 && (
+									<Row className="mb-[16px]">
+										<Column>
+											<Text className="text-[#666] text-[14px] m-0">
+												Desconto{couponCode ? ` (${couponCode})` : ""}
+											</Text>
+										</Column>
+										<Column className="text-right">
+											<Text className="text-[#34A759] text-[14px] font-semibold m-0">
+												-{formatPrice(discount)}
+											</Text>
+										</Column>
+									</Row>
+								)}
+
 								<Hr className="border-[#E5E7EB] border-solid my-[16px]" />
 
 								<Row>
@@ -397,7 +416,9 @@ PaymentConfirmedEmail.PreviewProps = {
 	],
 	subtotal: 85640, // 66650 + 18990
 	shipping: 1500,
-	total: 87140,
+	discount: 8564, // 10% discount
+	couponCode: "WELCOME10",
+	total: 78576, // 85640 + 1500 - 8564
 	shippingAddress: {
 		street: "Rua das Flores, 123, Apto 45",
 		city: "São Paulo",

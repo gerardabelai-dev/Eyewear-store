@@ -1,6 +1,7 @@
 import type {
 	Cart,
 	CartProduct,
+	Coupon,
 	Customer,
 	CustomerAddress,
 	NewCustomer,
@@ -100,6 +101,7 @@ export interface GetOrderResponse {
 		};
 		payment?: OrderPayment & {
 			orderPaymentMethod: OrderPaymentMethod;
+			coupon?: Coupon | null;
 		};
 	};
 }
@@ -126,6 +128,7 @@ export interface GetCustomerOrdersResponse {
 			payment:
 				| (OrderPayment & {
 						orderPaymentMethod: OrderPaymentMethod;
+						coupon?: Coupon | null;
 				  })
 				| null;
 		}
@@ -262,5 +265,47 @@ export interface GetProductBySlugResponse {
 	product: Product & {
 		productPrice: ProductPrice[];
 		images: ProductImage[];
+	};
+}
+
+// Coupon Types
+export interface ValidateCouponRequest {
+	code: string;
+	subtotalInCents: number;
+}
+
+export interface ValidateCouponResponse {
+	coupon: Pick<
+		Coupon,
+		"id" | "code" | "type" | "discountPercentage" | "discountAmountInCents"
+	> & {
+		discountInCents: number;
+	};
+}
+
+export interface ApplyCouponRequest {
+	code: string;
+}
+
+export interface ApplyCouponResponse {
+	success: boolean;
+	coupon: {
+		id: string;
+		code: string;
+		discountInCents: number;
+	};
+	payment: {
+		subtotalInCents: number;
+		discountInCents: number;
+		totalPriceInCents: number;
+	};
+}
+
+export interface RemoveCouponResponse {
+	success: boolean;
+	payment: {
+		subtotalInCents: number;
+		discountInCents: number;
+		totalPriceInCents: number;
 	};
 }

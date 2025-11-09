@@ -62,11 +62,18 @@ export async function POST(request: Request) {
 		);
 	}
 
-	// Calculate order total
+	// Calculate order total with product-level discounts applied
 	const cartProducts = orderFound.cart?.cartProducts || [];
 	const subtotalInCents = cartProducts.reduce((total, item) => {
-		const priceInCents = item.productPrice?.priceInCents || 0;
-		return total + priceInCents * item.quantity;
+		const productPrice = item.productPrice;
+		if (!productPrice) return total;
+
+		// Apply product-level discount
+		const discountMultiplier = 1 - productPrice.discountPercentage / 100;
+		const discountedPrice = Math.round(
+			productPrice.priceInCents * discountMultiplier,
+		);
+		return total + discountedPrice * item.quantity;
 	}, 0);
 
 	// Get delivery cost
@@ -80,7 +87,11 @@ export async function POST(request: Request) {
 	const defaultTaxesInCents = 1000; // R$ 10,00
 	const taxesInCents = defaultTaxesInCents;
 
-	const totalInCents = subtotalInCents + deliveryCostInCents + taxesInCents;
+	// Get coupon discount if applied
+	const discountInCents = orderFound.payment?.discountInCents || 0;
+
+	const totalInCents =
+		subtotalInCents + deliveryCostInCents + taxesInCents - discountInCents;
 
 	try {
 		// Create Stripe PaymentIntent
@@ -105,7 +116,12 @@ export async function POST(request: Request) {
 				.set({
 					stripePaymentIntentId: paymentIntent.id,
 					stripeClientSecret: paymentIntent.client_secret,
+					subtotalInCents,
+					shippingCostInCents: deliveryCostInCents,
+					taxInCents: taxesInCents,
+					discountInCents,
 					totalPriceInCents: totalInCents,
+					updatedAt: new Date(),
 				})
 				.where(eq(orderPayment.id, orderFound.payment.id))
 				.returning();
@@ -133,6 +149,10 @@ export async function POST(request: Request) {
 					orderPaymentMethodId: creditCardMethod.id,
 					stripePaymentIntentId: paymentIntent.id,
 					stripeClientSecret: paymentIntent.client_secret,
+					subtotalInCents,
+					shippingCostInCents: deliveryCostInCents,
+					taxInCents: taxesInCents,
+					discountInCents,
 					totalPriceInCents: totalInCents,
 					orderPaymentStatus: "pending",
 				})

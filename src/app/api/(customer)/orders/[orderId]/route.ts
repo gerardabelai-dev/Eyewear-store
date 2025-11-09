@@ -64,6 +64,7 @@ export async function GET(
 			where: eq(orderPayment.orderId, orderId),
 			with: {
 				orderPaymentMethod: true,
+				coupon: true,
 			},
 			orderBy: (orderPayment, { desc }) => [desc(orderPayment.updatedAt)],
 		});

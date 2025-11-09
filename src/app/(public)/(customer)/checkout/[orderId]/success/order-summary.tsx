@@ -32,6 +32,9 @@ export function OrderSummary({ order }: OrderSummaryProps) {
 	const discount =
 		expectedTotal > paymentTotal ? expectedTotal - paymentTotal : 0;
 
+	// Get coupon code if available
+	const couponCode = order.payment?.couponCode;
+
 	// Taxes are assumed to be included in the payment total for now
 	const taxes = 0;
 
@@ -44,9 +47,7 @@ export function OrderSummary({ order }: OrderSummaryProps) {
 
 			{discount > 0 && (
 				<div className="flex gap-4 justify-between">
-					<strong>
-						Desconto <Badge variant="secondary">APLICADO</Badge>
-					</strong>
+					<strong>Desconto {couponCode && <Badge>{couponCode}</Badge>}</strong>
 					<span>-R$ {discount.toFixed(2).replace(".", ",")} </span>
 				</div>
 			)}

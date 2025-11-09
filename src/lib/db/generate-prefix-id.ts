@@ -27,6 +27,9 @@ const tableNameToPrefix = {
 	orderPayment: "pay",
 	orderPaymentMethod: "pym",
 
+	// Coupon
+	coupon: "cpn",
+
 	// Activity
 	activity: "act",
 

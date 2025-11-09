@@ -69,6 +69,9 @@ async function clearDatabase() {
 	await seedDb.delete(schema.orderDeliveryMethod);
 	await seedDb.delete(schema.orderPaymentMethod);
 
+	// Clear coupon table
+	await seedDb.delete(schema.coupon);
+
 	// Clear better-auth tables last (user is referenced by customer)
 	await seedDb.delete(schema.session);
 	await seedDb.delete(schema.account);
@@ -1045,6 +1048,94 @@ async function seedActivity({
 	console.info(`✅ Activity created successfully with ID: ${activity.id}`);
 }
 
+async function seedCoupons() {
+	console.info("🎟️  Creating coupons...");
+
+	const coupons = [];
+
+	// Create a percentage discount coupon (10% off)
+	const [percentageCoupon] = await seedDb
+		.insert(schema.coupon)
+		.values({
+			code: "WELCOME10",
+			type: "percentage",
+			discountPercentage: 10,
+			minOrderValueInCents: 5000, // R$ 50,00 minimum
+			maxDiscountInCents: 5000, // R$ 50,00 max discount
+			usageLimit: 100,
+			usageCount: 0,
+			validFrom: new Date(),
+			validUntil: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
+			status: "active",
+		})
+		.returning();
+
+	console.info(`✅ Percentage coupon created: ${percentageCoupon.code}`);
+	coupons.push(percentageCoupon);
+
+	// Create a fixed amount coupon (R$ 20 off)
+	const [fixedCoupon] = await seedDb
+		.insert(schema.coupon)
+		.values({
+			code: "SAVE20",
+			type: "fixed_amount",
+			discountAmountInCents: 2000, // R$ 20,00
+			minOrderValueInCents: 10000, // R$ 100,00 minimum
+			usageLimit: 50,
+			usageCount: 0,
+			validFrom: new Date(),
+			validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+			status: "active",
+		})
+		.returning();
+
+	console.info(`✅ Fixed amount coupon created: ${fixedCoupon.code}`);
+	coupons.push(fixedCoupon);
+
+	// Create an unlimited percentage coupon (5% off, no usage limit)
+	const [unlimitedCoupon] = await seedDb
+		.insert(schema.coupon)
+		.values({
+			code: "VIP5",
+			type: "percentage",
+			discountPercentage: 5,
+			minOrderValueInCents: null,
+			maxDiscountInCents: null,
+			usageLimit: null, // Unlimited
+			usageCount: 0,
+			validFrom: new Date(),
+			validUntil: null, // No expiration
+			status: "active",
+		})
+		.returning();
+
+	console.info(`✅ Unlimited coupon created: ${unlimitedCoupon.code}`);
+	coupons.push(unlimitedCoupon);
+
+	// Create an expired coupon for testing
+	const [expiredCoupon] = await seedDb
+		.insert(schema.coupon)
+		.values({
+			code: "EXPIRED20",
+			type: "percentage",
+			discountPercentage: 20,
+			minOrderValueInCents: 5000,
+			maxDiscountInCents: 10000,
+			usageLimit: 100,
+			usageCount: 0,
+			validFrom: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000), // 60 days ago
+			validUntil: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+			status: "expired",
+		})
+		.returning();
+
+	console.info(`✅ Expired coupon created: ${expiredCoupon.code}`);
+	coupons.push(expiredCoupon);
+
+	console.info(`✅ Created ${coupons.length} coupons successfully`);
+	return coupons;
+}
+
 async function seed() {
 	try {
 		console.info("🌱 Starting database seeding...");
@@ -1066,6 +1157,9 @@ async function seed() {
 		// Create delivery and payment methods first (needed for orders)
 		const _orderDeliveryMethods = await seedOrderDeliveryMethods();
 		const orderPaymentMethods = await seedOrderPaymentMethods();
+
+		// Create coupons
+		await seedCoupons();
 
 		// Use Credit Card as the default payment method for seeded orders
 		const _defaultPaymentMethod =

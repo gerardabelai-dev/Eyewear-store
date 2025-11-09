@@ -5,6 +5,8 @@ export * from "./cart/mutations";
 export * from "./cart/queries";
 // Collections
 export * from "./collections/queries";
+// Coupons
+export * from "./coupons/mutations";
 // Customer Addresses
 export * from "./customer-addresses/mutations";
 // Customers

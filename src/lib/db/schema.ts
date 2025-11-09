@@ -301,6 +301,13 @@ export const orderPaymentStatus = pgEnum("orderPaymentStatus", [
 	"failed",
 ]);
 
+export const couponType = pgEnum("couponType", ["percentage", "fixed_amount"]);
+export const couponStatus = pgEnum("couponStatus", [
+	"active",
+	"inactive",
+	"expired",
+]);
+
 export const orderPayment = pgTable("orderPayment", {
 	id: text("id")
 		.primaryKey()
@@ -317,11 +324,34 @@ export const orderPayment = pgTable("orderPayment", {
 	subtotalInCents: integer("subtotalInCents").notNull().default(0),
 	shippingCostInCents: integer("shippingCostInCents").notNull().default(0),
 	taxInCents: integer("taxInCents").notNull().default(0),
+	discountInCents: integer("discountInCents").notNull().default(0),
 	totalPriceInCents: integer("totalPriceInCents").notNull().default(0),
+	// Coupon fields
+	couponId: text("couponId"),
+	couponCode: text("couponCode"),
 	// Stripe-specific fields
 	stripePaymentIntentId: text("stripePaymentIntentId"),
 	stripeClientSecret: text("stripeClientSecret"),
 	stripePaymentMethodId: text("stripePaymentMethodId"),
+	...timestamps,
+});
+
+// Coupon
+export const coupon = pgTable("coupon", {
+	id: text("id")
+		.primaryKey()
+		.$defaultFn(() => generatePrefixId("coupon")),
+	code: text("code").notNull().unique(),
+	type: couponType("type").notNull(),
+	discountPercentage: integer("discountPercentage"),
+	discountAmountInCents: integer("discountAmountInCents"),
+	minOrderValueInCents: integer("minOrderValueInCents"),
+	maxDiscountInCents: integer("maxDiscountInCents"),
+	usageLimit: integer("usageLimit"),
+	usageCount: integer("usageCount").notNull().default(0),
+	validFrom: timestamp("validFrom").notNull(),
+	validUntil: timestamp("validUntil"),
+	status: couponStatus("status").notNull().default("active"),
 	...timestamps,
 });
 
@@ -373,6 +403,9 @@ export type NewOrderDelivery = typeof orderDelivery.$inferInsert;
 
 export type OrderPayment = typeof orderPayment.$inferSelect;
 export type NewOrderPayment = typeof orderPayment.$inferInsert;
+
+export type Coupon = typeof coupon.$inferSelect;
+export type NewCoupon = typeof coupon.$inferInsert;
 
 export type Activity = typeof activity.$inferSelect;
 export type NewActivity = typeof activity.$inferInsert;
@@ -528,6 +561,14 @@ export const orderPaymentRelations = relations(orderPayment, ({ one }) => ({
 		fields: [orderPayment.orderPaymentMethodId],
 		references: [orderPaymentMethod.id],
 	}),
+	coupon: one(coupon, {
+		fields: [orderPayment.couponId],
+		references: [coupon.id],
+	}),
+}));
+
+export const couponRelations = relations(coupon, ({ many }) => ({
+	orderPayments: many(orderPayment),
 }));
 
 export const activityRelations = relations(activity, ({ one }) => ({

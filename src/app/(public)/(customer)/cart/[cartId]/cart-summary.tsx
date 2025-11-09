@@ -2,6 +2,8 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { HelpCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
 	Tooltip,
@@ -11,6 +13,7 @@ import {
 } from "@/components/ui/tooltip";
 import type { GetCartResponse } from "@/http/types";
 import { calculateDiscountedPrice, formatPrice } from "@/lib/format-price";
+import { useCartStore } from "@/stores/cart-store";
 import { CreateOrderButton } from "./create-order-button";
 import { getCartQueryOptions } from "./get-cart-query-options";
 
@@ -48,8 +51,15 @@ function calculateGroupTotal(groupedItem: GroupedCartItem): number {
 
 export function CartSummary({ cartId }: { cartId: string }) {
 	const { data } = useSuspenseQuery(getCartQueryOptions(cartId));
+	const clearCartId = useCartStore((state) => state.clearCartId);
+	const router = useRouter();
 
 	const isEmpty = !data.items || data.items.length === 0;
+
+	const handleClearCart = () => {
+		clearCartId();
+		router.push("/");
+	};
 
 	// Group items by groupId (same logic as cart-items.tsx)
 	const groupMap = new Map<string, GroupedCartItem>();
@@ -203,6 +213,15 @@ export function CartSummary({ cartId }: { cartId: string }) {
 				</div>
 
 				<CreateOrderButton cartId={cartId} disabled={isEmpty} />
+
+				<Button
+					variant="ghost"
+					className="w-full"
+					onClick={handleClearCart}
+					type="button"
+				>
+					Limpar Carrinho
+				</Button>
 			</div>
 		</TooltipProvider>
 	);

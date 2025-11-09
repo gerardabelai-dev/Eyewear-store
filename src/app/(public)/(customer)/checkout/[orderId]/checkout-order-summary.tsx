@@ -32,7 +32,9 @@ function calculateItemTotal(item: CartProductData): number {
 }
 
 export function CheckoutOrderSummary({ orderId }: CheckoutOrderSummaryProps) {
-	const { data: order } = useSuspenseQuery(getOrderByIdQueryOptions(orderId));
+	const { data: order, refetch } = useSuspenseQuery(
+		getOrderByIdQueryOptions(orderId),
+	);
 
 	// Get cart products from the order
 	const cartProducts = order.cart?.cartProducts || [];
@@ -63,7 +65,29 @@ export function CheckoutOrderSummary({ orderId }: CheckoutOrderSummaryProps) {
 	// For now, using fixed values for taxes
 	// These could be calculated based on delivery method, location, etc.
 	const taxesInCents = 1000; // R$ 10,00
-	const totalInCents = subtotalInCents + deliveryCostInCents + taxesInCents;
+
+	// Get coupon discount if applied
+	const discountInCents = order.payment?.discountInCents || 0;
+	const appliedCouponCode = order.payment?.couponCode || null;
+	const appliedCoupon = order.payment?.coupon || null;
+
+	const totalInCents =
+		subtotalInCents + deliveryCostInCents + taxesInCents - discountInCents;
+
+	// Format discount label based on coupon type
+	const getDiscountLabel = () => {
+		if (!appliedCoupon) return "Desconto";
+
+		if (appliedCoupon.type === "percentage") {
+			return `Desconto (${appliedCoupon.discountPercentage}%)`;
+		}
+
+		if (appliedCoupon.type === "fixed_amount") {
+			return `Desconto (${formatPrice(appliedCoupon.discountAmountInCents || 0)})`;
+		}
+
+		return "Desconto";
+	};
 
 	return (
 		<div className="flex flex-col gap-4 bg-muted p-8 rounded h-fit sticky top-14">
@@ -90,6 +114,19 @@ export function CheckoutOrderSummary({ orderId }: CheckoutOrderSummaryProps) {
 
 			<Separator />
 
+			{discountInCents > 0 && (
+				<>
+					<div className="flex gap-2 justify-between">
+						<span>{getDiscountLabel()}</span>
+						<strong className="text-emerald-600">
+							-{formatPrice(discountInCents)}
+						</strong>
+					</div>
+
+					<Separator />
+				</>
+			)}
+
 			<div className="flex gap-2 justify-between">
 				<span>Total</span>
 				<strong>{formatPrice(totalInCents)}</strong>
@@ -97,7 +134,11 @@ export function CheckoutOrderSummary({ orderId }: CheckoutOrderSummaryProps) {
 
 			<Separator />
 
-			<CheckoutCouponForm />
+			<CheckoutCouponForm
+				orderId={orderId}
+				appliedCouponCode={appliedCouponCode}
+				onCouponApplied={() => refetch()}
+			/>
 
 			<CheckoutOrderButton orderId={orderId} />
 		</div>
