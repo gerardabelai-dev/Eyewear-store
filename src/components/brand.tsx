@@ -9,11 +9,12 @@ import type * as React from "react";
 // Brand configuration - centralized brand information
 export const BRAND_CONFIG = {
 	name: "Dr. Vista",
-	tagline: "Plataforma de Autenticação Segura",
+	cnpj: "12.345.678/0001-90",
+	tagline: "Sua ótica online de confiança",
 	email: "contato@drvista.com.br",
 	website: "https://www.drvista.com.br",
 	phone: "+55 (11) 1234-5678",
-	address: "São Paulo, SP - Brasil",
+	address: "Rua Exemplo, 123 - Centro, São Paulo - SP, 01234-567",
 	colors: {
 		primary: "#0066CC", // Blue
 		secondary: "#00A859", // Green
