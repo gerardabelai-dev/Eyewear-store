@@ -165,6 +165,11 @@ export function OrderList() {
 													{price
 														? formatPrice(price.priceInCents)
 														: "Preço indisponível"}
+													{cartProduct.quantity > 1 && (
+														<span className="ml-1 text-muted-foreground">
+															x{cartProduct.quantity}
+														</span>
+													)}
 												</strong>
 											</div>
 
