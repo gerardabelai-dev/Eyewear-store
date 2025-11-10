@@ -123,6 +123,9 @@ export const product = pgTable("product", {
 	description: text("description"),
 	stock: integer("stock").notNull().default(0),
 	status: productStatus("status").notNull().default("active"),
+	requiresPrescription: boolean("requiresPrescription")
+		.notNull()
+		.default(false),
 	...timestamps,
 });
 
@@ -206,6 +209,12 @@ export const cart = pgTable("cart", {
 	...timestamps,
 });
 
+export const prescriptionStatus = pgEnum("prescriptionStatus", [
+	"not_required",
+	"pending",
+	"uploaded",
+]);
+
 export const cartProduct = pgTable("cartProduct", {
 	id: text("id")
 		.primaryKey()
@@ -224,6 +233,13 @@ export const cartProduct = pgTable("cartProduct", {
 	}),
 	groupId: text("groupId"), // Groups related cart items (glasses + lens options)
 	quantity: integer("quantity").notNull().default(1),
+	prescriptionStatus: prescriptionStatus("prescriptionStatus")
+		.notNull()
+		.default("not_required"),
+	prescriptionFileUrl: text("prescriptionFileUrl"),
+	prescriptionFileName: text("prescriptionFileName"),
+	prescriptionFileSize: integer("prescriptionFileSize"),
+	prescriptionUploadedAt: timestamp("prescriptionUploadedAt"),
 	...timestamps,
 });
 
@@ -231,6 +247,7 @@ export const cartProduct = pgTable("cartProduct", {
 export const orderStatus = pgEnum("orderStatus", [
 	"pending",
 	"paid",
+	"awaiting_prescription",
 	"cancelled",
 ]);
 export const order = pgTable("order", {
@@ -248,6 +265,7 @@ export const order = pgTable("order", {
 		() => customerAddress.id,
 		{ onDelete: "set null" },
 	),
+	prescriptionReminderSentAt: timestamp("prescriptionReminderSentAt"),
 	...timestamps,
 });
 

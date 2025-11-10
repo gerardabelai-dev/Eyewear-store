@@ -55,6 +55,8 @@ interface PaymentConfirmedEmailProps {
 		zipCode: string;
 	};
 	estimatedDelivery: string;
+	requiresPrescription?: boolean;
+	prescriptionUploadUrl?: string;
 }
 
 const PaymentConfirmedEmail = ({
@@ -70,6 +72,8 @@ const PaymentConfirmedEmail = ({
 	total,
 	shippingAddress,
 	estimatedDelivery,
+	requiresPrescription,
+	prescriptionUploadUrl,
 }: PaymentConfirmedEmailProps) => {
 	return (
 		<Html lang="pt-BR" dir="ltr">
@@ -284,6 +288,29 @@ const PaymentConfirmedEmail = ({
 									CEP: {shippingAddress.zipCode}
 								</Text>
 							</Section>
+
+							{/* Prescription Notice */}
+							{requiresPrescription && prescriptionUploadUrl && (
+								<Section className="bg-[#FFF4E5] border-[2px] border-[#FF9500] p-[24px] mb-[32px]">
+									<Heading className="text-[#333] text-[18px] font-bold mb-[16px] mt-0">
+										⚠️ Ação Necessária: Envie sua Receita
+									</Heading>
+									<Text className="text-[#666] text-[14px] leading-[20px] mb-[16px] m-0">
+										Alguns produtos do seu pedido requerem receita médica. Por
+										favor, envie sua receita o quanto antes para que possamos dar
+										continuidade ao seu pedido.
+									</Text>
+									<Button
+										href={prescriptionUploadUrl}
+										className="bg-[#FF9500] text-white font-semibold py-[12px] px-[24px] rounded-[8px] text-[14px] no-underline inline-block"
+									>
+										Enviar Receita Agora
+									</Button>
+									<Text className="text-[#666] text-[12px] leading-[18px] mt-[16px] m-0">
+										Formatos aceitos: PDF, JPG, PNG ou HEIC (máx. 5MB)
+									</Text>
+								</Section>
+							)}
 
 							{/* Next Steps */}
 							<Section className="bg-[#F6F8FA] p-[24px] mb-[32px]">

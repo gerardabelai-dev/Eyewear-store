@@ -23,6 +23,12 @@ const schema = z.object({
 	// Resend Configuration
 	RESEND_API_KEY: z.string().min(1, "RESEND_API_KEY is required"),
 
+	// Vercel Blob Configuration
+	BLOB_READ_WRITE_TOKEN: z.string().min(1, "BLOB_READ_WRITE_TOKEN is required"),
+
+	// Cron Job Configuration (optional in development)
+	CRON_SECRET: z.string().optional(),
+
 	// Stripe Configuration
 	STRIPE_SECRET_KEY: z.string().min(1, "STRIPE_SECRET_KEY is required"),
 	STRIPE_PUBLISHABLE_KEY: z

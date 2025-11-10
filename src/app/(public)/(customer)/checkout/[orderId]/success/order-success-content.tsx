@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { getOrderByIdQueryOptions } from "@/http/orders/queries";
 import { OrderDetails } from "./order-details";
 import { OrderItems } from "./order-items";
+import { OrderPrescriptionUpload } from "./order-prescription-upload";
 import { OrderSummary } from "./order-summary";
 
 interface OrderSuccessContentProps {
@@ -30,6 +31,8 @@ export function OrderSuccessContent({ orderId }: OrderSuccessContentProps) {
 					{order.delivery?.id || "Não disponível"}
 				</span>
 			</div>
+
+			<OrderPrescriptionUpload order={order} />
 
 			<section className="grid grid-cols-1 gap-4">
 				<OrderItems order={order} />

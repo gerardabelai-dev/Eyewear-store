@@ -1,4 +1,4 @@
-import { Info } from "lucide-react";
+import { AlertCircle, Info } from "lucide-react";
 import { CartProduct } from "@/components/ui/cart-product";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -13,6 +13,7 @@ import {
 	type GroupedCartItem,
 	groupCartItems,
 } from "@/lib/utils/group-cart-items";
+import { PrescriptionUploadDrawer } from "./prescription-upload-drawer";
 
 interface OrderItemsProps {
 	order: GetOrderResponse["order"];
@@ -70,12 +71,25 @@ function LensOption({ item }: { item: OrderCartItem }) {
 
 function OrderItem({
 	groupedItem,
+	orderId,
+	cartId,
 }: {
 	groupedItem: GroupedCartItem<TransformedOrderCartItem>;
+	orderId: string;
+	cartId: string;
 }) {
 	const item = groupedItem.glasses;
 	const product = item.product;
 	const quantity = groupedItem.totalQuantity;
+
+	// Check if this product has lens options requiring prescription
+	const hasChildRequiringPrescription = groupedItem.lensOptions.some(
+		(lensOption) => lensOption.product.requiresPrescription,
+	);
+	const isPrescriptionPending =
+		hasChildRequiringPrescription && item.prescriptionStatus === "pending";
+	const isPrescriptionUploaded =
+		hasChildRequiringPrescription && item.prescriptionStatus === "uploaded";
 
 	// Get the product price, handling the array case
 	const productPrice = Array.isArray(product?.productPrice)
@@ -128,7 +142,32 @@ function OrderItem({
 
 			<CartProduct.Content>
 				<CartProduct.Header>
-					<CartProduct.Name name={product?.name || "Produto"} />
+					<div className="flex items-center gap-2 flex-wrap">
+						<CartProduct.Name name={product?.name || "Produto"} />
+						{isPrescriptionPending && (
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<span className="inline-flex items-center gap-1 text-xs font-medium text-white bg-red-500 dark:bg-red-600 px-2 py-0.5 rounded cursor-help">
+										<AlertCircle className="h-3 w-3" />
+										Pendente
+									</span>
+								</TooltipTrigger>
+								<TooltipContent>
+									<p>Receita médica pendente - envio obrigatório</p>
+								</TooltipContent>
+							</Tooltip>
+						)}
+						{hasChildRequiringPrescription && (
+							<PrescriptionUploadDrawer
+								productName={product?.name || "Produto"}
+								cartProductId={item.id}
+								orderId={orderId}
+								cartId={cartId}
+								hasUpload={isPrescriptionUploaded}
+								prescriptionFileName={item.prescriptionFileName}
+							/>
+						)}
+					</div>
 					<CartProduct.Description
 						description={product?.description || "Descrição não disponível"}
 					/>
@@ -194,7 +233,11 @@ export function OrderItems({ order }: OrderItemsProps) {
 		<ul className="flex flex-col gap-4">
 			{groupedItems.map((groupedItem, index) => (
 				<div key={groupedItem.combinationKey}>
-					<OrderItem groupedItem={groupedItem} />
+					<OrderItem
+						groupedItem={groupedItem}
+						orderId={order.id}
+						cartId={order.cartId}
+					/>
 					{index < groupedItems.length - 1 && <Separator className="my-6" />}
 				</div>
 			))}

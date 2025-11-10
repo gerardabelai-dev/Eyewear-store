@@ -1,59 +1,15 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import {
-	BadgeCheck,
-	Clock,
-	Package,
-	PackageCheck,
-	Truck,
-	XCircle,
-} from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCustomerOrdersQueryOptions } from "@/http/orders/queries";
-import type { OrderDelivery } from "@/lib/db/schema";
 import { formatDate } from "@/lib/format-date";
 import { formatPrice } from "@/lib/format-price";
-
-function getDeliveryStatusDisplay(
-	status: OrderDelivery["orderDeliveryStatus"],
-) {
-	switch (status) {
-		case "delivered":
-			return {
-				icon: <BadgeCheck className="text-white fill-green-500 size-6" />,
-				label: "Entregue",
-			};
-		case "shipped":
-			return {
-				icon: <Truck className="text-blue-500 size-6" />,
-				label: "Em trânsito",
-			};
-		case "processing":
-			return {
-				icon: <Package className="text-orange-500 size-6" />,
-				label: "Em processamento",
-			};
-		case "cancelled":
-			return {
-				icon: <XCircle className="text-red-500 size-6" />,
-				label: "Cancelado",
-			};
-		case "returned":
-			return {
-				icon: <PackageCheck className="text-gray-500 size-6" />,
-				label: "Devolvido",
-			};
-		default:
-			return {
-				icon: <Clock className="text-muted-foreground size-6" />,
-				label: "Aguardando envio",
-			};
-	}
-}
 
 export function OrderList() {
 	const { data: orders, isPending } = useQuery(getCustomerOrdersQueryOptions());
@@ -79,12 +35,27 @@ export function OrderList() {
 		<div className="flex flex-col gap-6">
 			{orders.map((order) => {
 				const totalPrice = order.payment?.totalPriceInCents ?? 0;
-				const deliveryStatus = order.delivery?.orderDeliveryStatus ?? "pending";
-				const isDelivered = deliveryStatus === "delivered";
 
 				// Filter to get only main products (no parent)
 				const mainProducts = order.cart.cartProducts.filter(
 					(cp) => !cp.parentProductId,
+				);
+
+				// Check if order has pending prescriptions
+				// Use same logic as OrderPrescriptionUpload component
+				const parentProductsWithPrescription = mainProducts.filter(
+					(parentProduct) => {
+						const childLensOptions = order.cart.cartProducts.filter(
+							(cp) =>
+								cp.parentProductId === parentProduct.productId &&
+								cp.product.requiresPrescription,
+						);
+						return childLensOptions.length > 0;
+					},
+				);
+
+				const hasPendingPrescriptions = parentProductsWithPrescription.some(
+					(cp) => cp.prescriptionStatus !== "uploaded",
 				);
 
 				return (
@@ -121,6 +92,20 @@ export function OrderList() {
 								</Button>
 							</div>
 						</div>
+
+						{/* Prescription alert */}
+						{hasPendingPrescriptions && (
+							<Alert className="mt-6 border-red-300 bg-red-500 text-white dark:bg-red-700/5 dark:border-red-500 dark:text-red-500">
+								<AlertCircle className="h-4 w-4 text-white dark:text-red-500" />
+								<AlertTitle className="text-white dark:text-red-500">
+									Receita médica necessária
+								</AlertTitle>
+								<AlertDescription className="text-white/90 dark:text-red-500">
+									Este pedido requer envio de receita médica. Clique em "Ver
+									Detalhes" para fazer o upload.
+								</AlertDescription>
+							</Alert>
+						)}
 
 						{/* Order products */}
 						{mainProducts.map((cartProduct) => {
@@ -182,31 +167,13 @@ export function OrderList() {
 										</div>
 									</div>
 
-									{/* Order delivery date & actions */}
-									<div className="flex gap-8 justify-between w-full">
-										{/* Product delivery status */}
-										<div className="flex gap-2 items-center">
-											{getDeliveryStatusDisplay(deliveryStatus).icon}
-											<span className="text-muted-foreground">
-												{isDelivered ? (
-													<>
-														{getDeliveryStatusDisplay(deliveryStatus).label} em{" "}
-														{formatDate(order.updatedAt)}
-													</>
-												) : (
-													getDeliveryStatusDisplay(deliveryStatus).label
-												)}
-											</span>
-										</div>
-
-										{/* Product actions */}
-										<div className="flex gap-2 items-center">
-											<Button variant="link" size="sm" asChild>
-												<Link href={`/products/${product.slug}`}>
-													Ver Produto
-												</Link>
-											</Button>
-										</div>
+									{/* Product actions */}
+									<div className="flex gap-2 items-center justify-end w-full">
+										<Button variant="link" size="sm" asChild>
+											<Link href={`/products/${product.slug}`}>
+												Ver Produto
+											</Link>
+										</Button>
 									</div>
 								</div>
 							);

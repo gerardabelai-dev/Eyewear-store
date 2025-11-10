@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { getOrderByIdQueryOptions } from "@/http/orders/queries";
 import { OrderDetails } from "../../checkout/[orderId]/success/order-details";
 import { OrderItems } from "../../checkout/[orderId]/success/order-items";
+import { OrderPrescriptionUpload } from "../../checkout/[orderId]/success/order-prescription-upload";
 import { OrderSummary } from "../../checkout/[orderId]/success/order-summary";
 import { OrderTimeline } from "./order-timeline";
 
@@ -32,6 +33,9 @@ export function OrdersPageContent({ orderId }: OrdersPageContentProps) {
 					{order.delivery?.id || "Não disponível"}
 				</span>
 			</div>
+
+			{/* Prescription upload alert */}
+			<OrderPrescriptionUpload order={order} />
 
 			<section className="grid grid-cols-1 gap-4">
 				{/* Order items */}

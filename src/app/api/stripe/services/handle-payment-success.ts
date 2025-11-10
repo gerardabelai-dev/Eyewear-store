@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import type Stripe from "stripe";
 import { db } from "@/lib/db";
-import { order, orderPayment } from "@/lib/db/schema";
+import { cartProduct, order, orderPayment } from "@/lib/db/schema";
 import { formatOrderDate } from "@/lib/format-date";
 import { resend } from "@/lib/resend/client";
 import PaymentConfirmedEmail from "../../../../../emails/payment-confirmed";
@@ -68,15 +68,48 @@ export async function handlePaymentSuccess(
 			})
 			.where(eq(orderPayment.id, orderPaymentFound.id));
 
-		// Update order status to paid
+		// Group cart products by groupId to handle same glasses with different lens options
+		const cartProducts = orderPaymentFound.order.cart?.cartProducts || [];
+
+		// Check if any cart products require prescription
+		const productsRequiringPrescription = cartProducts.filter(
+			(cp) => cp.product.requiresPrescription,
+		);
+
+		// Update prescription status for products that require it
+		for (const product of productsRequiringPrescription) {
+			await db
+				.update(cartProduct)
+				.set({
+					prescriptionStatus: "pending",
+				})
+				.where(eq(cartProduct.id, product.id));
+		}
+
+		// Determine order status based on prescription requirements
+		// Only count parent products (glasses) that have child lens options requiring prescription
+		const parentProductsRequiringPrescription = cartProducts.filter((cp) => {
+			if (cp.parentProductId) return false;
+			// Check if this parent has any child lens options requiring prescription
+			const hasChildRequiringPrescription = cartProducts.some(
+				(child) =>
+					child.parentProductId === cp.productId &&
+					child.product.requiresPrescription,
+			);
+			return hasChildRequiringPrescription;
+		});
+		const requiresPrescription = parentProductsRequiringPrescription.length > 0;
+		const finalOrderStatus = requiresPrescription
+			? "awaiting_prescription"
+			: "paid";
+
+		// Update order status
 		await db
 			.update(order)
 			.set({
-				orderStatus: "paid",
+				orderStatus: finalOrderStatus,
 			})
 			.where(eq(order.id, orderPaymentFound.orderId));
-		// Group cart products by groupId to handle same glasses with different lens options
-		const cartProducts = orderPaymentFound.order.cart?.cartProducts || [];
 		type CartProductType = (typeof cartProducts)[number];
 		const groupedProducts = new Map<
 			string,
@@ -140,6 +173,10 @@ export async function handlePaymentSuccess(
 			};
 		});
 
+		// Prepare prescription parameters
+		const baseUrl = process.env.WEB_URL || "https://drvista.com.br";
+		const prescriptionUploadUrl = `${baseUrl}/checkout/${orderPaymentFound.order.id}/success`;
+
 		const { error } = await resend.emails.send({
 			from: "Dr. Vista <contato@drvista.com.br>",
 			to: [orderPaymentFound.order.customer?.user?.email || ""],
@@ -170,6 +207,10 @@ export async function handlePaymentSuccess(
 					zipCode: orderPaymentFound.order.customerAddress?.zipCode || "N/A",
 				},
 				estimatedDelivery: "7 a 10 dias úteis",
+				requiresPrescription: requiresPrescription,
+				prescriptionUploadUrl: requiresPrescription
+					? prescriptionUploadUrl
+					: undefined,
 			}),
 		});
 

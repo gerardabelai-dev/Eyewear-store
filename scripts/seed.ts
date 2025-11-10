@@ -155,7 +155,7 @@ async function seedAccounts(userId: string) {
 	return accountData;
 }
 
-async function seedCustomer(userId: string) {
+async function seedCustomer(userId: string, phoneNumber?: string) {
 	console.info(`👤 Creating customer for user ID: ${userId}...`);
 
 	const [customer] = await seedDb
@@ -164,6 +164,7 @@ async function seedCustomer(userId: string) {
 			userId,
 			firstName: faker.person.firstName(),
 			lastName: faker.person.lastName(),
+			phoneNumber,
 		})
 		.returning();
 
@@ -541,6 +542,7 @@ async function seedLensProducts(collections: {
 			description:
 				"Lentes monofocais para correção de miopia, hipermetropia ou astigmatismo",
 			price: 15000, // R$ 150.00 in cents
+			requiresPrescription: true, // Requires prescription upload
 		},
 		{
 			name: "Sem grau | com filtro de luz azul",
@@ -548,6 +550,7 @@ async function seedLensProducts(collections: {
 			description:
 				"Lentes sem grau ideais para quem está à procura de estilo e mais conforto visual. Perfeito para quem não desgruda os olhos das telas",
 			price: 8000, // R$ 80.00 in cents
+			requiresPrescription: false,
 		},
 		{
 			name: "Sem grau | apenas a armação",
@@ -555,6 +558,7 @@ async function seedLensProducts(collections: {
 			description:
 				"Armação acompanhada de lentes de demonstração feitas de acrílico e não recomendadas para o uso diário",
 			price: 0, // Free - just the frame
+			requiresPrescription: false,
 		},
 	];
 
@@ -567,6 +571,7 @@ async function seedLensProducts(collections: {
 				description: productData.description,
 				stock: 999,
 				status: "active",
+				requiresPrescription: productData.requiresPrescription,
 			})
 			.returning();
 
@@ -610,6 +615,7 @@ async function seedLensProducts(collections: {
 			description:
 				"Lentes com espessura padrão, feitas de resina. Contemplam hipermetropia e miopia até +/- 2,75 e astigmatismo até -2,00",
 			price: 0,
+			requiresPrescription: true, // All prescription strength products require prescription
 		},
 		{
 			name: "Grau moderado | até +/- 4,00",
@@ -617,6 +623,7 @@ async function seedLensProducts(collections: {
 			description:
 				"Lentes mais leves e resistentes, feitas de policarbonato. Contemplam hipermetropia e miopia até +/- 4,00 e astigmatismo até -2,00",
 			price: 30000, // R$ 300.00 in cents
+			requiresPrescription: true,
 		},
 		{
 			name: "Grau alto | até +5,00/-6,50",
@@ -624,6 +631,7 @@ async function seedLensProducts(collections: {
 			description:
 				"Lentes mais finas e voltadas para graus mais altos, feitas de resina de alto índice. Contemplam hipermetropia até +5,00, miopia até -6,50, e astigmatismo até -4,00",
 			price: 60000, // R$ 600.00 in cents
+			requiresPrescription: true,
 		},
 	];
 
@@ -636,6 +644,7 @@ async function seedLensProducts(collections: {
 				description: productData.description,
 				stock: 999,
 				status: "active",
+				requiresPrescription: productData.requiresPrescription,
 			})
 			.returning();
 
@@ -679,6 +688,7 @@ async function seedLensProducts(collections: {
 			description:
 				"Lentes com espessura padrão, feitas de resina. Contemplam hipermetropia e miopia até +/- 2,75 e astigmatismo até -2,00",
 			price: 0,
+			requiresPrescription: false,
 		},
 		{
 			name: "Filtro de luz azul",
@@ -686,6 +696,7 @@ async function seedLensProducts(collections: {
 			description:
 				"Além da resistência contra arranhões, antirreflexo e proteção UV, também filtram mais luz azul de aparelhos digitais e do sol do que lentes clássicas ou fotossensíveis. +O filtro de luz azul pode deixar um residual azulado ou esverdeado nas lentes.",
 			price: 20000, // R$ 200.00 in cents
+			requiresPrescription: false,
 		},
 	];
 
@@ -698,6 +709,7 @@ async function seedLensProducts(collections: {
 				description: productData.description,
 				stock: 999,
 				status: "active",
+				requiresPrescription: productData.requiresPrescription,
 			})
 			.returning();
 
@@ -1192,7 +1204,9 @@ async function seed() {
 			await seedSessions(user.id);
 			await seedAccounts(user.id);
 
-			const customer = await seedCustomer(user.id);
+			const phoneNumber =
+				user.email === "admin@example.com" ? "(12) 34123-4123" : undefined;
+			const customer = await seedCustomer(user.id, phoneNumber);
 			const customerAddress = await seedCustomerAddress(customer.id, user.id);
 
 			// Create cart and add random products

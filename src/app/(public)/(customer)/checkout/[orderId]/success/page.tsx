@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { getQueryClient } from "@/lib/tanstack-query/get-query-client";
+import { getOrderStatusDisplay } from "./get-order-status-display";
 import { getOrderSuccessQueryOptions } from "./get-order-success-query-options";
 import { OrderSuccessContent } from "./order-success-content";
 import { OrderSuccessSkeleton } from "./order-success-skeleton";
@@ -21,15 +22,25 @@ export default async function CheckoutSuccessPage({
 
 	const queryClient = getQueryClient();
 
-	void queryClient.prefetchQuery(getOrderSuccessQueryOptions(orderId));
+	// Fetch order data to get the actual order status
+	const order = await queryClient.fetchQuery(
+		getOrderSuccessQueryOptions(orderId),
+	);
+
+	if (!order) {
+		notFound();
+	}
+
+	// Get user-friendly status message based on actual order status
+	const statusDisplay = getOrderStatusDisplay(order.orderStatus);
 
 	return (
 		<>
 			<h2 className="text-md text-primary -mb-6">Obrigado!</h2>
 
 			<PageHeader
-				title="Pedido em análise"
-				description={`Seu pedido #${orderId} esta sendo analisado e será enviado em breve`}
+				title={statusDisplay.title}
+				description={`${statusDisplay.description}. Pedido #${orderId}`}
 				action={
 					<div className="flex gap-2">
 						<Button asChild variant="link" size="lg">

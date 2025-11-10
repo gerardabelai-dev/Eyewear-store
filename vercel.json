@@ -14,5 +14,11 @@
 		"src/app/(private)/**": {
 			"includeFiles": "src/app/(private)/**"
 		}
-	}
+	},
+	"crons": [
+		{
+			"path": "/api/cron/send-prescription-reminders",
+			"schedule": "0 */6 * * *"
+		}
+	]
 }

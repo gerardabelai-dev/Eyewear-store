@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/tooltip";
 import type { GetCartResponse } from "@/http/types";
 import { calculateDiscountedPrice, formatPrice } from "@/lib/format-price";
-import { useCartStore } from "@/stores/cart-store";
 import { CreateOrderButton } from "./create-order-button";
 import { getCartQueryOptions } from "./get-cart-query-options";
 
@@ -51,13 +50,11 @@ function calculateGroupTotal(groupedItem: GroupedCartItem): number {
 
 export function CartSummary({ cartId }: { cartId: string }) {
 	const { data } = useSuspenseQuery(getCartQueryOptions(cartId));
-	const clearCartId = useCartStore((state) => state.clearCartId);
 	const router = useRouter();
 
 	const isEmpty = !data.items || data.items.length === 0;
 
-	const handleClearCart = () => {
-		clearCartId();
+	const handleContinueShopping = () => {
 		router.push("/");
 	};
 
@@ -215,12 +212,12 @@ export function CartSummary({ cartId }: { cartId: string }) {
 				<CreateOrderButton cartId={cartId} disabled={isEmpty} />
 
 				<Button
-					variant="ghost"
+					variant="outline"
 					className="w-full"
-					onClick={handleClearCart}
+					onClick={handleContinueShopping}
 					type="button"
 				>
-					Limpar Carrinho
+					Continuar Comprando
 				</Button>
 			</div>
 		</TooltipProvider>
