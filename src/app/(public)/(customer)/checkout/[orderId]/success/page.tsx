@@ -32,7 +32,7 @@ export default async function CheckoutSuccessPage({
 	}
 
 	// Get user-friendly status message based on actual order status
-	const statusDisplay = getOrderStatusDisplay(order.orderStatus);
+	const statusDisplay = getOrderStatusDisplay(order);
 
 	return (
 		<>
