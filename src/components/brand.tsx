@@ -3,8 +3,8 @@
  * These components can be used in both the web app and email templates
  */
 
-import Image from "next/image";
-import type * as React from "react";
+import { Store } from "lucide-react";
+import type { CSSProperties, ReactNode } from "react";
 
 // Brand configuration - centralized brand information
 export const BRAND_CONFIG = {
@@ -45,49 +45,37 @@ export const BRAND_CONFIG = {
 export function AppLogo({
 	showText = true,
 	className = "",
+	size = "md",
 }: {
 	showText?: boolean;
 	className?: string;
+	size?: "sm" | "md" | "lg";
 }) {
-	if (!showText) {
-		// Logo only - use the favicon SVG
-		return (
-			<div className={`flex items-center ${className}`}>
-				<Image
-					src="/acme-favicon.svg"
-					alt={BRAND_CONFIG.name}
-					width={32}
-					height={32}
-					className="object-contain size-8"
-				/>
-			</div>
-		);
-	}
+	const sizes = {
+		sm: { icon: 20, text: "text-lg" },
+		md: { icon: 24, text: "text-xl" },
+		lg: { icon: 32, text: "text-2xl" },
+	};
 
-	// Full logo with text - use CSS to handle theme switching to avoid hydration mismatch
+	const currentSize = sizes[size];
+
 	return (
-		<div className={`flex items-center ${className}`}>
-			{/* Light theme logo - hidden in dark mode */}
-			<Image
-				src="/acme-logo-light.svg"
-				alt={BRAND_CONFIG.name}
-				width={140}
-				height={32}
-				className="object-contain w-28 dark:hidden"
-			/>
-			{/* Dark theme logo - hidden in light mode */}
-			<Image
-				src="/acme-logo-dark.svg"
-				alt={BRAND_CONFIG.name}
-				width={140}
-				height={32}
-				className="object-contain w-28 hidden dark:block"
-			/>
+		<div className={`flex items-center gap-2 ${className}`}>
+			<div className="flex items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary p-1.5 text-white">
+				<Store size={currentSize.icon} strokeWidth={2} />
+			</div>
+			{showText && (
+				<span
+					className={`font-bold ${currentSize.text} text-gray-900 dark:text-white`}
+				>
+					{BRAND_CONFIG.name}
+				</span>
+			)}
 		</div>
 	);
 }
 
-// Logo for email templates (inline styles) - keeps using the old approach since emails don't support theme switching
+// Logo for email templates (inline styles) - uses Store icon as inline SVG
 export function EmailLogo({
 	size = "md",
 	showText = true,
@@ -96,30 +84,48 @@ export function EmailLogo({
 	showText?: boolean;
 }) {
 	const sizes = {
-		sm: { width: "24px", height: "24px", fontSize: "10px", textSize: "18px" },
-		md: { width: "32px", height: "32px", fontSize: "12px", textSize: "20px" },
-		lg: { width: "48px", height: "48px", fontSize: "16px", textSize: "24px" },
+		sm: { container: "28px", icon: "16px", textSize: "18px" },
+		md: { container: "36px", icon: "20px", textSize: "20px" },
+		lg: { container: "48px", icon: "28px", textSize: "24px" },
 	};
 
 	const currentSize = sizes[size];
+	const iconSize = Number.parseInt(currentSize.icon);
 
 	return (
 		<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
 			<div
 				style={{
-					width: currentSize.width,
-					height: currentSize.height,
+					width: currentSize.container,
+					height: currentSize.container,
 					borderRadius: "8px",
 					background: `linear-gradient(135deg, ${BRAND_CONFIG.colors.primary} 0%, ${BRAND_CONFIG.colors.secondary} 100%)`,
 					display: "flex",
 					alignItems: "center",
 					justifyContent: "center",
-					color: "white",
-					fontWeight: "bold",
-					fontSize: currentSize.fontSize,
 				}}
 			>
-				{BRAND_CONFIG.name.substring(0, 2)}
+				{/* Inline SVG for Store icon - compatible with email clients */}
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width={iconSize}
+					height={iconSize}
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="white"
+					strokeWidth="2"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					role="img"
+					aria-label={BRAND_CONFIG.name}
+				>
+					<title>{BRAND_CONFIG.name}</title>
+					<path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7" />
+					<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+					<path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" />
+					<path d="M2 7h20" />
+					<path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7" />
+				</svg>
 			</div>
 			{showText && (
 				<span
@@ -182,9 +188,9 @@ export function EmailCompanyInfo({
 	style = {},
 }: {
 	variant?: "full" | "contact" | "minimal";
-	style?: React.CSSProperties;
+	style?: CSSProperties;
 }) {
-	const baseStyle: React.CSSProperties = {
+	const baseStyle: CSSProperties = {
 		fontFamily: "Arial, sans-serif",
 		color: BRAND_CONFIG.colors.gray[600],
 		fontSize: "14px",
@@ -314,7 +320,7 @@ export function EmailButton({
 	size = "md",
 }: {
 	href: string;
-	children: React.ReactNode;
+	children: ReactNode;
 	variant?: "primary" | "secondary" | "outline";
 	size?: "sm" | "md" | "lg";
 }) {

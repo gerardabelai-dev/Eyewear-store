@@ -8,6 +8,16 @@ import { mapInvalidZodResponse } from "@/app/api/utils/map-invalid-zod-response"
 import { db } from "@/lib/db";
 import { product, productPrice } from "@/lib/db/schema";
 
+const corsHeaders = {
+	"Access-Control-Allow-Origin": "*",
+	"Access-Control-Allow-Methods": "GET, OPTIONS",
+	"Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
+export async function OPTIONS() {
+	return NextResponse.json({}, { headers: corsHeaders });
+}
+
 const getProductBySlugSchema = z.object({
 	productSlug: z.string(),
 });
@@ -44,12 +54,11 @@ export async function GET(
 	});
 
 	if (!productFound) {
-		return Response.json(mapErrorCodes(ERROR_CODES.PRODUCT_NOT_FOUND), {
+		return NextResponse.json(mapErrorCodes(ERROR_CODES.PRODUCT_NOT_FOUND), {
 			status: HTTP_CODES.NOT_FOUND,
+			headers: corsHeaders,
 		});
 	}
 
-	return NextResponse.json({
-		product: productFound,
-	});
+	return NextResponse.json({ product: productFound }, { headers: corsHeaders });
 }

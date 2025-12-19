@@ -20,7 +20,6 @@ export const getProductBySlugQueryOptions = (productSlug: string) =>
 			}
 
 			const { product } = (await response.json()) as GetProductBySlugResponse;
-			console.log(product);
 
 			return product;
 		},
