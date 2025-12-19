@@ -65,9 +65,7 @@ const PrescriptionReminderEmail = ({
 
 						{/* Main Content */}
 						<Section className="bg-white rounded-lg shadow-sm p-8 mb-6">
-							<Text className="text-gray-900 mb-4">
-								Olá, {customerName}!
-							</Text>
+							<Text className="text-gray-900 mb-4">Olá, {customerName}!</Text>
 
 							<Text className="text-gray-700 mb-4">
 								Notamos que você ainda não enviou a receita médica para os
@@ -104,8 +102,8 @@ const PrescriptionReminderEmail = ({
 							</Section>
 
 							<Text className="text-gray-700 mb-4">
-								Para darmos continuidade ao seu pedido, precisamos que você envie
-								a receita médica o quanto antes. É rápido e fácil!
+								Para darmos continuidade ao seu pedido, precisamos que você
+								envie a receita médica o quanto antes. É rápido e fácil!
 							</Text>
 
 							<Text className="text-gray-700 mb-6">
@@ -133,9 +131,7 @@ const PrescriptionReminderEmail = ({
 
 						{/* Help Section */}
 						<Section className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-							<Text className="text-blue-900 font-semibold mb-2">
-								💡 Dica
-							</Text>
+							<Text className="text-blue-900 font-semibold mb-2">💡 Dica</Text>
 							<Text className="text-blue-800 text-sm mb-0">
 								Se você não tem uma cópia digital da sua receita, basta tirar
 								uma foto com o seu celular e fazer o upload. Certifique-se de

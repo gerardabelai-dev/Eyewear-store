@@ -299,8 +299,8 @@ const PaymentConfirmedEmail = ({
 									</Heading>
 									<Text className="text-[#666] text-[14px] leading-[20px] mb-[16px] m-0">
 										Alguns produtos do seu pedido requerem receita médica. Por
-										favor, envie sua receita o quanto antes para que possamos dar
-										continuidade ao seu pedido.
+										favor, envie sua receita o quanto antes para que possamos
+										dar continuidade ao seu pedido.
 									</Text>
 									<Button
 										href={prescriptionUploadUrl}

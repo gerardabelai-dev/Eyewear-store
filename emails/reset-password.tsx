@@ -62,8 +62,8 @@ const ResetPasswordEmail = ({
 
 							<Text className="text-[#333] text-[16px] leading-[24px] mb-[20px]">
 								Recebemos uma solicitação para redefinir a senha da sua conta na{" "}
-								{brandName}. Se você fez essa solicitação, clique no botão abaixo
-								para criar uma nova senha:
+								{brandName}. Se você fez essa solicitação, clique no botão
+								abaixo para criar uma nova senha:
 							</Text>
 
 							<Section className="text-center my-[32px]">

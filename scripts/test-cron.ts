@@ -13,7 +13,8 @@ async function testCronJob() {
 	console.log("🧪 Testing prescription reminder cron job...\n");
 
 	const baseUrl = process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000";
-	const cronSecret = process.env.CRON_SECRET || "your-secret-key-here-change-in-production";
+	const cronSecret =
+		process.env.CRON_SECRET || "your-secret-key-here-change-in-production";
 
 	console.log(`📍 Base URL: ${baseUrl}`);
 	console.log(`🔑 Using CRON_SECRET: ${cronSecret.substring(0, 10)}...\n`);
@@ -29,7 +30,9 @@ async function testCronJob() {
 			},
 		);
 
-		console.log(`📊 Response Status: ${response.status} ${response.statusText}\n`);
+		console.log(
+			`📊 Response Status: ${response.status} ${response.statusText}\n`,
+		);
 
 		const data = await response.json();
 
