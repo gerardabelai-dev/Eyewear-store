@@ -2,8 +2,7 @@
 
 A modern, full-stack e-commerce platform for eyewear built with Next.js 15, featuring a customer storefront, checkout flow with Stripe payments, and an admin panel.
 
-<!-- TODO: Add hero screenshot -->
-<!-- ![ACME Eyewear Store](./docs/screenshots/hero.png) -->
+![ACME Eyewear Store](./docs/screenshots/hero.png)
 
 ## Features
 
@@ -16,10 +15,9 @@ A modern, full-stack e-commerce platform for eyewear built with Next.js 15, feat
 - **Guest Checkout** - Complete purchases without creating an account
 - **Order History** - View past orders and track delivery status
 
-<!-- TODO: Add storefront screenshots -->
-<!-- ![Product Catalog](./docs/screenshots/catalog.png) -->
-<!-- ![Product Details](./docs/screenshots/product-details.png) -->
-<!-- ![Shopping Cart](./docs/screenshots/cart.png) -->
+![Product Catalog](./docs/screenshots/catalog.png)
+![Product Details](./docs/screenshots/product-details.png)
+![Shopping Cart](./docs/screenshots/cart.png)
 
 ### Authentication
 
@@ -37,9 +35,8 @@ A modern, full-stack e-commerce platform for eyewear built with Next.js 15, feat
 - **Coupon System** - Apply discount codes with various rules
 - **Order Confirmation** - Email notifications on successful orders
 
-<!-- TODO: Add checkout screenshots -->
-<!-- ![Checkout Flow](./docs/screenshots/checkout.png) -->
-<!-- ![Payment](./docs/screenshots/payment.png) -->
+![Checkout Flow](./docs/screenshots/checkout.png)
+![Payment](./docs/screenshots/payment.png)
 
 ### Prescription Management
 
