@@ -16,8 +16,9 @@ import {
 // biome-ignore lint/correctness/noUnusedImports: react-email
 import * as React from "react";
 
-const baseUrl = process.env.WEB_URL || "https://drvista.com.br";
-const logoUrl = `${baseUrl}/api/images/proxy?url=${encodeURIComponent("https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/branding/drvista-logo.png")}&w=200&q=80`;
+const baseUrl = process.env.WEB_URL || "https://acme.com";
+const brandName = "ACME";
+const logoUrl = `${baseUrl}/static/acme-logo.png`;
 
 interface PrescriptionProduct {
 	name: string;
@@ -51,7 +52,7 @@ const PrescriptionReminderEmail = ({
 							<Img
 								src={logoUrl}
 								width="150"
-								alt="Dr. Vista"
+								alt={brandName}
 								className="mx-auto mb-6"
 							/>
 							<Heading className="text-2xl font-bold text-gray-900 text-center mb-2">
@@ -155,7 +156,7 @@ const PrescriptionReminderEmail = ({
 								</Link>
 							</Text>
 							<Text className="text-gray-500 text-xs mb-2">
-								Dr. Vista - Óculos de Qualidade
+								{brandName} - Óculos de Qualidade
 							</Text>
 							<Text className="text-gray-500 text-xs mb-0">
 								Este é um e-mail automático. Por favor, não responda.
@@ -186,5 +187,5 @@ PrescriptionReminderEmail.PreviewProps = {
 				"https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/products/colin-lloyd-uGS733o4Ukk-unsplash.jpg",
 		},
 	],
-	uploadUrl: "https://drvista.com.br/checkout/ord_abc123/success",
+	uploadUrl: `${baseUrl}/checkout/ord_abc123/success`,
 } as PrescriptionReminderEmailProps;

@@ -8,11 +8,11 @@ import type * as React from "react";
 
 // Brand configuration - centralized brand information
 export const BRAND_CONFIG = {
-	name: "Dr. Vista",
+	name: "ACME",
 	cnpj: "12.345.678/0001-90",
 	tagline: "Sua ótica online de confiança",
-	email: "contato@drvista.com.br",
-	website: "https://www.drvista.com.br",
+	email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "contato@acme.com",
+	website: process.env.NEXT_PUBLIC_WEB_URL || "https://www.acme.com",
 	phone: "+55 (11) 1234-5678",
 	address: "Rua Exemplo, 123 - Centro, São Paulo - SP, 01234-567",
 	colors: {
@@ -34,10 +34,10 @@ export const BRAND_CONFIG = {
 		text: "#1F2937",
 	},
 	social: {
-		twitter: "https://twitter.com/drvista",
-		linkedin: "https://linkedin.com/company/drvista",
-		instagram: "https://instagram.com/drvista",
-		facebook: "https://facebook.com/drvista",
+		twitter: "https://twitter.com/acme",
+		linkedin: "https://linkedin.com/company/acme",
+		instagram: "https://instagram.com/acme",
+		facebook: "https://facebook.com/acme",
 	},
 };
 
@@ -54,8 +54,8 @@ export function AppLogo({
 		return (
 			<div className={`flex items-center ${className}`}>
 				<Image
-					src="/drvista-favicon.svg"
-					alt="Dr. Vista"
+					src="/acme-favicon.svg"
+					alt={BRAND_CONFIG.name}
 					width={32}
 					height={32}
 					className="object-contain size-8"
@@ -69,16 +69,16 @@ export function AppLogo({
 		<div className={`flex items-center ${className}`}>
 			{/* Light theme logo - hidden in dark mode */}
 			<Image
-				src="/drvista-logo-light.svg"
-				alt="Dr. Vista"
+				src="/acme-logo-light.svg"
+				alt={BRAND_CONFIG.name}
 				width={140}
 				height={32}
 				className="object-contain w-28 dark:hidden"
 			/>
 			{/* Dark theme logo - hidden in light mode */}
 			<Image
-				src="/drvista-logo-dark.svg"
-				alt="Dr. Vista"
+				src="/acme-logo-dark.svg"
+				alt={BRAND_CONFIG.name}
 				width={140}
 				height={32}
 				className="object-contain w-28 hidden dark:block"
@@ -119,7 +119,7 @@ export function EmailLogo({
 					fontSize: currentSize.fontSize,
 				}}
 			>
-				Dr
+				{BRAND_CONFIG.name.substring(0, 2)}
 			</div>
 			{showText && (
 				<span

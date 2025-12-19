@@ -1,4 +1,4 @@
-# Inventário de Funcionalidades - Dr. Vista E-commerce
+# Inventário de Funcionalidades - ACME E-commerce
 
 > Documento detalhado de todas as funcionalidades implementadas e pendentes para lançamento em produção.
 >

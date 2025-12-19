@@ -153,7 +153,7 @@ export async function handlePaymentSuccess(
 			);
 			const unitPrice = basePrice + subItemsTotal;
 
-			const baseUrl = process.env.WEB_URL || "https://drvista.com.br";
+			const baseUrl = process.env.WEB_URL || "https://acme.com";
 			const originalImageUrl = group.parent.product.images?.[0]?.imageUrl || "";
 			const proxyImageUrl = originalImageUrl
 				? `${baseUrl}/api/images/proxy?url=${encodeURIComponent(originalImageUrl)}&w=200&q=60`
@@ -174,11 +174,13 @@ export async function handlePaymentSuccess(
 		});
 
 		// Prepare prescription parameters
-		const baseUrl = process.env.WEB_URL || "https://drvista.com.br";
+		const baseUrl = process.env.WEB_URL || "https://acme.com";
+		const brandName = "ACME";
+		const fromEmail = process.env.CONTACT_EMAIL || "contato@acme.com";
 		const prescriptionUploadUrl = `${baseUrl}/checkout/${orderPaymentFound.order.id}/success`;
 
 		const { error } = await resend.emails.send({
-			from: "Dr. Vista <contato@drvista.com.br>",
+			from: `${brandName} <${fromEmail}>`,
 			to: [orderPaymentFound.order.customer?.user?.email || ""],
 			subject: "Seu pagamento foi realizado com sucesso!",
 			react: PaymentConfirmedEmail({

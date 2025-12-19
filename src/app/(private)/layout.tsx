@@ -9,7 +9,7 @@ import { getCurrentUser } from "@/lib/auth-server";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-	title: "Dr. Vista - Plataforma de Autenticação Segura",
+	title: "ACME - Plataforma de Autenticação Segura",
 	description:
 		"Sistema administrativo moderno com autenticação segura e interface intuitiva para gestão completa",
 };

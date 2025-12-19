@@ -32,52 +32,36 @@ export async function POST(request: Request) {
 		const cartProductId = formData.get("cartProductId") as string;
 
 		if (!file) {
-			return NextResponse.json(
-				mapErrorCodes({
-					code: "PRESCRIPTION_UPLOAD_FAILED",
-					message: "No file provided",
-				}),
-				{ status: HTTP_CODES.BAD_REQUEST },
-			);
+			return NextResponse.json(mapErrorCodes("PRESCRIPTION_UPLOAD_FAILED"), {
+				status: HTTP_CODES.BAD_REQUEST,
+			});
 		}
 
 		// Validate file size
 		if (file.size > MAX_FILE_SIZE) {
-			return NextResponse.json(
-				mapErrorCodes({
-					code: "PRESCRIPTION_UPLOAD_FAILED",
-					message: "File size exceeds 5MB limit",
-				}),
-				{ status: HTTP_CODES.BAD_REQUEST },
-			);
+			return NextResponse.json(mapErrorCodes("PRESCRIPTION_UPLOAD_FAILED"), {
+				status: HTTP_CODES.BAD_REQUEST,
+			});
 		}
 
 		// Validate file type
 		if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-			return NextResponse.json(
-				mapErrorCodes({
-					code: "PRESCRIPTION_UPLOAD_FAILED",
-					message: `Invalid file type. Allowed types: PDF, JPG, PNG, HEIC`,
-				}),
-				{ status: HTTP_CODES.BAD_REQUEST },
-			);
+			return NextResponse.json(mapErrorCodes("PRESCRIPTION_UPLOAD_FAILED"), {
+				status: HTTP_CODES.BAD_REQUEST,
+			});
 		}
 
 		// Validate schema
-		const { success, error, data } = uploadPrescriptionSchema.safeParse({
+		const { success, data } = uploadPrescriptionSchema.safeParse({
 			orderId,
 			cartProductId,
 			filename: file.name,
 		});
 
 		if (!success) {
-			return NextResponse.json(
-				mapErrorCodes({
-					code: "PRESCRIPTION_UPLOAD_FAILED",
-					message: error.errors.map((e) => e.message).join(", "),
-				}),
-				{ status: HTTP_CODES.BAD_REQUEST },
-			);
+			return NextResponse.json(mapErrorCodes("PRESCRIPTION_UPLOAD_FAILED"), {
+				status: HTTP_CODES.BAD_REQUEST,
+			});
 		}
 
 		// Generate file path: prescriptions/{orderId}_{cartProductId}_{original_filename}

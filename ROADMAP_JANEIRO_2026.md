@@ -1,6 +1,6 @@
 # Roadmap de Lançamento - Janeiro 2026
 
-> **Objetivo:** Lançar e-commerce Dr. Vista funcional até Janeiro 2026
+> **Objetivo:** Lançar e-commerce ACME funcional até Janeiro 2026
 >
 > **Contexto:** 8 horas/semana disponíveis, ~8 semanas até o prazo
 >

@@ -60,6 +60,7 @@ const getMockProducts = (): ProductWithCategory[] => [
 		subcategoryId: "1",
 		subcategoryName: "Notebooks",
 		subcategorySlug: "notebooks",
+		requiresPrescription: false,
 	},
 	{
 		id: "2",
@@ -79,6 +80,7 @@ const getMockProducts = (): ProductWithCategory[] => [
 		subcategoryId: "2",
 		subcategoryName: "Camisetas",
 		subcategorySlug: "camisetas",
+		requiresPrescription: false,
 	},
 	{
 		id: "3",
@@ -98,6 +100,7 @@ const getMockProducts = (): ProductWithCategory[] => [
 		subcategoryId: "3",
 		subcategoryName: "Móveis",
 		subcategorySlug: "moveis",
+		requiresPrescription: false,
 	},
 ];
 

@@ -19,7 +19,9 @@ import {
 import * as React from "react";
 import { formatPrice } from "@/lib/format-price";
 
-const baseUrl = process.env.WEB_URL || "https://drvista.com.br";
+const baseUrl = process.env.WEB_URL || "https://acme.com";
+const brandName = "ACME";
+const supportEmail = process.env.CONTACT_EMAIL || "atendimento@acme.com";
 
 interface OrderProductSubItem {
 	name: string;
@@ -76,8 +78,8 @@ const OrderConfirmedEmail = ({
 						{/* Header */}
 						<Section className="bg-white px-[40px] pt-[40px] pb-[20px]">
 							<Img
-								src={`${baseUrl}/static/drvista-logo.png`}
-								alt="Dr. Vista"
+								src={`${baseUrl}/static/acme-logo.png`}
+								alt={brandName}
 								width="200"
 								className="w-full max-w-[200px] mx-auto block"
 							/>
@@ -264,7 +266,7 @@ const OrderConfirmedEmail = ({
 
 						<Section className="px-[40px] pb-[40px]">
 							<Text className="text-[#666] text-[14px] leading-[20px] text-center mb-[16px] m-0">
-								Dr. Vista
+								{brandName}
 								<br />
 								Rua Pedro Porto, 31, Casa 2, Vila Arruda
 								<br />
@@ -273,22 +275,21 @@ const OrderConfirmedEmail = ({
 
 							<Text className="text-[#666] text-[14px] leading-[20px] text-center mb-[16px]">
 								<Link
-									href="https://drvista.com.br"
+									href={baseUrl}
 									className="text-[#34A759]"
 									style={{ textDecoration: "none" }}
 								>
-									drvista.com.br
+									{baseUrl.replace("https://", "")}
 								</Link>
 							</Text>
 
 							<Text className="text-[#666] text-[12px] leading-[16px] text-center mb-[8px]">
-								© 2025 Dr. Vista. Todos os direitos reservados.
+								© 2025 {brandName}. Todos os direitos reservados.
 							</Text>
 
 							<Text className="text-[#666] text-[12px] leading-[16px] text-center m-0">
 								Se você recebeu este e-mail por engano, por favor, desconsidere
-								e entre em contato com nosso suporte pelo e-mail
-								atendimento@drvista.com.br
+								e entre em contato com nosso suporte pelo e-mail {supportEmail}
 							</Text>
 						</Section>
 					</Container>
@@ -300,13 +301,13 @@ const OrderConfirmedEmail = ({
 
 OrderConfirmedEmail.PreviewProps = {
 	customerName: "Maria Santos",
-	orderNumber: "DV-2025-001234",
+	orderNumber: "ACME-2025-001234",
 	orderDate: "05/01/2025 às 14:30",
 	products: [
 		{
 			name: "Incredible Steel Mouse",
 			image: "https://new.email/static/app/placeholder.png",
-			price: 66650, // Total: 1650 (base) + 15000 + 30000 + 20000
+			price: 66650,
 			quantity: 1,
 			prescription: "OD: -2.00 | OE: -1.75",
 			subItems: [
@@ -334,7 +335,7 @@ OrderConfirmedEmail.PreviewProps = {
 			quantity: 1,
 		},
 	],
-	subtotal: 85640, // 66650 + 18990
+	subtotal: 85640,
 	shipping: 1500,
 	total: 87140,
 	shippingAddress: {
@@ -343,7 +344,7 @@ OrderConfirmedEmail.PreviewProps = {
 		state: "SP",
 		zipCode: "01234-567",
 	},
-	trackingUrl: "https://drvista.com.br/pedidos/DV-2025-001234",
+	trackingUrl: `${baseUrl}/pedidos/ACME-2025-001234`,
 };
 
 export default OrderConfirmedEmail;

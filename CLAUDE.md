@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Dr. Vista e-commerce platform for eyewear (óculos) - Next.js 15 fullstack application with customer-facing storefront, checkout flow, and admin panel.
+ACME e-commerce platform for eyewear (óculos) - Next.js 15 fullstack application with customer-facing storefront, checkout flow, and admin panel.
 
 ## Key Commands
 

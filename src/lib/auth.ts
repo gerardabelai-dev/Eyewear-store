@@ -18,11 +18,13 @@ export const auth = betterAuth({
 		requireEmailVerification: false,
 		sendResetPassword: async ({ user, token }, _request) => {
 			const resetUrl = `${env.WEB_URL}/reset-password?token=${token}&email=${encodeURIComponent(user.email)}`;
+			const brandName = "ACME";
+			const fromEmail = process.env.CONTACT_EMAIL || "contato@acme.com";
 
 			const { data, error } = await resend.emails.send({
-				from: "Dr. Vista <contato@drvista.com.br>",
+				from: `${brandName} <${fromEmail}>`,
 				to: [user.email],
-				subject: "Redefinir senha - Dr. Vista",
+				subject: `Redefinir senha - ${brandName}`,
 				react: ResetPasswordEmail({
 					customerName: user.name,
 					resetPasswordUrl: resetUrl,
@@ -69,10 +71,13 @@ export const auth = betterAuth({
 		}),
 		magicLink({
 			sendMagicLink: async ({ email, url: _url, token: _token }, _request) => {
+				const brandName = "ACME";
+				const fromEmail = process.env.CONTACT_EMAIL || "contato@acme.com";
+
 				const { data, error } = await resend.emails.send({
-					from: "Dr. Vista <contato@drvista.com.br>",
+					from: `${brandName} <${fromEmail}>`,
 					to: [email],
-					subject: "Bem-vindo à Dr. Vista! Complete seu cadastro.",
+					subject: `Bem-vindo à ${brandName}! Complete seu cadastro.`,
 					react: CompleteRegistrationEmail({
 						customerName: email,
 						resetPasswordUrl: `${env.WEB_URL}/reset-password`,

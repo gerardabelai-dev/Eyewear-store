@@ -19,8 +19,10 @@ import {
 import * as React from "react";
 import { formatPrice } from "@/lib/format-price";
 
-const baseUrl = process.env.WEB_URL || "https://drvista.com.br";
-const logoUrl = `${baseUrl}/api/images/proxy?url=${encodeURIComponent("https://iujqf0zpqycuhvmp.public.blob.vercel-storage.com/branding/drvista-logo.png")}&w=200&q=80`;
+const baseUrl = process.env.WEB_URL || "https://acme.com";
+const brandName = "ACME";
+const supportEmail = process.env.CONTACT_EMAIL || "atendimento@acme.com";
+const logoUrl = `${baseUrl}/static/acme-logo.png`;
 
 interface OrderProductSubItem {
 	name: string;
@@ -88,7 +90,7 @@ const PaymentConfirmedEmail = ({
 						<Section className="bg-white px-[40px] pt-[40px] pb-[20px]">
 							<Img
 								src={logoUrl}
-								alt="Dr. Vista"
+								alt={brandName}
 								width="200"
 								className="w-full max-w-[200px] mx-auto block"
 							/>
@@ -354,11 +356,11 @@ const PaymentConfirmedEmail = ({
 									Dúvidas? Nossa equipe está aqui para ajudar!
 								</Text>
 								<Link
-									href="mailto:atendimento@drvista.com.br"
+									href={`mailto:${supportEmail}`}
 									className="text-[#34A759] text-[14px] font-semibold"
 									style={{ textDecoration: "none" }}
 								>
-									atendimento@drvista.com.br
+									{supportEmail}
 								</Link>
 							</Section>
 						</Section>
@@ -368,7 +370,7 @@ const PaymentConfirmedEmail = ({
 
 						<Section className="px-[40px] pb-[40px]">
 							<Text className="text-[#666] text-[14px] leading-[20px] text-center mb-[16px] m-0">
-								Dr. Vista
+								{brandName}
 								<br />
 								Rua Pedro Porto, 31, Casa 2, Vila Arruda
 								<br />
@@ -377,22 +379,21 @@ const PaymentConfirmedEmail = ({
 
 							<Text className="text-[#666] text-[14px] leading-[20px] text-center mb-[16px]">
 								<Link
-									href="https://drvista.com.br"
+									href={baseUrl}
 									className="text-[#34A759]"
 									style={{ textDecoration: "none" }}
 								>
-									drvista.com.br
+									{baseUrl.replace("https://", "")}
 								</Link>
 							</Text>
 
 							<Text className="text-[#666] text-[12px] leading-[16px] text-center mb-[8px]">
-								© 2025 Dr. Vista. Todos os direitos reservados.
+								© 2025 {brandName}. Todos os direitos reservados.
 							</Text>
 
 							<Text className="text-[#666] text-[12px] leading-[16px] text-center m-0">
 								Se você recebeu este e-mail por engano, por favor, desconsidere
-								e entre em contato com nosso suporte pelo e-mail
-								atendimento@drvista.com.br
+								e entre em contato com nosso suporte pelo e-mail {supportEmail}
 							</Text>
 						</Section>
 					</Container>
@@ -404,15 +405,14 @@ const PaymentConfirmedEmail = ({
 
 PaymentConfirmedEmail.PreviewProps = {
 	customerName: "Maria Silva",
-	orderNumber: "DV-2025-001234",
+	orderNumber: "ACME-2025-001234",
 	orderDate: "05/01/2025 às 14:30",
 	paymentMethod: "Cartão de Crédito",
 	products: [
 		{
 			name: "Incredible Steel Mouse",
-			image:
-				"https://drvista.com.br/api/images/proxy?url=https%3A%2F%2Fnew.email%2Fstatic%2Fapp%2Fplaceholder.png&w=200&q=60",
-			price: 66650, // Total: 1650 (base) + 15000 + 30000 + 20000
+			image: `${baseUrl}/api/images/proxy?url=https%3A%2F%2Fnew.email%2Fstatic%2Fapp%2Fplaceholder.png&w=200&q=60`,
+			price: 66650,
 			quantity: 1,
 			prescription: "OD: -2.00 | OE: -1.75",
 			subItems: [
@@ -435,17 +435,16 @@ PaymentConfirmedEmail.PreviewProps = {
 		},
 		{
 			name: "Óculos de Sol Premium",
-			image:
-				"https://drvista.com.br/api/images/proxy?url=https%3A%2F%2Fnew.email%2Fstatic%2Fapp%2Fplaceholder.png&w=200&q=60",
+			image: `${baseUrl}/api/images/proxy?url=https%3A%2F%2Fnew.email%2Fstatic%2Fapp%2Fplaceholder.png&w=200&q=60`,
 			price: 18990,
 			quantity: 1,
 		},
 	],
-	subtotal: 85640, // 66650 + 18990
+	subtotal: 85640,
 	shipping: 1500,
-	discount: 8564, // 10% discount
+	discount: 8564,
 	couponCode: "WELCOME10",
-	total: 78576, // 85640 + 1500 - 8564
+	total: 78576,
 	shippingAddress: {
 		street: "Rua das Flores, 123, Apto 45",
 		city: "São Paulo",

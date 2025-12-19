@@ -4,7 +4,7 @@ import { ROUTES } from "@/constants/routes";
 import { getCurrentUser } from "@/lib/auth-server";
 
 export const metadata: Metadata = {
-	title: "Dr. Vista - Administração",
+	title: "ACME - Administração",
 	description: "Sistema administrativo moderno para gestão completa",
 };
 

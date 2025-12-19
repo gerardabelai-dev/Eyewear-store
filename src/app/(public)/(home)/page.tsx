@@ -313,7 +313,7 @@ export default async function HomePage() {
 
 						<h3 className="text-md md:text-xl font-medium">
 							<TextAnimate animation="blurInUp" by="word" delay={1.3} once>
-								CUPOM: DRVISTA2025
+								CUPOM: ACME2025
 							</TextAnimate>
 						</h3>
 					</div>
@@ -485,7 +485,7 @@ export default async function HomePage() {
 			<section className="bg-muted p-2 py-20 mt-4 grid items-center justify-items-center gap-8 mx-auto">
 				<div className="grid gap-4">
 					<h2 className="text-lg md:text-3xl text-center font-bold">
-						Blog do Dr. Vista
+						Blog da ACME
 					</h2>
 				</div>
 

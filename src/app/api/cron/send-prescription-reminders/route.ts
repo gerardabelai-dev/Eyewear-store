@@ -89,7 +89,9 @@ export async function GET(request: Request) {
 					continue;
 				}
 
-				const baseUrl = process.env.WEB_URL || "https://drvista.com.br";
+				const baseUrl = process.env.WEB_URL || "https://acme.com";
+				const brandName = "ACME";
+				const fromEmail = process.env.CONTACT_EMAIL || "contato@acme.com";
 				const uploadUrl = `${baseUrl}/checkout/${orderRecord.id}/success`;
 
 				// Prepare products for email
@@ -107,7 +109,7 @@ export async function GET(request: Request) {
 
 				// Send email
 				const { error } = await resend.emails.send({
-					from: "Dr. Vista <contato@drvista.com.br>",
+					from: `${brandName} <${fromEmail}>`,
 					to: [orderRecord.customer.user.email],
 					subject: `Lembrete: Envie sua receita - Pedido #${orderRecord.id}`,
 					react: PrescriptionReminderEmail({
