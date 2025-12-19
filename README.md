@@ -2,7 +2,7 @@
 
 A modern, full-stack e-commerce platform for eyewear built with Next.js 15, featuring a customer storefront, checkout flow with Stripe payments, and an admin panel.
 
-![ACME Eyewear Store](./docs/screenshots/hero.png)
+![ACME Eyewear Store](./docs/screenshots/hero.jpg)
 
 ## Features
 
@@ -15,9 +15,9 @@ A modern, full-stack e-commerce platform for eyewear built with Next.js 15, feat
 - **Guest Checkout** - Complete purchases without creating an account
 - **Order History** - View past orders and track delivery status
 
-![Product Catalog](./docs/screenshots/catalog.png)
-![Product Details](./docs/screenshots/product-details.png)
-![Shopping Cart](./docs/screenshots/cart.png)
+![Product Catalog](./docs/screenshots/catalog.jpg)
+![Product Details](./docs/screenshots/product-details.jpg)
+![Shopping Cart](./docs/screenshots/cart.jpg)
 
 ### Authentication
 
@@ -35,8 +35,8 @@ A modern, full-stack e-commerce platform for eyewear built with Next.js 15, feat
 - **Coupon System** - Apply discount codes with various rules
 - **Order Confirmation** - Email notifications on successful orders
 
-![Checkout Flow](./docs/screenshots/checkout.png)
-![Payment](./docs/screenshots/payment.png)
+![Checkout Flow](./docs/screenshots/checkout.jpg)
+![Payment](./docs/screenshots/payment.jpg)
 
 ### Prescription Management
 
@@ -53,9 +53,9 @@ A modern, full-stack e-commerce platform for eyewear built with Next.js 15, feat
 - **Category Management** - Organize products into categories
 
 <!-- TODO: Add admin screenshots -->
-<!-- ![Admin Dashboard](./docs/screenshots/admin-dashboard.png) -->
-<!-- ![Order Management](./docs/screenshots/admin-orders.png) -->
-<!-- ![Product Management](./docs/screenshots/admin-products.png) -->
+<!-- ![Admin Dashboard](./docs/screenshots/admin-dashboard.jpg) -->
+<!-- ![Order Management](./docs/screenshots/admin-orders.jpg) -->
+<!-- ![Product Management](./docs/screenshots/admin-products.jpg) -->
 
 ### Email System
 
